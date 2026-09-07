@@ -1,7 +1,8 @@
 import { createWorker, type Worker } from 'tesseract.js';
 
 import { normaliseBbox } from './bbox';
-import type { OCRWord } from './types';
+import { groupWordsIntoLines } from './ocr-lines';
+import type { OCRLine, OCRWord } from './types';
 
 let worker: Worker | null = null;
 
@@ -13,7 +14,13 @@ async function getWorker(onProgress?: (progress: number) => void): Promise<Worke
   return worker;
 }
 
-export interface OCRRunResult { words: OCRWord[]; imageDataUrl: string; imageWidth: number; imageHeight: number; }
+export interface OCRRunResult {
+  words: OCRWord[];
+  lines: OCRLine[];
+  imageDataUrl: string;
+  imageWidth: number;
+  imageHeight: number;
+}
 
 export async function runOCR(file: File, onProgress?: (progress: number) => void): Promise<OCRRunResult> {
   const imageDataUrl = await new Promise<string>((resolve, reject) => {
@@ -38,5 +45,11 @@ export async function runOCR(file: File, onProgress?: (progress: number) => void
       bbox: normaliseBbox([x0, y0, x1 - x0, y1 - y0], dimensions.width, dimensions.height),
     };
   });
-  return { words, imageDataUrl, imageWidth: dimensions.width, imageHeight: dimensions.height };
+  return {
+    words,
+    lines: groupWordsIntoLines(words),
+    imageDataUrl,
+    imageWidth: dimensions.width,
+    imageHeight: dimensions.height,
+  };
 }

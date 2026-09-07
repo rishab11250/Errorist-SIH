@@ -528,13 +528,14 @@ git commit -m "feat: define versioned inspection analysis contract"
 **Files:**
 - Create: `frontend/lib/ocr-lines.ts`
 - Modify: `frontend/lib/ocr.ts`
+- Modify: `frontend/vitest.config.ts`
 - Create: `frontend/tests/ocr-lines.test.ts`
 
 **Interfaces:**
 - Consumes: normalized `OCRWord[]`.
 - Produces: `groupWordsIntoLines(words: OCRWord[]): OCRLine[]` and `OCRRunResult.lines`.
 
-- [ ] **Step 1: Write line-grouping tests**
+- [x] **Step 1: Write line-grouping tests**
 
 Create `frontend/tests/ocr-lines.test.ts`:
 
@@ -561,13 +562,13 @@ describe('groupWordsIntoLines', () => {
 });
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/frontend && pnpm test:run -- tests/ocr-lines.test.ts`.
 
 Expected: FAIL because `ocr-lines.ts` does not exist.
 
-- [ ] **Step 3: Implement deterministic grouping**
+- [x] **Step 3: Implement deterministic grouping**
 
 Create `frontend/lib/ocr-lines.ts` with this public algorithm:
 
@@ -608,7 +609,7 @@ export function groupWordsIntoLines(words: OCRWord[]): OCRLine[] {
 
 Add `lines: OCRLine[]` to `OCRRunResult` and return `groupWordsIntoLines(words)` from `runOCR`.
 
-- [ ] **Step 4: Run tests and type checking**
+- [x] **Step 4: Run tests and type checking**
 
 Run:
 
@@ -620,10 +621,10 @@ pnpm exec tsc --noEmit
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
-git add frontend/lib/ocr-lines.ts frontend/lib/ocr.ts frontend/lib/types.ts frontend/tests/ocr-lines.test.ts
+git add frontend/lib/ocr-lines.ts frontend/lib/ocr.ts frontend/lib/types.ts frontend/vitest.config.ts frontend/tests/ocr-lines.test.ts docs/superpowers/plans/2026-09-07-inspection-intelligence.md
 git commit -m "feat(frontend): retain OCR line geometry"
 ```
 

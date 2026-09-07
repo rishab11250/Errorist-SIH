@@ -23,7 +23,10 @@ def list_history(
         {
             "scan_id": scan.id,
             "thumbnail_b64": scan.image_b64[:200] + "..." if len(scan.image_b64) > 200 else scan.image_b64,
+            "thumbnail": scan.image_b64[:200] + "..." if len(scan.image_b64) > 200 else scan.image_b64,
             "overall_status": scan.overall_status,
+            "verdict_count": len(scan.verdicts),
+            "product": None,
             "verdict_summary": {
                 "pass": sum(verdict.status == "pass" for verdict in scan.verdicts),
                 "fail": sum(verdict.status == "fail" for verdict in scan.verdicts),

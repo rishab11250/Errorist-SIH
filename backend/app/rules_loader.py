@@ -80,6 +80,11 @@ def load_rules(path: str | Path) -> RulesConfig:
         for other_key, other_vset in versions.items():
             if key != other_key and vset.effective_from == other_vset.effective_from:
                 raise RulesLoadError(f"font_size_rules.{key} and .{other_key} share effective_from")
+            if key != other_key:
+                vset_end = vset.superseded_date or "9999-12-31"
+                other_end = other_vset.superseded_date or "9999-12-31"
+                if vset.effective_from < other_end and other_vset.effective_from < vset_end:
+                    raise RulesLoadError(f"font_size_rules.{key} and .{other_key} have overlapping effective ranges")
     exemption = fsr.get("exemption", {})
     font_size = FontSizeRules(versions, default_v, bool(exemption.get("applies_when_another_law_governs", False)),
                               list(exemption.get("exempted_declarations", [])), list(exemption.get("exempted_categories", [])))

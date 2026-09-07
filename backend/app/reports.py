@@ -8,6 +8,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import cm
+from reportlab.lib.utils import ImageReader
 from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from app.db import Scan
@@ -25,8 +26,38 @@ def _decode_image(image_b64: str) -> io.BytesIO | None:
         return None
 
 
-def _draw_annotated_image(canvas, doc, scan: Scan) -> None:  # noqa: ANN001, ARG001
-    """Reserved for Task 14 annotation rendering; intentionally not wired yet."""
+def _draw_annotated_image(canvas, doc, scan: Scan) -> None:  # noqa: ANN001
+    """Render the stored label and normalised verdict boxes on page two."""
+    if doc.page != 2:
+        return
+    image = _decode_image(scan.image_b64)
+    if image is None:
+        return
+    try:
+        from PIL import Image as PILImage
+
+        pil_image = PILImage.open(image)
+        image_width, image_height = pil_image.size
+        image.seek(0)
+    except Exception:
+        return
+    available_width, available_height = A4[0] - 4 * cm, A4[1] - 8 * cm
+    scale = min(available_width / image_width, available_height / image_height)
+    draw_width, draw_height = image_width * scale, image_height * scale
+    x_offset, y_offset = 2 * cm, A4[1] - 4 * cm - draw_height
+    canvas.drawImage(ImageReader(image), x_offset, y_offset, width=draw_width, height=draw_height)
+    for verdict in scan.verdicts:
+        canvas.setStrokeColor(STATUS_COLOUR.get(verdict.status, colors.black))
+        canvas.setLineWidth(1.5)
+        for x, y, width, height in verdict.evidence_bboxes:
+            canvas.rect(
+                x_offset + x * draw_width,
+                y_offset + draw_height - (y + height) * draw_height,
+                width * draw_width,
+                height * draw_height,
+                stroke=1,
+                fill=0,
+            )
 
 
 def build_report(scan: Scan) -> bytes:
@@ -85,5 +116,9 @@ def build_report(scan: Scan) -> bytes:
             styles["Normal"],
         ),
     ])
-    document.build(elements, onFirstPage=lambda canvas, doc: None, onLaterPages=lambda canvas, doc: None)
+    document.build(
+        elements,
+        onFirstPage=lambda canvas, doc: None,
+        onLaterPages=lambda canvas, doc: _draw_annotated_image(canvas, doc, scan),
+    )
     return buffer.getvalue()

@@ -204,7 +204,7 @@ git commit -m "feat(backend): add users sessions and review schema"
 **Interfaces:**
 - Produces: `hash_password`, `verify_password`, `issue_session`, `resolve_session`, `revoke_session`, and `AuthSettings`.
 
-- [ ] **Step 1: Write service tests**
+- [x] **Step 1: Write service tests**
 
 ```python
 def test_password_hash_is_argon2_and_verifies():
@@ -230,13 +230,13 @@ def test_expired_and_revoked_sessions_do_not_resolve(db_session, inspector):
     assert resolve_session(db_session, second.token, now=NOW) is None
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_auth_services.py -q`.
 
 Expected: FAIL because auth services do not exist.
 
-- [ ] **Step 3: Implement password and session primitives**
+- [x] **Step 3: Implement password and session primitives**
 
 Use one configured `argon2.PasswordHasher`, normalize usernames with `unicodedata.normalize("NFKC", value).casefold().strip()`, create tokens with `secrets.token_urlsafe(32)`, and hash them with SHA-256 before storage:
 
@@ -261,7 +261,7 @@ def resolve_session(session: Session, token: str, *, now: datetime) -> User | No
 
 `AuthSettings` reads `LMPC_SESSION_HOURS` default `8`, `LMPC_COOKIE_SECURE` default `false`, `LMPC_COOKIE_NAME` default `lmpc_session`, upload limits, database path, and backend origin. Parse booleans strictly as `true/false/1/0` and reject invalid values on startup.
 
-- [ ] **Step 4: Run focused tests**
+- [x] **Step 4: Run focused tests**
 
 Run:
 
@@ -273,7 +273,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/app/auth backend/app/settings.py backend/tests/test_auth_services.py

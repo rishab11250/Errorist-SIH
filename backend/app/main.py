@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.db import init_db
+from app.dashboard_routes import router as dashboard_router
 from app.models import HealthResponse
 from app.rules_loader import get_active_rules, load_rules, set_active_rules
 from app.scan_routes import router as scan_router
@@ -39,6 +40,7 @@ app.add_middleware(
 )
 
 app.include_router(scan_router)
+app.include_router(dashboard_router)
 
 
 @app.get("/api/health", response_model=HealthResponse)

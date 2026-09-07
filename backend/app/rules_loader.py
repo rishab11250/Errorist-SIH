@@ -1,4 +1,5 @@
 """Load and validate rules.yaml into RulesConfig."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,8 +7,15 @@ from typing import Any
 
 import yaml
 
-from app.domain import (CheckConfig, ConfidenceThresholds, FontSizeBracket, FontSizeRules,
-                        FontSizeRuleSet, FontSizeTable, RulesConfig)
+from app.domain import (
+    CheckConfig,
+    ConfidenceThresholds,
+    FontSizeBracket,
+    FontSizeRules,
+    FontSizeRuleSet,
+    FontSizeTable,
+    RulesConfig,
+)
 
 
 class RulesLoadError(ValueError):
@@ -19,8 +27,13 @@ def _parse_brackets(raw: list[dict[str, Any]], field: str) -> list[FontSizeBrack
     for i, row in enumerate(raw):
         if "normal_mm" not in row or "blown_mm" not in row:
             raise RulesLoadError(f"{field}[{i}]: missing normal_mm or blown_mm")
-        out.append(FontSizeBracket(max_value=row.get("max_g_or_ml") or row.get("max_cm2"),
-                                   normal_mm=float(row["normal_mm"]), blown_mm=float(row["blown_mm"])))
+        out.append(
+            FontSizeBracket(
+                max_value=row.get("max_g_or_ml") or row.get("max_cm2"),
+                normal_mm=float(row["normal_mm"]),
+                blown_mm=float(row["blown_mm"]),
+            )
+        )
     return out
 
 
@@ -31,28 +44,61 @@ def _parse_font_size_set(key: str, raw: dict[str, Any]) -> FontSizeRuleSet:
     table_I = None
     table_II = None
     if "table_I_weight_volume" in raw:
-        table_I = FontSizeTable(_parse_brackets(raw["table_I_weight_volume"]["brackets"], f"{key}.table_I_weight_volume"))
+        table_I = FontSizeTable(
+            _parse_brackets(
+                raw["table_I_weight_volume"]["brackets"], f"{key}.table_I_weight_volume"
+            )
+        )
     if "table_II_length_area_number" in raw:
-        table_II = FontSizeTable(_parse_brackets(raw["table_II_length_area_number"]["brackets"], f"{key}.table_II_length_area_number"))
+        table_II = FontSizeTable(
+            _parse_brackets(
+                raw["table_II_length_area_number"]["brackets"], f"{key}.table_II_length_area_number"
+            )
+        )
     if "table_I" in raw:
         table_I = FontSizeTable(_parse_brackets(raw["table_I"]["brackets"], f"{key}.table_I"))
-    return FontSizeRuleSet(key, citation, effective_from, raw.get("superseded_date"), table_I, table_II,
-                           raw.get("letter_min_mm"), raw.get("letter_blown_min_mm"))
+    return FontSizeRuleSet(
+        key,
+        citation,
+        effective_from,
+        raw.get("superseded_date"),
+        table_I,
+        table_II,
+        raw.get("letter_min_mm"),
+        raw.get("letter_blown_min_mm"),
+    )
 
 
 def _parse_check(raw: dict[str, Any]) -> CheckConfig:
-    required = {"rule_id", "citation", "field", "check_type", "severity", "requires", "failure_message"}
+    required = {
+        "rule_id",
+        "citation",
+        "field",
+        "check_type",
+        "severity",
+        "requires",
+        "failure_message",
+    }
     missing = required - raw.keys()
     if missing:
         raise RulesLoadError(f"check {raw.get('rule_id', '?')}: missing fields {missing}")
-    return CheckConfig(rule_id=raw["rule_id"], citation=raw["citation"], field=raw["field"],
-                       check_type=raw["check_type"], severity=raw["severity"], requires=list(raw["requires"]),
-                       failure_message=raw["failure_message"], tax_inclusive_phrase_regex=raw.get("tax_inclusive_phrase_regex"),
-                       requires_unit_in=raw.get("requires_unit_in"), pin_code_regex=raw.get("pin_code_regex"),
-                       email_regex=raw.get("email_regex"), phone_regex=raw.get("phone_regex"),
-                       date_format_regex=raw.get("date_format_regex"),
-                       skipped_when_category_in=raw.get("skipped_when_category_in"),
-                       skipped_when_mode=raw.get("skipped_when_mode"))
+    return CheckConfig(
+        rule_id=raw["rule_id"],
+        citation=raw["citation"],
+        field=raw["field"],
+        check_type=raw["check_type"],
+        severity=raw["severity"],
+        requires=list(raw["requires"]),
+        failure_message=raw["failure_message"],
+        tax_inclusive_phrase_regex=raw.get("tax_inclusive_phrase_regex"),
+        requires_unit_in=raw.get("requires_unit_in"),
+        pin_code_regex=raw.get("pin_code_regex"),
+        email_regex=raw.get("email_regex"),
+        phone_regex=raw.get("phone_regex"),
+        date_format_regex=raw.get("date_format_regex"),
+        skipped_when_category_in=raw.get("skipped_when_category_in"),
+        skipped_when_mode=raw.get("skipped_when_mode"),
+    )
 
 
 def load_rules(path: str | Path) -> RulesConfig:
@@ -72,10 +118,16 @@ def load_rules(path: str | Path) -> RulesConfig:
     fsr = raw.get("font_size_rules", {})
     if "default_version" not in fsr:
         raise RulesLoadError("font_size_rules.default_version required")
-    versions = {key: _parse_font_size_set(key, fsr[key]) for key in ("original_2011", "consolidated_post_2021") if key in fsr}
+    versions = {
+        key: _parse_font_size_set(key, fsr[key])
+        for key in ("original_2011", "consolidated_post_2021")
+        if key in fsr
+    }
     default_v = fsr["default_version"]
     if default_v not in versions:
-        raise RulesLoadError(f"default_version {default_v!r} not in defined versions {list(versions)}")
+        raise RulesLoadError(
+            f"default_version {default_v!r} not in defined versions {list(versions)}"
+        )
     for key, vset in versions.items():
         for other_key, other_vset in versions.items():
             if key != other_key and vset.effective_from == other_vset.effective_from:
@@ -84,12 +136,37 @@ def load_rules(path: str | Path) -> RulesConfig:
                 vset_end = vset.superseded_date or "9999-12-31"
                 other_end = other_vset.superseded_date or "9999-12-31"
                 if vset.effective_from < other_end and other_vset.effective_from < vset_end:
-                    raise RulesLoadError(f"font_size_rules.{key} and .{other_key} have overlapping effective ranges")
+                    raise RulesLoadError(
+                        f"font_size_rules.{key} and .{other_key} have overlapping effective ranges"
+                    )
+    enforcement_scale_confidence = fsr.get("enforcement_scale_confidence")
+    if (
+        isinstance(enforcement_scale_confidence, bool)
+        or not isinstance(enforcement_scale_confidence, (int, float))
+        or not 0.0 < enforcement_scale_confidence <= 1.0
+    ):
+        raise RulesLoadError(
+            "font_size_rules.enforcement_scale_confidence must satisfy 0 < value <= 1"
+        )
+    boundary_error_policy = fsr.get("boundary_error_policy")
+    if boundary_error_policy != "manual_review":
+        raise RulesLoadError("font_size_rules.boundary_error_policy must be 'manual_review'")
     exemption = fsr.get("exemption", {})
-    font_size = FontSizeRules(versions, default_v, bool(exemption.get("applies_when_another_law_governs", False)),
-                              list(exemption.get("exempted_declarations", [])), list(exemption.get("exempted_categories", [])))
+    font_size = FontSizeRules(
+        versions=versions,
+        default_version=default_v,
+        exemption_applies_when_another_law_governs=bool(
+            exemption.get("applies_when_another_law_governs", False)
+        ),
+        exempted_declarations=list(exemption.get("exempted_declarations", [])),
+        exempted_categories=list(exemption.get("exempted_categories", [])),
+        enforcement_scale_confidence=float(enforcement_scale_confidence),
+        boundary_error_policy=boundary_error_policy,
+    )
     ct = raw.get("confidence_thresholds", {})
-    confidence_thresholds = ConfidenceThresholds(float(ct.get("pass_min", 0.7)), float(ct.get("warn_min", 0.6)))
+    confidence_thresholds = ConfidenceThresholds(
+        float(ct.get("pass_min", 0.7)), float(ct.get("warn_min", 0.6))
+    )
     if not (0.0 <= confidence_thresholds.warn_min < confidence_thresholds.pass_min <= 1.0):
         raise RulesLoadError("confidence_thresholds must satisfy 0 <= warn_min < pass_min <= 1")
     checks_raw = raw.get("checks", [])

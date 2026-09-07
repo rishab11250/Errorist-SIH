@@ -195,6 +195,8 @@ class FontSizeRules:
     exemption_applies_when_another_law_governs: bool
     exempted_declarations: list[str]
     exempted_categories: list[str]
+    enforcement_scale_confidence: float
+    boundary_error_policy: Literal["manual_review"]
 
 
 @dataclass(frozen=True)

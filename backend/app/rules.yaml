@@ -2,6 +2,9 @@ version: "2026-09"
 schema_version: 1
 
 font_size_rules:
+  enforcement_scale_confidence: 0.80
+  boundary_error_policy: manual_review
+
   original_2011:
     citation: "Rule 7(2), GSR 202(E), 7 March 2011"
     effective_from: "2011-04-01"

@@ -755,7 +755,7 @@ git commit -m "feat(backend): analyze label image quality"
 - Produces: `assess_declaration_readability(...) -> ReadabilityAssessment` and `assess_fields(extracted, words, lines, quality, panel, rules) -> dict[str, ReadabilityAssessment]`.
 - Produces: one assessment per declaration with `score`, pixel height, optional millimetres, method, scale confidence, status, and reasoning.
 
-- [ ] **Step 1: Write policy tests**
+- [x] **Step 1: Write policy tests**
 
 Create table-driven tests for these exact cases:
 
@@ -797,13 +797,13 @@ def test_camera_dpi_alone_never_creates_millimetres():
 
 Also test boundary uncertainty: if `estimated_mm ± error_mm` crosses `minimum_mm`, status is `manual_review`.
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_readability.py -q`.
 
 Expected: FAIL because the assessment function does not exist.
 
-- [ ] **Step 3: Implement the measurement decision**
+- [x] **Step 3: Implement the measurement decision**
 
 Implement this policy in `readability.py`:
 
@@ -840,7 +840,7 @@ Use `direct_metadata` only when decoded metadata identifies a flatbed/document s
 
 `assess_fields` samples contrast and Laplacian sharpness inside each declaration's evidence union, uses the corresponding OCR line's median character height, and calculates character-height consistency as `1 - min(1, MAD / median)`. A consistency score below `0.60`, severe local glare, or evidence overlap adds a readability warning; it never creates a Rule 7 physical-size failure by itself.
 
-- [ ] **Step 4: Run focused and rules regression tests**
+- [x] **Step 4: Run focused and rules regression tests**
 
 Run:
 
@@ -851,7 +851,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS; the existing two non-overlapping Rule 7 versions still load.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/app/visual_analysis/readability.py backend/app/domain.py backend/app/rules.yaml backend/app/rules_loader.py backend/tests/test_readability.py backend/tests/test_rules_yaml.py

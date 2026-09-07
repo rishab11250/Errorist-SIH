@@ -4,10 +4,12 @@ import sqlite3
 from multiprocessing import get_context
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
-from app import db
+from app import db, main
+from app.main import app
 from app.migrations import HEAD_REVISION, LegacySchemaError, upgrade_database
 
 
@@ -99,6 +101,33 @@ def test_unversioned_legacy_database_is_adopted_without_data_loss(tmp_path) -> N
         assert connection.execute("SELECT version_num FROM alembic_version").fetchone()[0] == (
             HEAD_REVISION
         )
+
+
+def test_upgraded_legacy_scan_keeps_id_and_downloads_report(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "legacy-report.db"
+    with sqlite3.connect(path) as connection:
+        _create_legacy_schema(connection)
+        connection.executescript(
+            """
+            INSERT INTO scans VALUES
+              (7, CURRENT_TIMESTAMP, 'retail_image', 'unknown', 'aGVsbG8=', '{}', '[]', 'pass');
+            INSERT INTO verdicts VALUES
+              (11, 7, 'r6_1_e_mrp', 'pass', 'critical', 'Rule 6(1)(e)',
+               'MRP Rs.99', '[]', NULL, '2026-09', CURRENT_TIMESTAMP);
+            """
+        )
+
+    upgrade_database(path)
+    monkeypatch.setattr(main, "DB_PATH", path)
+    with TestClient(app) as client:
+        stored = client.get("/api/scan/7")
+        report = client.get("/api/report/7")
+
+    assert stored.status_code == 200
+    assert stored.json()["scan"]["id"] == 7
+    assert report.status_code == 200
+    assert report.headers["content-type"] == "application/pdf"
+    assert report.content.startswith(b"%PDF")
 
 
 def test_partial_legacy_database_is_rejected(tmp_path) -> None:

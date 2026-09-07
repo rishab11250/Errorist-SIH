@@ -1,4 +1,5 @@
 """History and dashboard API routes."""
+
 from __future__ import annotations
 
 from typing import Annotated
@@ -18,12 +19,18 @@ def list_history(
     limit: int = Query(default=20, ge=1, le=100),
 ) -> list[dict]:
     """Return recent scans, most-recent first."""
-    scans = session.execute(select(Scan).order_by(Scan.created_at.desc()).limit(limit)).scalars().all()
+    scans = (
+        session.execute(select(Scan).order_by(Scan.created_at.desc()).limit(limit)).scalars().all()
+    )
     return [
         {
             "scan_id": scan.id,
-            "thumbnail_b64": scan.image_b64[:200] + "..." if len(scan.image_b64) > 200 else scan.image_b64,
-            "thumbnail": scan.image_b64[:200] + "..." if len(scan.image_b64) > 200 else scan.image_b64,
+            "thumbnail_b64": scan.image_b64[:200] + "..."
+            if len(scan.image_b64) > 200
+            else scan.image_b64,
+            "thumbnail": scan.image_b64[:200] + "..."
+            if len(scan.image_b64) > 200
+            else scan.image_b64,
             "overall_status": scan.overall_status,
             "verdict_count": len(scan.verdicts),
             "product": None,
@@ -61,7 +68,11 @@ def dashboard_summary(session: Annotated[Session, Depends(get_session)]) -> dict
         "pass_rate": pass_count / total,
         "top_failed_rule": top_failed_row[0] if top_failed_row else None,
         "recent_activity": [
-            {"scan_id": scan.id, "overall_status": scan.overall_status, "created_at": scan.created_at.isoformat()}
+            {
+                "scan_id": scan.id,
+                "overall_status": scan.overall_status,
+                "created_at": scan.created_at.isoformat(),
+            }
             for scan in recent
         ],
     }

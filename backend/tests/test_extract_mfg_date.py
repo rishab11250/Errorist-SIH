@@ -1,4 +1,5 @@
 """Tests for the mfg date extractor."""
+
 from __future__ import annotations
 
 from app.domain import ImageMeta, OCRWord

@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import io
 
+import numpy as np
 import pytest
 from PIL import Image, ImageDraw
 
@@ -20,6 +21,14 @@ def _image_b64(*, flat: bool = False) -> str:
         drawing.rectangle((20, 20, 280, 180), fill=(220, 220, 220), width=4)
         for y in range(40, 175, 20):
             drawing.line((35, y, 260, y), fill=(30, 30, 30), width=3)
+    output = io.BytesIO()
+    image.save(output, format="PNG")
+    return base64.b64encode(output.getvalue()).decode("ascii")
+
+
+def _low_sharpness_image_b64() -> str:
+    gradient = np.tile(np.linspace(40, 210, 300, dtype=np.uint8), (200, 1))
+    image = Image.fromarray(gradient, mode="L").convert("RGB")
     output = io.BytesIO()
     image.save(output, format="PNG")
     return base64.b64encode(output.getvalue()).decode("ascii")
@@ -134,3 +143,31 @@ def test_oversized_image_maps_to_payload_too_large(monkeypatch) -> None:
         analyze_scan(_request(), load_rules("app/rules.yaml"))
     assert caught.value.status_code == 413
     assert caught.value.error == "image_too_large"
+
+
+def test_low_quality_image_returns_guidance_without_false_failure() -> None:
+    result = analyze_scan(
+        _request(image_b64=_low_sharpness_image_b64()),
+        load_rules("app/rules.yaml"),
+    )
+    assert result.quality.status == "retake_recommended"
+    assert result.quality.guidance
+    assert result.overall_status == "manual_review"
+    assert "fail" not in {verdict.status for verdict in result.verdicts}
+
+
+def test_listing_mode_skips_physical_only_checks() -> None:
+    result = analyze_scan(
+        _request(
+            scan_context={
+                "mode": "ecommerce_listing",
+                "category": "non_food",
+                "imported": False,
+            }
+        ),
+        load_rules("app/rules.yaml"),
+    )
+    verdicts = {verdict.rule_id: verdict for verdict in result.verdicts}
+    assert verdicts["r6_1_d_mfg_date"].status == "na"
+    assert verdicts["r6_1_f_dimensions"].status == "na"
+    assert verdicts["r7_font_size"].status == "na"

@@ -1314,9 +1314,9 @@ git commit -m "feat(frontend): support retail and screenshot analysis results"
 
 ## Inspection intelligence completion gate
 
-- [ ] Run `cd backend && .venv/bin/python -m pytest -q && .venv/bin/python -m ruff check app tests`.
-- [ ] Run `cd frontend && pnpm test:run && pnpm exec tsc --noEmit && pnpm build`.
-- [ ] Upgrade a copy of a pre-Alembic database and verify its scan IDs and report downloads.
-- [ ] Confirm a low-quality image produces guidance/manual review instead of false noncompliance.
-- [ ] Confirm listing mode never runs physical-only placement/font checks.
-- [ ] Commit any gate-only fixes as `fix: close inspection intelligence verification gaps`.
+- [x] Run `cd backend && .venv/bin/python -m pytest -q && .venv/bin/python -m ruff check app tests`.
+- [x] Run `cd frontend && pnpm test:run && pnpm exec tsc --noEmit && pnpm build`.
+- [x] Upgrade a copy of a pre-Alembic database and verify its scan IDs and report downloads.
+- [x] Confirm a low-quality image produces guidance/manual review instead of false noncompliance.
+- [x] Confirm listing mode never runs physical-only placement/font checks.
+- [x] Commit any gate-only fixes as `fix: close inspection intelligence verification gaps`.

@@ -1,10 +1,10 @@
 """Tests for history and dashboard routes."""
+
 from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app import db
 from app import main
 from app.main import app
 from scripts.seed_demo import main as seed_main

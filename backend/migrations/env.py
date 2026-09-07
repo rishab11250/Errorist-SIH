@@ -43,15 +43,36 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-            compare_type=True,
-            render_as_batch=True,
-        )
+        is_sqlite = connection.dialect.name == "sqlite"
+        if is_sqlite:
+            # SQLite batch migrations rebuild referenced tables. Enforcement
+            # must be suspended for the DDL and integrity checked before it is
+            # restored for the connection.
+            connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+            connection.commit()
+        try:
+            context.configure(
+                connection=connection,
+                target_metadata=target_metadata,
+                compare_type=True,
+                render_as_batch=True,
+            )
 
-        with context.begin_transaction():
-            context.run_migrations()
+            with context.begin_transaction():
+                context.run_migrations()
+            if is_sqlite:
+                violations = connection.exec_driver_sql("PRAGMA foreign_key_check").all()
+                if violations:
+                    raise RuntimeError(
+                        f"migration left SQLite foreign-key violations: {violations}"
+                    )
+                connection.commit()
+        finally:
+            if is_sqlite:
+                if connection.in_transaction():
+                    connection.rollback()
+                connection.exec_driver_sql("PRAGMA foreign_keys=ON")
+                connection.commit()
 
 
 if context.is_offline_mode():

@@ -83,7 +83,7 @@ frontend/tests/server.ts
 - Consumes: Alembic revision `0002_inspection_v2`.
 - Produces: `User`, `SessionRow`, `ReviewAction`, nullable `Scan.owner_user_id`, and revision `0003_operations`.
 
-- [ ] **Step 1: Add security and export dependencies**
+- [x] **Step 1: Add security and export dependencies**
 
 Add to `backend/pyproject.toml`:
 
@@ -96,7 +96,7 @@ Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pip install -e '.
 
 Expected: exit 0; importing `argon2` and `docx` succeeds.
 
-- [ ] **Step 2: Write migration tests**
+- [x] **Step 2: Write migration tests**
 
 ```python
 def test_operations_migration_creates_auth_and_review_tables(tmp_path):
@@ -113,13 +113,13 @@ def test_legacy_scan_remains_unowned_after_operations_migration(inspection_v2_da
         assert connection.execute("SELECT owner_user_id FROM scans WHERE id = 7").fetchone() == (None,)
 ```
 
-- [ ] **Step 3: Verify failure**
+- [x] **Step 3: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_operations_migration.py -q`.
 
 Expected: FAIL because revision `0003_operations` is absent.
 
-- [ ] **Step 4: Add revision `0003_operations`**
+- [x] **Step 4: Add revision `0003_operations`**
 
 The migration creates:
 
@@ -168,11 +168,11 @@ with op.batch_alter_table("scans") as batch:
 
 Create indexes for normalized username, session token hash/expiry, scan owner/created time, verdict rule/status, and review scan/time. Downgrade removes the scan foreign key/column before dropping new tables.
 
-- [ ] **Step 5: Map ORM relationships and update the head constant**
+- [x] **Step 5: Map ORM relationships and update the head constant**
 
 Add `User`, `SessionRow`, and `ReviewAction` to `db.py`, plus bidirectional relationships where they prevent extra queries. Set `HEAD_REVISION = "0003_operations"` in `app/migrations.py`.
 
-- [ ] **Step 6: Run migration and backend regressions**
+- [x] **Step 6: Run migration and backend regressions**
 
 Run:
 
@@ -184,7 +184,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add backend/pyproject.toml backend/app/db.py backend/app/migrations.py backend/migrations/versions/0003_operations.py backend/tests/test_operations_migration.py

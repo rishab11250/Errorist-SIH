@@ -14,7 +14,7 @@ from sqlalchemy import inspect
 from app.sqlite import create_sqlite_engine
 
 BASELINE_REVISION = "0001_legacy_schema"
-HEAD_REVISION = "0002_inspection_v2"
+HEAD_REVISION = "0003_operations"
 LOCK_TIMEOUT_SECONDS = 10.0
 
 LEGACY_SCHEMA = {

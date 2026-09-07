@@ -1,0 +1,88 @@
+version: "2026-09"
+schema_version: 1
+
+font_size_rules:
+  original_2011:
+    citation: "Rule 7(2), GSR 202(E), 7 March 2011"
+    effective_from: "2011-04-01"
+    superseded_date: "2022-04-01"
+    table_I_weight_volume:
+      brackets:
+        - {max_g_or_ml: 200,   normal_mm: 1, blown_mm: 2}
+        - {max_g_or_ml: 500,   normal_mm: 2, blown_mm: 4}
+        - {max_g_or_ml: null,  normal_mm: 4, blown_mm: 6}
+    table_II_length_area_number:
+      brackets:
+        - {max_cm2: 100,      normal_mm: 1, blown_mm: 2}
+        - {max_cm2: 500,      normal_mm: 2, blown_mm: 4}
+        - {max_cm2: 2500,     normal_mm: 4, blown_mm: 6}
+        - {max_cm2: null,     normal_mm: 6, blown_mm: 6}
+    letter_min_mm: 1
+    letter_blown_min_mm: 2
+
+  consolidated_post_2021:
+    citation: "Rule 7(2) consolidated up to GSR 31.10.2021 (w.e.f. 1.4.2022)"
+    effective_from: "2022-04-01"
+    superseded_date: null
+    table_I:
+      brackets:
+        - {max_cm2: 50,       normal_mm: 1.0, blown_mm: 1.5}
+        - {max_cm2: 100,      normal_mm: 1.5, blown_mm: 3.0}
+        - {max_cm2: 500,      normal_mm: 2.5, blown_mm: 4.0}
+        - {max_cm2: 2500,     normal_mm: 4.0, blown_mm: 6.0}
+        - {max_cm2: null,     normal_mm: 6.0, blown_mm: 6.0}
+
+  default_version: "consolidated_post_2021"
+  exemption:
+    applies_when_another_law_governs: true
+    exempted_declarations: [net_weight, retail_sale_price, expiry_date, consumer_care]
+    exempted_categories: [food, cosmetics, seeds]
+
+confidence_thresholds:
+  pass_min: 0.7
+  warn_min: 0.6
+
+checks:
+  - rule_id: r6_1_e_mrp
+    citation: "Rule 6(1)(e) of LMPC Rules 2011"
+    field: mrp
+    check_type: presence_and_format
+    severity: critical
+    requires: [mrp_value, tax_inclusive_phrase]
+    tax_inclusive_phrase_regex: '(?i)\b(?:incl\.?|inclusive)\s*(?:of\s+)?all\s+taxes?\b'
+    failure_message: "MRP must be declared and accompanied by 'Inclusive of all taxes'"
+  - rule_id: r6_1_c_net_quantity
+    citation: "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011"
+    field: net_quantity
+    check_type: presence_and_format
+    severity: critical
+    requires: [net_quantity_value, net_quantity_unit]
+    requires_unit_in: [g, kg, ml, l, gm, GM, Kg, Litre, Liter, mL]
+    failure_message: "Net quantity must be declared in metric units (g/kg/ml/l)"
+  - rule_id: r6_1_a_address
+    citation: "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011"
+    field: manufacturer_address
+    check_type: presence_and_format
+    severity: critical
+    requires: [manufacturer_name, address, pin_code]
+    pin_code_regex: '\b([1-9][0-9]{5})\b'
+    failure_message: "Manufacturer/packer/importer name, complete address, and 6-digit PIN required"
+  - rule_id: r6_2_consumer_care
+    citation: "Rule 6(2) of LMPC Rules 2011"
+    field: consumer_care
+    check_type: presence_and_format
+    severity: critical
+    requires: [consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email]
+    email_regex: '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
+    phone_regex: '(?:\+91[\s-]?)?[6-9]\d{9}'
+    failure_message: "Consumer care must include name, address, phone, and email (Rule 6(2))"
+  - rule_id: r6_1_d_mfg_date
+    citation: "Rule 6(1)(d) of LMPC Rules 2011"
+    field: mfg_date
+    check_type: presence_and_format
+    severity: critical
+    requires: [mfg_date_value]
+    skipped_when_category_in: [food, cosmetics, seeds]
+    skipped_when_mode: ecommerce_listing
+    date_format_regex: '(?i)\b(?:mfg|mfd|manufactured|packed|pkd)[:\s,.]*((0?[1-9]|1[0-2])[\/\-\s]\d{2,4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{4})'
+    failure_message: "Month and year of manufacture required (skip if food/cosmetics/seeds or ecommerce mode)"

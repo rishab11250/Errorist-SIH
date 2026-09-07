@@ -1,14 +1,28 @@
 """FastAPI application entrypoint."""
+from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.models import HealthResponse
+from app.rules_loader import get_active_rules, load_rules, set_active_rules
+
+RULES_PATH = Path(__file__).resolve().parent / "rules.yaml"
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Load rules.yaml once at startup; expose version via health endpoint."""
+    cfg = load_rules(RULES_PATH)
+    set_active_rules(cfg)
+    yield
 
 app = FastAPI(
     title="LMPC Compliance Checker",
     version=__version__,
     description="Check packaged-commodity labels against LMPC Rules 2011.",
+    lifespan=lifespan,
 )
 
 # CORS: allow local dev frontend on 3000
@@ -23,8 +37,9 @@ app.add_middleware(
 
 @app.get("/api/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
-    """Liveness probe. Returns service version."""
-    return HealthResponse(status="ok", rules_version="not-loaded")
+    """Liveness probe. Returns service version + rules version."""
+    cfg = get_active_rules()
+    return HealthResponse(status="ok", rules_version=cfg.version)
 
 
 @app.get("/")

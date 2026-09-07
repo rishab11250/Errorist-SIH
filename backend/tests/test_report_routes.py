@@ -1,4 +1,5 @@
 """Tests for the PDF report endpoint."""
+
 from __future__ import annotations
 
 import pytest
@@ -12,10 +13,6 @@ from app.main import app
 def client(tmp_path, monkeypatch):
     db_file = tmp_path / "test.db"
     monkeypatch.setattr(main, "DB_PATH", db_file)
-    db.init_db(db_file)
-    assert db._engine is not None
-    db.Base.metadata.drop_all(db._engine)
-    db.Base.metadata.create_all(db._engine)
     with TestClient(app) as test_client:
         yield test_client
 

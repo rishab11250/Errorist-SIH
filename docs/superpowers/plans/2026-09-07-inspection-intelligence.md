@@ -74,6 +74,7 @@ frontend/
 - Modify: `backend/pyproject.toml`
 - Modify: `backend/app/db.py`
 - Modify: `backend/app/main.py`
+- Create: `backend/app/sqlite.py`
 - Create: `backend/alembic.ini`
 - Create: `backend/migrations/env.py`
 - Create: `backend/migrations/script.py.mako`
@@ -81,12 +82,15 @@ frontend/
 - Create: `backend/migrations/versions/0002_inspection_v2.py`
 - Create: `backend/app/migrations.py`
 - Create: `backend/tests/test_migrations.py`
+- Modify: `backend/tests/test_health.py`
+- Modify: `backend/tests/test_report_routes.py`
+- Modify: `backend/tests/test_scan_routes.py`
 
 **Interfaces:**
 - Produces: `upgrade_database(db_path: str | Path) -> None` and database revision `0002_inspection_v2`.
 - Preserves: existing `scans` and `verdicts` rows and IDs.
 
-- [ ] **Step 1: Add the migration dependencies**
+- [x] **Step 1: Add the migration dependencies**
 
 Add these runtime dependencies to `backend/pyproject.toml`:
 
@@ -105,7 +109,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: exit 0; `python -c "import alembic, cv2, numpy"` exits 0.
 
-- [ ] **Step 2: Write migration tests that cover fresh and legacy databases**
+- [x] **Step 2: Write migration tests that cover fresh and legacy databases**
 
 Create `backend/tests/test_migrations.py` with these cases:
 
@@ -163,7 +167,7 @@ def test_unversioned_legacy_database_is_adopted_without_data_loss(tmp_path) -> N
         assert connection.execute("SELECT version_num FROM alembic_version").fetchone()[0] == HEAD_REVISION
 ```
 
-- [ ] **Step 3: Run the migration tests to verify failure**
+- [x] **Step 3: Run the migration tests to verify failure**
 
 Run:
 
@@ -174,7 +178,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: FAIL because `app.migrations` does not exist.
 
-- [ ] **Step 4: Add the Alembic configuration and revisions**
+- [x] **Step 4: Add the Alembic configuration and revisions**
 
 Generate the standard Alembic runner and revision template, then replace the generated `env.py` and add the two named revisions:
 
@@ -260,7 +264,7 @@ def downgrade() -> None:
             batch.drop_column(name)
 ```
 
-- [ ] **Step 5: Implement legacy adoption and startup migration**
+- [x] **Step 5: Implement legacy adoption and startup migration**
 
 Create `backend/app/migrations.py`:
 
@@ -299,7 +303,9 @@ def upgrade_database(db_path: str | Path) -> None:
 
 Change `init_db` to call `upgrade_database(path)` before constructing `SessionLocal`, remove `Base.metadata.create_all`, and make `main.DB_PATH` read `LMPC_DB_PATH` with default `lmpc.db`.
 
-- [ ] **Step 6: Run migrations and the full backend regression suite**
+Serialize the complete inspect/stamp/upgrade region with a bounded Linux `flock` on the database file so concurrent application workers cannot race non-transactional SQLite DDL. Enable `PRAGMA foreign_keys=ON` on application, inspection, and Alembic engines. Before adopting a versionless database, validate the exact table/column set, SQLite type affinities, nullability, primary keys, the verdict-to-scan foreign key, and `PRAGMA foreign_key_check`. Dispose any previous application engine before rebinding. Update all `TestClient` fixtures to point the lifespan at their migrated temporary database rather than the real default database.
+
+- [x] **Step 6: Run migrations and the full backend regression suite**
 
 Run:
 
@@ -311,10 +317,10 @@ cd /home/wind/Projects/sih/backend
 
 Expected: both commands PASS; legacy scan ID 7 remains present.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
-git add backend/pyproject.toml backend/alembic.ini backend/migrations backend/app/db.py backend/app/main.py backend/app/migrations.py backend/tests/test_migrations.py
+git add backend/pyproject.toml backend/alembic.ini backend/migrations backend/app/db.py backend/app/main.py backend/app/migrations.py backend/app/sqlite.py backend/tests/test_migrations.py backend/tests/test_health.py backend/tests/test_report_routes.py backend/tests/test_scan_routes.py docs/superpowers/plans/2026-09-07-inspection-intelligence.md
 git commit -m "feat(backend): add migration foundation for inspection data"
 ```
 

@@ -1,19 +1,22 @@
 """FastAPI application entrypoint."""
+
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
-from app.db import init_db
 from app.dashboard_routes import router as dashboard_router
+from app.db import init_db
 from app.models import HealthResponse
 from app.report_routes import router as report_router
 from app.rules_loader import get_active_rules, load_rules, set_active_rules
 from app.scan_routes import router as scan_router
 
 RULES_PATH = Path(__file__).resolve().parent / "rules.yaml"
-DB_PATH = Path("lmpc.db")
+DB_PATH = Path(os.environ.get("LMPC_DB_PATH", "lmpc.db"))
 
 
 @asynccontextmanager
@@ -23,6 +26,7 @@ async def lifespan(app: FastAPI):
     set_active_rules(cfg)
     init_db(DB_PATH)
     yield
+
 
 app = FastAPI(
     title="LMPC Compliance Checker",

@@ -1,12 +1,22 @@
 """SQLAlchemy models and session factory for the SQLite scan store."""
+
 from __future__ import annotations
 
 from collections.abc import Iterator
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, create_engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    Session,
+    mapped_column,
+    relationship,
+    sessionmaker,
+)
+
+from app.sqlite import create_sqlite_engine
 
 
 class Base(DeclarativeBase):
@@ -17,14 +27,16 @@ class Scan(Base):
     __tablename__ = "scans"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
     mode: Mapped[str] = mapped_column(String, default="retail_image")
     category: Mapped[str] = mapped_column(String, default="unknown")
     image_b64: Mapped[str] = mapped_column(Text)
     image_meta: Mapped[dict] = mapped_column(JSON)
     ocr_payload: Mapped[list] = mapped_column(JSON)
     overall_status: Mapped[str] = mapped_column(String, default="mixed")
-    verdicts: Mapped[list[VerdictRow]] = relationship(back_populates="scan", cascade="all, delete-orphan")
+    verdicts: Mapped[list[VerdictRow]] = relationship(
+        back_populates="scan", cascade="all, delete-orphan"
+    )
 
 
 class VerdictRow(Base):
@@ -40,7 +52,7 @@ class VerdictRow(Base):
     evidence_bboxes: Mapped[list] = mapped_column(JSON, default=list)
     failure_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     rule_version: Mapped[str] = mapped_column(String)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
     scan: Mapped[Scan] = relationship(back_populates="verdicts")
 
 
@@ -49,13 +61,23 @@ SessionLocal: sessionmaker[Session] | None = None
 
 
 def init_db(db_path: str | Path = "lmpc.db") -> None:
-    """Initialize SQLite and create the scan and verdict tables."""
+    """Upgrade SQLite and initialize the session factory."""
     global _engine, SessionLocal
     path = Path(db_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    _engine = create_engine(f"sqlite:///{path}", echo=False, future=True)
-    SessionLocal = sessionmaker(bind=_engine, autoflush=False, autocommit=False, expire_on_commit=False)
-    Base.metadata.create_all(_engine)
+    from app.migrations import upgrade_database
+
+    if _engine is not None:
+        _engine.dispose()
+    _engine = None
+    SessionLocal = None
+    upgrade_database(path)
+    _engine = create_sqlite_engine(path, echo=False, future=True)
+    SessionLocal = sessionmaker(
+        bind=_engine,
+        autoflush=False,
+        autocommit=False,
+        expire_on_commit=False,
+    )
 
 
 def get_session() -> Iterator[Session]:

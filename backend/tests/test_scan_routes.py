@@ -1,4 +1,5 @@
 """End-to-end tests for the scan API."""
+
 from __future__ import annotations
 
 import base64
@@ -6,18 +7,15 @@ import base64
 import pytest
 from fastapi.testclient import TestClient
 
-from app import db
+from app import main
 from app.main import app
 
 
 @pytest.fixture
-def client(tmp_path):
+def client(tmp_path, monkeypatch):
     """Use a per-test SQLite file so tests do not share state."""
     db_file = tmp_path / "test.db"
-    db.init_db(db_file)
-    assert db._engine is not None
-    db.Base.metadata.drop_all(db._engine)
-    db.Base.metadata.create_all(db._engine)
+    monkeypatch.setattr(main, "DB_PATH", db_file)
     with TestClient(app) as test_client:
         yield test_client
 

@@ -43,7 +43,16 @@ def _mrp(words: list[OCRWord], meta: ImageMeta, rules: RulesConfig):
         if check and check.tax_inclusive_phrase_regex
         else r"(?i)\binclusive\s+of\s+all\s+taxes\b"
     )
-    return extract_mrp(words, meta, phrase)
+    extracted = extract_mrp(words, meta, phrase)
+    if extracted and extracted.value:
+        return ExtractedField(
+            name=extracted.name,
+            value=f"MRP {extracted.value} (Inclusive of all taxes)",
+            bbox=extracted.bbox,
+            confidence=extracted.confidence,
+            evidence_spans=extracted.evidence_spans,
+        )
+    return extracted
 
 
 def _consumer_care(words: list[OCRWord], meta: ImageMeta, rules: RulesConfig):

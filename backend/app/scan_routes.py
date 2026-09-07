@@ -2,155 +2,177 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
+from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
+from app.analysis_pipeline import PipelineError, analyze_scan
 from app.db import Scan, VerdictRow, get_session
-from app.domain import ExtractedField, ImageMeta, OCRWord, ScanContext
-from app.engine import run_engine
-from app.extractors import (
-    extract_common_name,
-    extract_consumer_care,
-    extract_country_origin,
-    extract_manufacturer_address,
-    extract_mfg_date,
-    extract_mrp,
-    extract_net_quantity,
-)
-from app.models import ScanRequest
+from app.domain import AnalysisResult, ExtractedField, QualitySummary, Verdict
+from app.errors import AppError
+from app.models import ScanAnalysisResponse, ScanRequest
 from app.rules_loader import get_active_rules
 
 router = APIRouter(prefix="/api", tags=["scan"])
 
-_LEGACY_RULE_IDS = {
-    "r6_1_e_mrp",
-    "r6_1_c_net_quantity",
-    "r6_1_a_address",
-    "r6_2_consumer_care",
-    "r6_1_d_mfg_date",
-}
+
+def _quality_dict(quality: QualitySummary) -> dict:
+    return {
+        "status": quality.status,
+        "score": quality.score,
+        "metrics": [
+            {
+                "name": metric.name,
+                "value": metric.value,
+                "unit": metric.unit,
+                "confidence": metric.confidence,
+                "method": metric.method,
+                "evidence_bboxes": [list(box) for box in metric.evidence_bboxes],
+            }
+            for metric in quality.metrics
+        ],
+        "guidance": list(quality.guidance),
+    }
 
 
-def _word_from_dto(word: object) -> OCRWord:
-    return OCRWord(text=word.text, confidence=word.confidence, bbox=tuple(word.bbox))
+def _extracted_dict(field: ExtractedField | None) -> dict | None:
+    if field is None:
+        return None
+    return {
+        "name": field.name,
+        "value": field.value,
+        "bbox": list(field.bbox) if field.bbox is not None else None,
+        "confidence": field.confidence,
+        "evidence_bboxes": [list(box) for box in field.evidence_spans],
+    }
 
 
-class ScanCreatedResponse(BaseModel):
-    scan_id: int
-    overall_status: str
-    verdicts: list[dict]
+def _verdict_dict(verdict: Verdict) -> dict:
+    return {
+        "rule_id": verdict.rule_id,
+        "status": verdict.status,
+        "severity": verdict.severity,
+        "citation": verdict.citation,
+        "evidence": verdict.evidence,
+        "evidence_bboxes": [list(box) for box in verdict.evidence_bboxes],
+        "confidence": verdict.confidence,
+        "reasoning": verdict.reasoning,
+        "measurement_method": verdict.measurement_method,
+        "failure_message": verdict.failure_message,
+        "rule_version": verdict.rule_version,
+    }
 
 
-@router.post("/scan", response_model=ScanCreatedResponse, status_code=201)
+def _verdict_row(verdict: Verdict) -> VerdictRow:
+    return VerdictRow(
+        rule_id=verdict.rule_id,
+        status=verdict.status,
+        severity=verdict.severity,
+        citation=verdict.citation,
+        evidence=verdict.evidence,
+        evidence_bboxes=[list(box) for box in verdict.evidence_bboxes],
+        confidence=verdict.confidence,
+        reasoning=verdict.reasoning,
+        measurement_method=verdict.measurement_method,
+        failure_message=verdict.failure_message,
+        rule_version=verdict.rule_version,
+    )
+
+
+def _mark_failed(
+    session: Session,
+    scan_id: int,
+    *,
+    stage: str,
+    error_code: str,
+) -> None:
+    session.rollback()
+    scan = session.get(Scan, scan_id)
+    if scan is None:
+        return
+    scan.processing_status = "failed"
+    scan.failure_stage = stage
+    scan.processing_error_code = error_code
+    scan.analysis_version = "inspection-v2"
+    scan.updated_at = datetime.now(UTC)
+    scan.verdicts.clear()
+    session.commit()
+
+
+def _store_complete(scan: Scan, result: AnalysisResult) -> None:
+    extracted = {name: _extracted_dict(field) for name, field in result.extracted.items()}
+    scan.processing_status = "complete"
+    scan.quality_summary = _quality_dict(result.quality)
+    scan.extracted_fields = extracted
+    scan.analysis_version = result.analysis_version
+    scan.overall_status = result.overall_status
+    scan.product_name = (
+        result.extracted.get("common_name").value
+        if result.extracted.get("common_name") is not None
+        else None
+    )
+    scan.updated_at = datetime.now(UTC)
+    scan.failure_stage = None
+    scan.processing_error_code = None
+    scan.verdicts = [_verdict_row(verdict) for verdict in result.verdicts]
+
+
+@router.post("/scan", response_model=ScanAnalysisResponse, status_code=201)
 def create_scan(
     req: ScanRequest,
+    request: Request,
     session: Annotated[Session, Depends(get_session)],
-) -> ScanCreatedResponse:
-    if not req.ocr_payload:
-        raise HTTPException(status_code=422, detail="no_text_extracted")
-
+) -> ScanAnalysisResponse:
     rules = get_active_rules()
-    words = [_word_from_dto(word) for word in req.ocr_payload]
-    image_meta = ImageMeta(**req.image_meta.model_dump())
-    address_check = rules.check_by_id("r6_1_a_address")
-    quantity_check = rules.check_by_id("r6_1_c_net_quantity")
-    mrp_check = rules.check_by_id("r6_1_e_mrp")
-    care_check = rules.check_by_id("r6_2_consumer_care")
-    date_check = rules.check_by_id("r6_1_d_mfg_date")
-
-    mrp = (
-        extract_mrp(words, image_meta, mrp_check.tax_inclusive_phrase_regex) if mrp_check else None
-    )
-    # A non-empty MRP extractor result already verified the tax phrase; preserve
-    # that fact in the engine input while retaining its evidence bboxes.
-    if mrp and mrp.value:
-        mrp = ExtractedField(
-            name=mrp.name,
-            value=f"MRP {mrp.value} (Inclusive of all taxes)",
-            bbox=mrp.bbox,
-            confidence=mrp.confidence,
-            evidence_spans=mrp.evidence_spans,
-        )
-
-    extracted: dict[str, ExtractedField] = {
-        "manufacturer_address": extract_manufacturer_address(
-            words, image_meta, address_check.pin_code_regex
-        )
-        if address_check and address_check.pin_code_regex
-        else None,
-        "net_quantity": extract_net_quantity(words, image_meta, quantity_check.requires_unit_in)
-        if quantity_check and quantity_check.requires_unit_in
-        else None,
-        "mrp": mrp,
-        "consumer_care": extract_consumer_care(
-            words, image_meta, care_check.email_regex, care_check.phone_regex
-        )
-        if care_check and care_check.email_regex and care_check.phone_regex
-        else None,
-        "mfg_date": extract_mfg_date(words, image_meta, date_check.date_format_regex)
-        if date_check and date_check.date_format_regex
-        else None,
-        "common_name": extract_common_name(words, image_meta),
-        "country_origin": extract_country_origin(words, image_meta),
-    }
-    # The complete configured profile is consumed by the version-2 analysis
-    # pipeline introduced in Task 9. Keep this legacy route response stable
-    # until that pipeline can provide evidence for every new check.
-    legacy_rules = replace(
-        rules,
-        checks=[check for check in rules.checks if check.rule_id in _LEGACY_RULE_IDS],
-    )
-    verdicts = run_engine(
-        extracted,
-        legacy_rules,
-        ScanContext(mode=req.scan_context.mode, category=req.scan_context.category),
-    )
-    statuses = {verdict.status for verdict in verdicts}
-    overall = "fail" if "fail" in statuses else "mixed" if "warn" in statuses else "pass"
+    request_id = request.state.request_id
     scan = Scan(
         mode=req.scan_context.mode,
         category=req.scan_context.category,
         image_b64=req.image_b64,
-        image_meta=req.image_meta.model_dump(),
-        ocr_payload=[word.model_dump() for word in req.ocr_payload],
-        overall_status=overall,
-        verdicts=[
-            VerdictRow(
-                rule_id=verdict.rule_id,
-                status=verdict.status,
-                severity=verdict.severity,
-                citation=verdict.citation,
-                evidence=verdict.evidence,
-                evidence_bboxes=[list(bbox) for bbox in verdict.evidence_bboxes],
-                failure_message=verdict.failure_message,
-                rule_version=verdict.rule_version,
-            )
-            for verdict in verdicts
-        ],
+        image_meta=req.image_meta.model_dump(mode="json"),
+        ocr_payload=[word.model_dump(mode="json") for word in req.ocr_payload],
+        overall_status="manual_review",
+        schema_version=req.schema_version,
+        processing_status="processing",
+        analysis_version="inspection-v2",
+        request_id=request_id,
+        quality_summary={},
+        extracted_fields={},
     )
     session.add(scan)
     session.commit()
     session.refresh(scan)
-    return ScanCreatedResponse(
+
+    try:
+        result = analyze_scan(req, rules)
+        _store_complete(scan, result)
+        session.commit()
+        session.refresh(scan)
+    except PipelineError as exc:
+        _mark_failed(
+            session,
+            scan.id,
+            stage=exc.stage,
+            error_code=exc.error,
+        )
+        raise
+    except AppError as exc:
+        _mark_failed(session, scan.id, stage="analysis", error_code=exc.error)
+        raise
+    except Exception:
+        _mark_failed(session, scan.id, stage="analysis", error_code="internal_error")
+        raise
+
+    return ScanAnalysisResponse(
         scan_id=scan.id,
-        overall_status=overall,
-        verdicts=[
-            {
-                "rule_id": verdict.rule_id,
-                "status": verdict.status,
-                "severity": verdict.severity,
-                "citation": verdict.citation,
-                "evidence": verdict.evidence,
-                "evidence_bboxes": [list(bbox) for bbox in verdict.evidence_bboxes],
-                "failure_message": verdict.failure_message,
-                "rule_version": verdict.rule_version,
-            }
-            for verdict in verdicts
-        ],
+        processing_status="complete",
+        quality=_quality_dict(result.quality),
+        extracted_fields={name: _extracted_dict(field) for name, field in result.extracted.items()},
+        verdicts=[_verdict_dict(verdict) for verdict in result.verdicts],
+        overall_status=result.overall_status,
+        analysis_version=result.analysis_version,
     )
 
 
@@ -163,11 +185,21 @@ def get_scan(scan_id: int, session: Annotated[Session, Depends(get_session)]) ->
         "scan": {
             "id": scan.id,
             "created_at": scan.created_at.isoformat(),
+            "updated_at": scan.updated_at.isoformat() if scan.updated_at else None,
             "mode": scan.mode,
             "category": scan.category,
             "overall_status": scan.overall_status,
             "image_b64": scan.image_b64,
             "image_meta": scan.image_meta,
+            "schema_version": scan.schema_version,
+            "processing_status": scan.processing_status,
+            "product_name": scan.product_name,
+            "quality_summary": scan.quality_summary,
+            "extracted_fields": scan.extracted_fields,
+            "analysis_version": scan.analysis_version,
+            "failure_stage": scan.failure_stage,
+            "request_id": scan.request_id,
+            "processing_error_code": scan.processing_error_code,
         },
         "verdicts": [
             {
@@ -177,8 +209,12 @@ def get_scan(scan_id: int, session: Annotated[Session, Depends(get_session)]) ->
                 "citation": verdict.citation,
                 "evidence": verdict.evidence,
                 "evidence_bboxes": verdict.evidence_bboxes,
+                "confidence": verdict.confidence,
+                "reasoning": verdict.reasoning,
+                "measurement_method": verdict.measurement_method,
                 "failure_message": verdict.failure_message,
                 "rule_version": verdict.rule_version,
+                "review_state": verdict.review_state,
             }
             for verdict in scan.verdicts
         ],

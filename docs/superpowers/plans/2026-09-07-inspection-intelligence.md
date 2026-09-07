@@ -1135,7 +1135,7 @@ git commit -m "feat(backend): distinguish noncompliance from uncertain evidence"
 - Produces: `analyze_scan(request: ScanRequest, rules: RulesConfig) -> AnalysisResult`.
 - Persists: quality summary, extracted fields, analysis version, expanded verdict evidence.
 
-- [ ] **Step 1: Replace the fake image fixture and add API tests**
+- [x] **Step 1: Replace the fake image fixture and add API tests**
 
 Use Pillow in tests to create a real in-memory PNG. Add assertions:
 
@@ -1165,7 +1165,7 @@ def test_bad_image_has_error_envelope(client, complete_payload):
     assert set(response.json()) == {"error", "detail", "request_id"}
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run:
 
@@ -1176,7 +1176,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: FAIL because the route has no version-2 pipeline.
 
-- [ ] **Step 3: Implement orchestration without embedding algorithms in the route**
+- [x] **Step 3: Implement orchestration without embedding algorithms in the route**
 
 `analysis_pipeline.analyze_scan` must perform exactly this sequence:
 
@@ -1211,7 +1211,7 @@ return AnalysisResult(
 
 Define `normalize_ocr` in `analysis_pipeline.py`: convert DTOs to domain values, discard no valid version-2 line, reject an out-of-range word index, and reconstruct line groups from word geometry for version-1 requests. `scan_routes.create_scan` creates a `processing_status="processing"` row with the middleware request ID, calls the pipeline once, then atomically replaces its analysis fields and sets `processing_status="complete"`. A caught pipeline error rolls back partial verdicts, stores `processing_status="failed"`, `failure_stage`, request ID, and a stable `processing_error_code`; expected `AppError` values retain their 4xx response and unexpected exceptions return the shared 500 envelope. No failure serializes a partial result as complete. Map image decode exceptions to 400 `invalid_image`, 413 `image_too_large`, or 422 `image_decode_failed`; map empty OCR and unreadable quality to the explicit 422 errors above. `get_scan` returns the same stored analysis fields.
 
-- [ ] **Step 4: Run API and report regressions**
+- [x] **Step 4: Run API and report regressions**
 
 Run:
 
@@ -1223,7 +1223,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS; version-1 request tests remain green through defaults.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/app/analysis_pipeline.py backend/app/scan_routes.py backend/app/models.py backend/app/db.py backend/tests/test_analysis_pipeline.py backend/tests/test_scan_routes.py

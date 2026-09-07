@@ -641,7 +641,7 @@ git commit -m "feat(frontend): retain OCR line geometry"
 - Produces: `decode_image(image_b64, max_bytes, max_pixels) -> DecodedImage`, `analyze_quality(decoded, words=()) -> QualitySummary`, and `estimate_panel(decoded, words) -> PanelEstimate`.
 - Consumes: Task-2 `QualitySummary` and `VisualMetric`.
 
-- [ ] **Step 1: Write decoder and quality tests**
+- [x] **Step 1: Write decoder and quality tests**
 
 Create tests covering a valid checkerboard PNG, invalid base64, a 1-byte payload, byte limits, pixel limits, a decompression-bomb header, unsupported GIF/BMP content, a data-URL MIME/content mismatch, a flat low-contrast image, a blurred image, and a high-contrast sharp image. The principal assertions are:
 
@@ -661,13 +661,13 @@ def test_invalid_base64_has_stable_error() -> None:
         decode_image("%%%", max_bytes=1_000_000, max_pixels=1_000_000)
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_visual_quality.py -q`.
 
 Expected: FAIL because `visual_analysis` does not exist.
 
-- [ ] **Step 3: Implement bounded decoding**
+- [x] **Step 3: Implement bounded decoding**
 
 `image_io.py` must:
 
@@ -702,7 +702,7 @@ def decode_image(image_b64: str, *, max_bytes: int, max_pixels: int) -> DecodedI
 
 `split_data_url` accepts only raw base64 or `data:image/jpeg|png|webp;base64,...`; `mime_for` maps Pillow's detected format back to those three media types. `_read_metadata` uses Pillow to return orientation, DPI, and scanner/camera software tags when present. It never treats camera DPI as physical package scale.
 
-- [ ] **Step 4: Implement quality scoring**
+- [x] **Step 4: Implement quality scoring**
 
 Use grayscale Laplacian variance for sharpness, grayscale standard deviation for global contrast, fraction of pixels above 250 for glare, `cv2.minAreaRect` over edge pixels for skew, and largest quadrilateral contour geometry for perspective confidence. Compute text coverage as the union-area fraction of normalized OCR boxes and OCR-confidence distribution as the median and lower quartile encoded as two named metrics. Normalize every score metric to `0..100`. Apply configuration defaults:
 
@@ -723,7 +723,7 @@ Return `unreadable` only when both sharpness and contrast are below retake thres
 
 `panel.py` finds the largest plausible quadrilateral containing OCR-word centers, stores its normalized bounding box and corner points, and sets confidence from contour coverage, rectangularity, and OCR containment. When no plausible contour exists, it returns the full image bounds with confidence `0.0`; downstream placement therefore selects `manual_review`.
 
-- [ ] **Step 5: Run tests**
+- [x] **Step 5: Run tests**
 
 Run:
 
@@ -735,7 +735,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add backend/app/visual_analysis backend/tests/test_visual_quality.py

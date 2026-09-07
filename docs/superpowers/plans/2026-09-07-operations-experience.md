@@ -378,7 +378,7 @@ git commit -m "feat(backend): expose local authentication API"
 - Produces: `python -m scripts.bootstrap_admin --username NAME --display-name NAME`.
 - Produces: `GET/POST /api/users` and `PATCH /api/users/{id}`; admin only.
 
-- [ ] **Step 1: Write user-management tests**
+- [x] **Step 1: Write user-management tests**
 
 ```python
 def test_inspector_cannot_list_users(inspector_client):
@@ -404,21 +404,21 @@ def test_final_active_admin_cannot_be_demoted(admin_client, admin_user):
 
 Test duplicate normalized username, weak password, reset revoking sessions, and bootstrap refusing to overwrite an existing username.
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_user_routes.py tests/test_bootstrap_admin.py -q`.
 
 Expected: FAIL because user routes and CLI are missing.
 
-- [ ] **Step 3: Implement admin endpoints**
+- [x] **Step 3: Implement admin endpoints**
 
 Require passwords of 12–128 characters and reject values containing the normalized username. POST returns no hash. PATCH accepts exactly `username`, `display_name`, `role`, `is_active`, or `password`; rejects an empty patch; normalizes and uniqueness-checks a renamed username; protects the final active admin from demotion or deactivation; and revokes sessions after password reset or deactivation. Use 409 for duplicate username/final-admin conflicts.
 
-- [ ] **Step 4: Implement bootstrap CLI**
+- [x] **Step 4: Implement bootstrap CLI**
 
 The CLI reads a password twice through `getpass.getpass()` unless `LMPC_BOOTSTRAP_PASSWORD` is present, runs migrations first, creates one admin transactionally, prints the created username but never the password/hash, and exits 2 for an existing normalized username.
 
-- [ ] **Step 5: Run tests**
+- [x] **Step 5: Run tests**
 
 Run:
 
@@ -429,7 +429,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add backend/app/users backend/app/main.py backend/scripts/bootstrap_admin.py backend/tests/test_user_routes.py backend/tests/test_bootstrap_admin.py

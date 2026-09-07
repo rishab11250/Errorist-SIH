@@ -17,6 +17,7 @@ from app.report_routes import router as report_router
 from app.rules_loader import get_active_rules, load_rules, set_active_rules
 from app.scan_routes import router as scan_router
 from app.settings import AuthSettings
+from app.users.routes import router as users_router
 
 RULES_PATH = Path(__file__).resolve().parent / "rules.yaml"
 DB_PATH = Path(os.environ.get("LMPC_DB_PATH", "lmpc.db"))
@@ -53,6 +54,7 @@ app.include_router(scan_router)
 app.include_router(dashboard_router)
 app.include_router(report_router)
 app.include_router(auth_router)
+app.include_router(users_router)
 
 
 @app.get("/api/health", response_model=HealthResponse)

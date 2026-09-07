@@ -870,7 +870,7 @@ git commit -m "feat(backend): add confidence-aware font and readability analysis
 - Produces: `evaluate_placement(field, panel, related_fields, mode) -> PlacementResult` and `assess_placements(extracted, panel, context, rules) -> dict[str, PlacementResult]`.
 - Consumes: `ExtractedField` evidence boxes and panel estimate from visual analysis.
 
-- [ ] **Step 1: Write geometry and uncertainty tests**
+- [x] **Step 1: Write geometry and uncertainty tests**
 
 ```python
 def test_clipped_declaration_fails_with_sufficient_panel_confidence() -> None:
@@ -900,13 +900,13 @@ def test_listing_mode_uses_viewport_visibility() -> None:
     assert result.relationship == "visible_in_submitted_screenshot"
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_placement.py -q`.
 
 Expected: FAIL because `app.placement` does not exist.
 
-- [ ] **Step 3: Implement focused box operations and evaluator**
+- [x] **Step 3: Implement focused box operations and evaluator**
 
 `geometry.py` exposes `area`, `intersection`, `intersection_ratio`, `union`, `inside_ratio`, and `edge_distance`, all clamped to normalized coordinates. `evaluator.py` applies these constants:
 
@@ -920,7 +920,7 @@ UNRELATED_OVERLAP_IOU_WARN = 0.25
 
 Retail placement returns `manual_review` when panel confidence is below 0.80, `fail` when less than 98% of a declaration lies inside the panel, `warn` when it lies within 1% of an image edge, and `pass` otherwise. Screenshot placement tests whether the complete evidence box lies inside the submitted viewport. Related label/value pairs pass when their normalized edge gap is at most 0.08 and become `manual_review` when a required partner is absent. A declaration with IoU above `0.25` against an unrelated declaration returns `warn` with both evidence boxes so possible overlap/obscuring is visible to the reviewer.
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 Run:
 
@@ -932,7 +932,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/app/placement backend/tests/test_placement.py

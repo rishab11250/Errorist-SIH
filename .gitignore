@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.db
+*.db-journal
+
+# Node
+node_modules/
+.next/
+out/
+.pnpm-store/
+*.tsbuildinfo
+next-env.d.ts
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Eval (images can be large)
+backend/tests/eval/images/*.jpg
+backend/tests/eval/images/*.jpeg
+backend/tests/eval/images/*.png
+!backend/tests/eval/images/.gitkeep
+
+# Local data
+data/
+*.sqlite
+*.sqlite3

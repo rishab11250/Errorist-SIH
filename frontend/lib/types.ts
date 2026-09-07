@@ -20,17 +20,17 @@ export interface ImageMeta {
 export interface ScanContext {
   mode: 'retail_image' | 'ecommerce_listing';
   category: 'food' | 'non_food' | 'cosmetics' | 'seeds' | 'unknown';
-  imported?: boolean | null;
+  imported: boolean | null;
   inspection_date?: string | null;
 }
 
 export interface ScanRequest {
+  schema_version: 2;
   image_b64: string;
   image_meta: ImageMeta;
   ocr_payload: OCRWord[];
-  scan_context?: ScanContext;
-  schema_version?: 1 | 2;
-  ocr_lines?: OCRLine[];
+  ocr_lines: OCRLine[];
+  scan_context: ScanContext;
 }
 
 export type VerdictStatus = 'pass' | 'fail' | 'warn' | 'manual_review' | 'na';
@@ -85,12 +85,6 @@ export interface Verdict {
   rule_version: string;
 }
 
-export interface LegacyScanResponse {
-  scan_id: number;
-  overall_status: 'pass' | 'fail' | 'mixed';
-  verdicts: Verdict[];
-}
-
 export interface ScanAnalysisResponse {
   scan_id: number;
   processing_status: 'processing' | 'complete' | 'failed';
@@ -101,4 +95,21 @@ export interface ScanAnalysisResponse {
   analysis_version: string;
 }
 
-export type ScanResponse = LegacyScanResponse | ScanAnalysisResponse;
+export type ScanResponse = ScanAnalysisResponse;
+
+export interface StoredScanResponse {
+  scan: {
+    id: number;
+    mode: ScanContext['mode'];
+    category: ScanContext['category'];
+    overall_status: OverallStatus;
+    image_b64: string;
+    image_meta: ImageMeta;
+    schema_version: number;
+    processing_status: ScanAnalysisResponse['processing_status'];
+    quality_summary: QualitySummary;
+    analysis_version: string;
+    processing_error_code: string | null;
+  };
+  verdicts: Verdict[];
+}

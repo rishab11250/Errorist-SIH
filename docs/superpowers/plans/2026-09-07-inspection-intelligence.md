@@ -1247,7 +1247,7 @@ git commit -m "feat(backend): integrate inspection intelligence pipeline"
 - Emits: `ScanRequest` schema version 2 with selected mode and OCR lines.
 - Displays: quality guidance and all five status values.
 
-- [ ] **Step 1: Add serialization and status tests**
+- [x] **Step 1: Add serialization and status tests**
 
 Extract `buildScanRequest` from the dropzone and test:
 
@@ -1267,13 +1267,13 @@ it('uses manual-review status without collapsing it to warn', () => {
 });
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/frontend && pnpm test:run -- tests/scan-contract.test.ts`.
 
 Expected: FAIL because the helpers and status do not exist.
 
-- [ ] **Step 3: Update request construction and minimal phase UI**
+- [x] **Step 3: Update request construction and minimal phase UI**
 
 Add an explicit two-option mode control with values `retail_image` and `ecommerce_listing`, a category selector, and an import-context selector with `Domestic`, `Imported`, and `Not sure` mapped to `false`, `true`, and `null`. Do not request font size, DPI, package dimensions, or calibration. Change upload copy and `capture` behavior by mode, and send:
 
@@ -1290,7 +1290,7 @@ return {
 
 Render quality status and every guidance item above verdicts. Add violet `manual_review` overlay strokes and badge treatment, plus reasoning, confidence, and measurement method in `VerdictCard`. Retain text labels so status is not color-only.
 
-- [ ] **Step 4: Run frontend and end-to-end phase checks**
+- [x] **Step 4: Run frontend and end-to-end phase checks**
 
 Run:
 
@@ -1305,7 +1305,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: all commands PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add frontend/app/page.tsx 'frontend/app/scan/[id]/page.tsx' frontend/components/UploadDropzone.tsx frontend/components/AnnotatedImage.tsx frontend/components/VerdictBadge.tsx frontend/components/VerdictCard.tsx frontend/lib/api.ts frontend/lib/ocr.ts frontend/lib/ocr-lines.ts frontend/lib/types.ts frontend/tests/scan-contract.test.ts

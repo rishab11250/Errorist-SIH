@@ -1,4 +1,5 @@
 """Extract manufacture / packing date per Rule 6(1)(d)."""
+
 from __future__ import annotations
 
 import re
@@ -27,15 +28,20 @@ def extract_mfg_date(
     text = " ".join(word.text for word in ocr_words)
     match = date_re.search(text)
     if match is None:
-        return ExtractedField(name="mfg_date", value=None, bbox=None, confidence=0.0, evidence_spans=[])
+        return ExtractedField(
+            name="mfg_date", value=None, bbox=None, confidence=0.0, evidence_spans=[]
+        )
 
     matched_words = [
         word
         for word in ocr_words
-        if match.start() <= text.find(word.text) + len(word.text) and text.find(word.text) <= match.end()
+        if match.start() <= text.find(word.text) + len(word.text)
+        and text.find(word.text) <= match.end()
     ]
     if not matched_words:
-        return ExtractedField(name="mfg_date", value=None, bbox=None, confidence=0.0, evidence_spans=[])
+        return ExtractedField(
+            name="mfg_date", value=None, bbox=None, confidence=0.0, evidence_spans=[]
+        )
 
     return ExtractedField(
         name="mfg_date",

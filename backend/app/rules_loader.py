@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +21,49 @@ from app.domain import (
 
 class RulesLoadError(ValueError):
     """Raised when rules.yaml is malformed."""
+
+
+_APPLICABILITY_KEYS = {"mode_in", "category_in", "imported", "context_required"}
+_MODES = {"retail_image", "ecommerce_listing"}
+_CATEGORIES = {"food", "non_food", "cosmetics", "seeds", "unknown"}
+_CONTEXT_FIELDS = {"mode", "category", "imported", "inspection_date"}
+
+
+def _mapping(raw: object, field_name: str) -> dict[str, Any]:
+    if raw is None:
+        return {}
+    if not isinstance(raw, dict):
+        raise RulesLoadError(f"{field_name} must be a mapping")
+    return dict(raw)
+
+
+def _parse_applies_when(raw: object, rule_id: str) -> dict[str, object]:
+    applies_when = _mapping(raw, f"check {rule_id}.applies_when")
+    unknown = applies_when.keys() - _APPLICABILITY_KEYS
+    if unknown:
+        raise RulesLoadError(f"check {rule_id}: unsupported applicability keys {sorted(unknown)}")
+    mode_in = applies_when.get("mode_in")
+    if mode_in is not None and (
+        not isinstance(mode_in, list) or not mode_in or any(mode not in _MODES for mode in mode_in)
+    ):
+        raise RulesLoadError(f"check {rule_id}.applies_when.mode_in is invalid")
+    category_in = applies_when.get("category_in")
+    if category_in is not None and (
+        not isinstance(category_in, list)
+        or not category_in
+        or any(category not in _CATEGORIES for category in category_in)
+    ):
+        raise RulesLoadError(f"check {rule_id}.applies_when.category_in is invalid")
+    imported = applies_when.get("imported")
+    if imported is not None and not isinstance(imported, bool):
+        raise RulesLoadError(f"check {rule_id}.applies_when.imported must be boolean")
+    context_required = applies_when.get("context_required")
+    if context_required is not None and (
+        not isinstance(context_required, list)
+        or any(field_name not in _CONTEXT_FIELDS for field_name in context_required)
+    ):
+        raise RulesLoadError(f"check {rule_id}.applies_when.context_required is invalid")
+    return applies_when
 
 
 def _parse_brackets(raw: list[dict[str, Any]], field: str) -> list[FontSizeBracket]:
@@ -82,8 +126,18 @@ def _parse_check(raw: dict[str, Any]) -> CheckConfig:
     missing = required - raw.keys()
     if missing:
         raise RulesLoadError(f"check {raw.get('rule_id', '?')}: missing fields {missing}")
+    rule_id = raw["rule_id"]
+    effective_from = raw.get("effective_from")
+    if effective_from is not None:
+        try:
+            date.fromisoformat(effective_from)
+        except (TypeError, ValueError) as exc:
+            raise RulesLoadError(f"check {rule_id}.effective_from must be an ISO date") from exc
+    placement = _mapping(raw.get("placement"), f"check {rule_id}.placement")
+    readability = _mapping(raw.get("readability"), f"check {rule_id}.readability")
+    exemption = _mapping(raw.get("exemption"), f"check {rule_id}.exemption")
     return CheckConfig(
-        rule_id=raw["rule_id"],
+        rule_id=rule_id,
         citation=raw["citation"],
         field=raw["field"],
         check_type=raw["check_type"],
@@ -98,6 +152,11 @@ def _parse_check(raw: dict[str, Any]) -> CheckConfig:
         date_format_regex=raw.get("date_format_regex"),
         skipped_when_category_in=raw.get("skipped_when_category_in"),
         skipped_when_mode=raw.get("skipped_when_mode"),
+        applies_when=_parse_applies_when(raw.get("applies_when"), rule_id),
+        placement=placement,
+        readability=readability,
+        effective_from=effective_from,
+        exemption=exemption,
     )
 
 

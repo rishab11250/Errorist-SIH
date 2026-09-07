@@ -1,6 +1,8 @@
 """Scan creation and retrieval API routes."""
+
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -23,6 +25,14 @@ from app.models import ScanRequest
 from app.rules_loader import get_active_rules
 
 router = APIRouter(prefix="/api", tags=["scan"])
+
+_LEGACY_RULE_IDS = {
+    "r6_1_e_mrp",
+    "r6_1_c_net_quantity",
+    "r6_1_a_address",
+    "r6_2_consumer_care",
+    "r6_1_d_mfg_date",
+}
 
 
 def _word_from_dto(word: object) -> OCRWord:
@@ -52,7 +62,9 @@ def create_scan(
     care_check = rules.check_by_id("r6_2_consumer_care")
     date_check = rules.check_by_id("r6_1_d_mfg_date")
 
-    mrp = extract_mrp(words, image_meta, mrp_check.tax_inclusive_phrase_regex) if mrp_check else None
+    mrp = (
+        extract_mrp(words, image_meta, mrp_check.tax_inclusive_phrase_regex) if mrp_check else None
+    )
     # A non-empty MRP extractor result already verified the tax phrase; preserve
     # that fact in the engine input while retaining its evidence bboxes.
     if mrp and mrp.value:
@@ -65,7 +77,9 @@ def create_scan(
         )
 
     extracted: dict[str, ExtractedField] = {
-        "manufacturer_address": extract_manufacturer_address(words, image_meta, address_check.pin_code_regex)
+        "manufacturer_address": extract_manufacturer_address(
+            words, image_meta, address_check.pin_code_regex
+        )
         if address_check and address_check.pin_code_regex
         else None,
         "net_quantity": extract_net_quantity(words, image_meta, quantity_check.requires_unit_in)
@@ -83,9 +97,16 @@ def create_scan(
         "common_name": extract_common_name(words, image_meta),
         "country_origin": extract_country_origin(words, image_meta),
     }
+    # The complete configured profile is consumed by the version-2 analysis
+    # pipeline introduced in Task 9. Keep this legacy route response stable
+    # until that pipeline can provide evidence for every new check.
+    legacy_rules = replace(
+        rules,
+        checks=[check for check in rules.checks if check.rule_id in _LEGACY_RULE_IDS],
+    )
     verdicts = run_engine(
         extracted,
-        rules,
+        legacy_rules,
         ScanContext(mode=req.scan_context.mode, category=req.scan_context.category),
     )
     statuses = {verdict.status for verdict in verdicts}

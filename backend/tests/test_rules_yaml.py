@@ -44,20 +44,33 @@ def test_consolidated_has_one_table() -> None:
 
 def test_all_five_mvp_checks_present() -> None:
     cfg = load_rules(RULES_PATH)
-    assert {c.rule_id for c in cfg.checks} == {
+    assert {
         "r6_1_e_mrp",
         "r6_1_c_net_quantity",
         "r6_1_a_address",
         "r6_2_consumer_care",
         "r6_1_d_mfg_date",
-    }
+    } <= {c.rule_id for c in cfg.checks}
+
+
+def test_extended_check_ids_are_present() -> None:
+    cfg = load_rules(RULES_PATH)
+    assert {
+        "r6_1_b_common_name",
+        "r6_1_aa_country_origin",
+        "r6_1_da_best_before",
+        "r6_1_f_dimensions",
+        "r6_11_unit_sale_price",
+        "r6_10_ecommerce_declarations",
+        "r7_font_size",
+    } <= {check.rule_id for check in cfg.checks}
 
 
 def test_citations_use_verified_form() -> None:
     import re
 
     cfg = load_rules(RULES_PATH)
-    pattern = re.compile(r"Rule\s+\d+\([a-z0-9]+\)")
+    pattern = re.compile(r"Rule\s+\d+(?:\([a-z0-9]+\))?")
     for c in cfg.checks:
         assert pattern.search(c.citation), f"{c.rule_id}: bad citation {c.citation!r}"
 
@@ -106,4 +119,23 @@ def test_invalid_font_size_enforcement_policy_is_rejected(
     invalid_rules = tmp_path / "rules.yaml"
     invalid_rules.write_text(yaml.safe_dump(raw), encoding="utf-8")
     with pytest.raises(RulesLoadError):
+        load_rules(invalid_rules)
+
+
+def test_unit_price_effective_date_and_exemptions_are_configured() -> None:
+    check = next(
+        check for check in load_rules(RULES_PATH).checks if check.rule_id == "r6_11_unit_sale_price"
+    )
+    assert check.effective_from == "2023-06-01"
+    assert check.exemption["retail_sale_price_equals_unit_sale_price"] is True
+    assert set(check.exemption["package_types"]) >= {"combination", "group", "multi_piece"}
+
+
+def test_unknown_applicability_key_is_rejected(tmp_path: Path) -> None:
+    source = Path(__file__).parents[1] / "app" / "rules.yaml"
+    raw = yaml.safe_load(source.read_text(encoding="utf-8"))
+    raw["checks"][0]["applies_when"] = {"unsupported_fact": True}
+    invalid_rules = tmp_path / "rules.yaml"
+    invalid_rules.write_text(yaml.safe_dump(raw), encoding="utf-8")
+    with pytest.raises(RulesLoadError, match="unsupported applicability"):
         load_rules(invalid_rules)

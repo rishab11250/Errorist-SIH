@@ -958,7 +958,7 @@ git commit -m "feat(backend): add evidence-based placement checks"
 - Produces: `extract_all(words, image_meta, context, rules) -> dict[str, ExtractedField | None]`.
 - Produces configured fields: `common_name`, `country_origin`, `best_before`, `dimensions`, `unit_price`, and `importer_address`.
 
-- [ ] **Step 1: Write table-driven extractor tests**
+- [x] **Step 1: Write table-driven extractor tests**
 
 Use normalized word fixtures and assert value plus evidence boxes:
 
@@ -984,13 +984,13 @@ def test_extended_extractors(text, field, expected, image_meta):
 
 Add negative cases for missing labels, non-metric dimensions, malformed price-per-unit, domestic mode without importer text, and screenshot text outside a visible box.
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_extract_extended.py -q`.
 
 Expected: FAIL for missing modules/registry.
 
-- [ ] **Step 3: Implement extractors with named-label windows**
+- [x] **Step 3: Implement extractors with named-label windows**
 
 Each extractor must call shared line/word helpers, match a bounded case-insensitive label, return only the label’s line plus at most two following lines, calculate confidence as the mean of contributing words, and union their boxes. Use these anchored patterns:
 
@@ -1007,7 +1007,7 @@ PATTERNS = {
 
 Register extractors by field name in `registry.py`; `scan_routes.py` will no longer call extractors one-by-one after Task 9.
 
-- [ ] **Step 4: Extend the rules schema and YAML**
+- [x] **Step 4: Extend the rules schema and YAML**
 
 Add `applies_when` with allowed keys `mode_in`, `category_in`, `imported`, and `context_required`; add `placement` and `readability` blocks to `CheckConfig`. Add these configured IDs and citations:
 
@@ -1023,7 +1023,7 @@ Add `applies_when` with allowed keys `mode_in`, `category_in`, `imported`, and `
 
 Country-of-origin and importer requirements use `imported: true`; screenshot aggregation uses `mode_in: [ecommerce_listing]`; physical placement/font checks use `mode_in: [retail_image]`. Unit sale price carries the effective date and exemption encoded in `rules.yaml`. If imported status or another required applicability fact is unknown, `context_required` makes the affected verdict `manual_review`.
 
-- [ ] **Step 5: Run focused and schema tests**
+- [x] **Step 5: Run focused and schema tests**
 
 Run:
 
@@ -1034,7 +1034,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS; all enabled checks have unique IDs, verified citations, registered extractors, and valid applicability.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add backend/app/extractors backend/app/rules.yaml backend/app/domain.py backend/app/rules_loader.py backend/tests/test_extract_extended.py backend/tests/test_rules_yaml.py

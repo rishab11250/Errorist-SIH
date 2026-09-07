@@ -89,3 +89,103 @@ checks:
     skipped_when_mode: ecommerce_listing
     date_format_regex: '(?i)\b(?:mfg|mfd|manufactured|packed|pkd)[:\s,.]*((0?[1-9]|1[0-2])[\/\-\s]\d{2,4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{4})'
     failure_message: "Month and year of manufacture required (skip if food/cosmetics/seeds or ecommerce mode)"
+
+  - rule_id: r6_1_b_common_name
+    citation: "Rule 6(1)(b) of LMPC Rules 2011"
+    field: common_name
+    check_type: presence_and_format
+    severity: critical
+    requires: [common_name_value]
+    failure_message: "Common or generic name of the commodity is required"
+    placement: {relationship: inside_visible_panel}
+    readability: {required: true}
+
+  - rule_id: r6_1_aa_country_origin
+    citation: "Rule 6(1)(aa) of LMPC Rules 2011"
+    field: country_origin
+    check_type: presence_and_format
+    severity: critical
+    requires: [country_origin_value]
+    failure_message: "Country of origin is required for imported products"
+    applies_when:
+      imported: true
+      context_required: [imported]
+    placement: {relationship: inside_visible_panel}
+    readability: {required: true}
+
+  - rule_id: r6_1_a_importer_address
+    citation: "Rule 6(1)(a) of LMPC Rules 2011"
+    field: importer_address
+    check_type: presence_and_format
+    severity: critical
+    requires: [importer_address_value]
+    failure_message: "Importer name and complete address are required for imported products"
+    applies_when:
+      imported: true
+      context_required: [imported]
+    placement: {relationship: inside_visible_panel}
+    readability: {required: true}
+
+  - rule_id: r6_1_da_best_before
+    citation: "Rule 6(1)(da) of LMPC Rules 2011"
+    field: best_before
+    check_type: presence_and_format
+    severity: warning
+    requires: [best_before_value]
+    failure_message: "Best-before, use-by, or expiry declaration is required when applicable"
+    applies_when:
+      category_in: [food]
+      context_required: [category]
+    placement: {relationship: inside_visible_panel}
+    readability: {required: true}
+
+  - rule_id: r6_1_f_dimensions
+    citation: "Rule 6(1)(f) of LMPC Rules 2011"
+    field: dimensions
+    check_type: presence_and_format
+    severity: warning
+    requires: [dimensions_value]
+    failure_message: "Metric dimensional declaration is required when applicable"
+    applies_when:
+      mode_in: [retail_image]
+      category_in: [non_food]
+      context_required: [category]
+    placement: {relationship: inside_visible_panel}
+    readability: {required: true}
+
+  - rule_id: r6_11_unit_sale_price
+    citation: "Rule 6(11) of LMPC Rules 2011"
+    field: unit_price
+    check_type: presence_and_format
+    severity: warning
+    requires: [unit_price_value]
+    failure_message: "Unit sale price in rupees per applicable unit is required"
+    effective_from: "2023-06-01"
+    exemption:
+      retail_sale_price_equals_unit_sale_price: true
+      package_types: [combination, group, multi_piece]
+      state_excise_governs_alcoholic_beverages: true
+    placement: {relationship: associated_with_related_declaration, related_fields: [mrp]}
+    readability: {required: true}
+
+  - rule_id: r6_10_ecommerce_declarations
+    citation: "Rule 6(10) of LMPC Rules 2011"
+    field: listing_declarations
+    check_type: aggregate_visibility
+    severity: critical
+    requires: [listing_declarations]
+    failure_message: "Mandatory declarations must be visible in the submitted listing evidence"
+    applies_when:
+      mode_in: [ecommerce_listing]
+    placement: {relationship: visible_in_submitted_screenshot}
+
+  - rule_id: r7_font_size
+    citation: "Rule 7 of LMPC Rules 2011"
+    field: declaration_readability
+    check_type: readability
+    severity: warning
+    requires: [declaration_readability]
+    failure_message: "Declaration character height must meet the applicable Rule 7 minimum"
+    applies_when:
+      mode_in: [retail_image]
+    readability: {required: true, confidence_aware: true}

@@ -216,6 +216,11 @@ class CheckConfig:
     date_format_regex: str | None = None
     skipped_when_category_in: list[str] | None = None
     skipped_when_mode: str | None = None
+    applies_when: dict[str, object] = field(default_factory=dict)
+    placement: dict[str, object] = field(default_factory=dict)
+    readability: dict[str, object] = field(default_factory=dict)
+    effective_from: str | None = None
+    exemption: dict[str, object] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

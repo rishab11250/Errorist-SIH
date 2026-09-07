@@ -1,4 +1,5 @@
 """Extract consumer care details per Rule 6(2) — name, address, phone, email."""
+
 from __future__ import annotations
 
 import re
@@ -32,8 +33,12 @@ def extract_consumer_care(
         )
 
     section_words = find_word_with_text(ocr_words, SECTION_KEYWORDS)
-    section_y = min(word.bbox[1] for word in section_words) if section_words else min(
-        min(word.bbox[1] for word in email_words), min(word.bbox[1] for word in phone_words)
+    section_y = (
+        min(word.bbox[1] for word in section_words)
+        if section_words
+        else min(
+            min(word.bbox[1] for word in email_words), min(word.bbox[1] for word in phone_words)
+        )
     )
 
     block = [word for word in ocr_words if 0 <= word.bbox[1] - section_y <= 200]

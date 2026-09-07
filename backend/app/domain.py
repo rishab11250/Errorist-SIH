@@ -156,6 +156,13 @@ class AnalysisInput:
 
 
 @dataclass(frozen=True)
+class ApplicabilityDecision:
+    has_required_context: bool
+    skipped: bool
+    reasoning: str
+
+
+@dataclass(frozen=True)
 class AnalysisResult:
     quality: QualitySummary
     extracted: dict[str, ExtractedField | None]

@@ -1052,7 +1052,7 @@ git commit -m "feat(backend): expand LMPC declaration coverage"
 - Consumes: extracted fields, quality/readability/placement evidence, and rule applicability.
 - Produces: `run_engine(AnalysisInput, RulesConfig, ScanContext) -> list[Verdict]`.
 
-- [ ] **Step 1: Add failing status-precedence and evidence-sufficiency tests**
+- [x] **Step 1: Add failing status-precedence and evidence-sufficiency tests**
 
 ```python
 def test_missing_field_with_unreadable_evidence_requires_review(rules):
@@ -1072,13 +1072,13 @@ def test_overall_precedence():
 
 Also change the old “confidence below warn threshold fails” assertion: low OCR confidence now becomes `manual_review` unless independent high-confidence evidence proves malformed content.
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_engine.py -q`.
 
 Expected: FAIL because the current engine maps low confidence to `fail` and lacks `manual_review`.
 
-- [ ] **Step 3: Implement evidence-sufficiency gates**
+- [x] **Step 3: Implement evidence-sufficiency gates**
 
 Use this decision order per applicable rule:
 
@@ -1103,7 +1103,7 @@ else:
 
 Every branch sets a non-empty `reasoning`, confidence from the weakest required evidence, the applicable measurement method, and relevant boxes. Add pure `overall_status(verdicts)` using the specified precedence.
 
-- [ ] **Step 4: Run engine and extractor regressions**
+- [x] **Step 4: Run engine and extractor regressions**
 
 Run:
 
@@ -1114,7 +1114,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add backend/app/engine.py backend/app/domain.py backend/tests/test_engine.py

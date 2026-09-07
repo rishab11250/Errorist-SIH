@@ -1,4 +1,4 @@
-# SIH 26034 — LMPC Compliance Checker
+# Errorist — SIH 26034 LMPC Compliance Checker
 
 Web app that checks packaged-commodity labels for compliance with the
 Legal Metrology (Packaged Commodities) Rules, 2011.
@@ -9,5 +9,5 @@ Legal Metrology (Packaged Commodities) Rules, 2011.
 
 ## Quick start
 
-Backend: `cd backend && uv sync && uv run uvicorn app.main:app --reload`
+Backend: `cd backend && .venv/bin/python -m pip install -e '.[dev]' && .venv/bin/python -m uvicorn app.main:app --reload`
 Frontend: `cd frontend && pnpm install && pnpm dev`

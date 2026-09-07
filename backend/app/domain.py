@@ -1,13 +1,18 @@
 """Core domain types used across the engine, extractors, and API layers."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Literal
+
+import numpy as np
 
 
 @dataclass(frozen=True)
 class OCRWord:
     """A single word returned by the browser's OCR engine."""
+
     text: str
     confidence: float
     bbox: tuple[float, float, float, float]
@@ -16,15 +21,17 @@ class OCRWord:
 @dataclass(frozen=True)
 class ImageMeta:
     """Metadata about the source image."""
+
     width: int
     height: int
-    dpi: int | None = None
+    dpi: float | None = None
     orientation: int = 1
 
 
 @dataclass
 class ExtractedField:
     """A single field extracted from the OCR payload by one extractor."""
+
     name: str
     value: str | None
     bbox: tuple[float, float, float, float] | None
@@ -40,9 +47,24 @@ Category = Literal["food", "non_food", "cosmetics", "seeds", "unknown"]
 class ScanContext:
     mode: Mode = "retail_image"
     category: Category = "unknown"
+    imported: bool | None = None
+    inspection_date: date | None = None
 
 
-VerdictStatus = Literal["pass", "fail", "warn", "na"]
+MeasurementMethod = Literal[
+    "direct_metadata",
+    "geometry_estimate",
+    "relative_readability",
+    "not_measurable",
+]
+QualityStatus = Literal[
+    "acceptable",
+    "usable_with_warnings",
+    "retake_recommended",
+    "unreadable",
+]
+VerdictStatus = Literal["pass", "fail", "warn", "manual_review", "na"]
+OverallStatus = Literal["pass", "fail", "mixed", "manual_review"]
 Severity = Literal["critical", "warning", "info"]
 
 
@@ -56,6 +78,90 @@ class Verdict:
     evidence_bboxes: list[tuple[float, float, float, float]]
     failure_message: str | None
     rule_version: str
+    confidence: float = 1.0
+    reasoning: str = "Legacy verdict"
+    measurement_method: MeasurementMethod = "not_measurable"
+
+
+@dataclass(frozen=True)
+class OCRLine:
+    word_indexes: tuple[int, ...]
+    bbox: tuple[float, float, float, float]
+    median_character_height: float
+
+
+@dataclass(frozen=True)
+class VisualMetric:
+    name: str
+    value: float
+    unit: str
+    confidence: float
+    method: str
+    evidence_bboxes: tuple[tuple[float, float, float, float], ...] = ()
+
+
+@dataclass(frozen=True)
+class QualitySummary:
+    status: QualityStatus
+    score: float
+    metrics: tuple[VisualMetric, ...]
+    guidance: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class DecodedImage:
+    image: np.ndarray
+    width: int
+    height: int
+    metadata: dict[str, object]
+
+
+@dataclass(frozen=True)
+class PanelEstimate:
+    bbox: tuple[float, float, float, float]
+    confidence: float
+    corners: tuple[tuple[float, float], ...] = ()
+    physical_width_mm: float | None = None
+    scale_method: MeasurementMethod = "not_measurable"
+
+
+@dataclass(frozen=True)
+class ReadabilityAssessment:
+    score: float
+    character_height_px: float
+    estimated_mm: float | None
+    error_mm: float | None
+    method: MeasurementMethod
+    scale_confidence: float
+    status: VerdictStatus
+    reasoning: str
+    evidence_bboxes: tuple[tuple[float, float, float, float], ...] = ()
+
+
+@dataclass(frozen=True)
+class PlacementResult:
+    status: VerdictStatus
+    relationship: str
+    confidence: float
+    reasoning: str
+    evidence_bboxes: tuple[tuple[float, float, float, float], ...] = ()
+
+
+@dataclass(frozen=True)
+class AnalysisInput:
+    extracted: dict[str, ExtractedField | None]
+    quality: QualitySummary
+    readability: dict[str, ReadabilityAssessment]
+    placement: dict[str, PlacementResult]
+
+
+@dataclass(frozen=True)
+class AnalysisResult:
+    quality: QualitySummary
+    extracted: dict[str, ExtractedField | None]
+    verdicts: tuple[Verdict, ...]
+    overall_status: OverallStatus
+    analysis_version: str
 
 
 @dataclass(frozen=True)

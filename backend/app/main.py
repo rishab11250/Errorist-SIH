@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
 from app.dashboard_routes import router as dashboard_router
 from app.db import init_db
+from app.errors import install_error_handlers
 from app.models import HealthResponse
 from app.report_routes import router as report_router
 from app.rules_loader import get_active_rules, load_rules, set_active_rules
@@ -34,6 +35,7 @@ app = FastAPI(
     description="Check packaged-commodity labels against LMPC Rules 2011.",
     lifespan=lifespan,
 )
+install_error_handlers(app)
 
 # CORS: allow local dev frontend on 3000
 app.add_middleware(

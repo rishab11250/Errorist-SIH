@@ -1,5 +1,49 @@
-"""Pydantic DTOs for HTTP request/response."""
-from pydantic import BaseModel, Field
+"""Pydantic DTOs for HTTP request and response payloads."""
+
+from __future__ import annotations
+
+import math
+from datetime import date
+from typing import Annotated, Literal
+
+from pydantic import AfterValidator, BaseModel, Field, field_validator
+
+
+def _normalized_bbox(
+    value: tuple[float, float, float, float],
+) -> tuple[float, float, float, float]:
+    x, y, width, height = value
+    if not all(math.isfinite(part) for part in value):
+        raise ValueError("bbox values must be finite")
+    if not all(0.0 <= part <= 1.0 for part in value):
+        raise ValueError("bbox values must be between 0 and 1")
+    if width <= 0.0 or height <= 0.0:
+        raise ValueError("bbox width and height must be greater than zero")
+    if x + width > 1.0 or y + height > 1.0:
+        raise ValueError("bbox must fit inside normalized image bounds")
+    return value
+
+
+NormalizedBBox = Annotated[
+    tuple[float, float, float, float],
+    AfterValidator(_normalized_bbox),
+]
+ModeValue = Literal["retail_image", "ecommerce_listing"]
+CategoryValue = Literal["food", "non_food", "cosmetics", "seeds", "unknown"]
+VerdictStatusValue = Literal["pass", "fail", "warn", "manual_review", "na"]
+OverallStatusValue = Literal["pass", "fail", "mixed", "manual_review"]
+QualityStatusValue = Literal[
+    "acceptable",
+    "usable_with_warnings",
+    "retake_recommended",
+    "unreadable",
+]
+MeasurementMethodValue = Literal[
+    "direct_metadata",
+    "geometry_estimate",
+    "relative_readability",
+    "not_measurable",
+]
 
 
 class HealthResponse(BaseModel):
@@ -8,28 +52,98 @@ class HealthResponse(BaseModel):
 
 
 class ScanContextIn(BaseModel):
-    mode: str = Field(default="retail_image", pattern="^(retail_image|ecommerce_listing)$")
-    category: str = Field(
-        default="unknown",
-        pattern="^(food|non_food|cosmetics|seeds|unknown)$",
-    )
+    mode: ModeValue = "retail_image"
+    category: CategoryValue = "unknown"
+    imported: bool | None = None
+    inspection_date: date | None = None
 
 
 class ImageMetaIn(BaseModel):
     width: int = Field(gt=0)
     height: int = Field(gt=0)
-    dpi: int | None = None
-    orientation: int = 1
+    dpi: float | None = Field(default=None, gt=0)
+    orientation: int = Field(default=1, ge=1, le=8)
 
 
 class OCRWordIn(BaseModel):
     text: str
     confidence: float = Field(ge=0.0, le=1.0)
-    bbox: tuple[float, float, float, float]  # x, y, w, h normalised 0..1
+    bbox: NormalizedBBox
+
+
+class OCRLineIn(BaseModel):
+    word_indexes: list[int] = Field(min_length=1)
+    bbox: NormalizedBBox
+    median_character_height: float = Field(gt=0.0, le=1.0)
+
+    @field_validator("word_indexes")
+    @classmethod
+    def validate_word_indexes(cls, value: list[int]) -> list[int]:
+        if any(index < 0 for index in value):
+            raise ValueError("word indexes must be non-negative")
+        if len(set(value)) != len(value):
+            raise ValueError("word indexes must not repeat")
+        return value
 
 
 class ScanRequest(BaseModel):
     image_b64: str
     image_meta: ImageMetaIn
     ocr_payload: list[OCRWordIn]
-    scan_context: ScanContextIn = ScanContextIn()
+    scan_context: ScanContextIn = Field(default_factory=ScanContextIn)
+    schema_version: Literal[1, 2] = 1
+    ocr_lines: list[OCRLineIn] = Field(default_factory=list)
+
+
+class VisualMetricOut(BaseModel):
+    name: str
+    value: float
+    unit: str
+    confidence: float = Field(ge=0.0, le=1.0)
+    method: str
+    evidence_bboxes: list[NormalizedBBox] = Field(default_factory=list)
+
+
+class QualitySummaryOut(BaseModel):
+    status: QualityStatusValue
+    score: float = Field(ge=0.0, le=100.0)
+    metrics: list[VisualMetricOut] = Field(default_factory=list)
+    guidance: list[str] = Field(default_factory=list)
+
+
+class ExtractedFieldOut(BaseModel):
+    name: str
+    value: str | None
+    bbox: NormalizedBBox | None
+    confidence: float = Field(ge=0.0, le=1.0)
+    evidence_bboxes: list[NormalizedBBox] = Field(default_factory=list)
+
+
+class VerdictOut(BaseModel):
+    rule_id: str
+    status: VerdictStatusValue
+    severity: Literal["critical", "warning", "info"]
+    citation: str
+    evidence: str
+    evidence_bboxes: list[NormalizedBBox] = Field(default_factory=list)
+    confidence: float = Field(ge=0.0, le=1.0)
+    reasoning: str = Field(min_length=1)
+    measurement_method: MeasurementMethodValue
+    failure_message: str | None
+    rule_version: str
+
+
+class ScanAnalysisResponse(BaseModel):
+    scan_id: int
+    processing_status: Literal["processing", "complete", "failed"]
+    quality: QualitySummaryOut
+    extracted_fields: dict[str, ExtractedFieldOut | None]
+    verdicts: list[VerdictOut]
+    overall_status: OverallStatusValue
+    analysis_version: str
+
+
+class ErrorResponse(BaseModel):
+    error: str
+    detail: str
+    request_id: str

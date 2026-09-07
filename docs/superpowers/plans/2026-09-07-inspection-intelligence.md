@@ -333,13 +333,14 @@ git commit -m "feat(backend): add migration foundation for inspection data"
 - Modify: `backend/app/main.py`
 - Create: `backend/app/errors.py`
 - Modify: `frontend/lib/types.ts`
+- Modify: `frontend/components/VerdictBadge.tsx`
 - Create: `backend/tests/test_analysis_contract.py`
 
 **Interfaces:**
 - Produces: `OCRLine`, `VisualMetric`, `QualitySummary`, `ExtractedFieldOut`, expanded `Verdict`, and `ScanAnalysisResponse`.
 - Consumes: migration columns from Task 1.
 
-- [ ] **Step 1: Write contract tests**
+- [x] **Step 1: Write contract tests**
 
 Create `backend/tests/test_analysis_contract.py`:
 
@@ -389,7 +390,7 @@ def test_app_error_uses_shared_envelope():
     }
 ```
 
-- [ ] **Step 2: Verify the tests fail**
+- [x] **Step 2: Verify the tests fail**
 
 Run:
 
@@ -400,7 +401,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: FAIL because the version-2 DTOs do not exist.
 
-- [ ] **Step 3: Add exact domain values and DTO validation**
+- [x] **Step 3: Add exact domain values and DTO validation**
 
 Add these exact domain types and equivalent Pydantic input/output models:
 
@@ -502,7 +503,7 @@ Mirror these exact enum strings and fields in `frontend/lib/types.ts`. Update SQ
 
 Create `errors.py` with `AppError`, `error_body`, request-ID middleware, and handlers for application, FastAPI HTTP, and Pydantic request-validation errors. Register it in `main.py` now so inspection errors already use `{error, detail, request_id}`; the operations plan later reuses and extends this module.
 
-- [ ] **Step 4: Run contract and regression tests**
+- [x] **Step 4: Run contract and regression tests**
 
 Run:
 
@@ -515,10 +516,10 @@ pnpm exec tsc --noEmit
 
 Expected: all tests and type checking PASS; version-1 callers still validate.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
-git add backend/app/domain.py backend/app/models.py backend/app/db.py backend/app/main.py backend/app/errors.py backend/tests/test_analysis_contract.py frontend/lib/types.ts
+git add backend/app/domain.py backend/app/models.py backend/app/db.py backend/app/main.py backend/app/errors.py backend/tests/test_analysis_contract.py frontend/lib/types.ts frontend/components/VerdictBadge.tsx docs/superpowers/plans/2026-09-07-inspection-intelligence.md
 git commit -m "feat: define versioned inspection analysis contract"
 ```
 

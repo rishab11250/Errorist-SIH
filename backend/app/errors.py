@@ -18,8 +18,12 @@ logger = logging.getLogger(__name__)
 _REQUEST_ID = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 _ERROR_CODE = re.compile(r"^[a-z][a-z0-9_]*$")
 _HTTP_DETAILS = {
+    "authentication_required": "Sign in to continue.",
+    "forbidden": "You do not have permission to perform this action.",
+    "invalid_credentials": "Username or password is incorrect.",
     "no_text_extracted": "No usable text was extracted from the evidence image.",
     "scan_not_found": "Scan not found.",
+    "session_expired": "Your session is no longer valid. Sign in again.",
 }
 
 

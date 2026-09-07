@@ -294,7 +294,7 @@ git commit -m "feat(backend): add secure local session services"
 - Produces: `require_user(request, session) -> User`, `require_admin(user) -> User` and `/api/auth/login|logout|me`.
 - Produces: `AppError(status_code, error, detail)` serialized with request ID.
 
-- [ ] **Step 1: Write authentication route tests**
+- [x] **Step 1: Write authentication route tests**
 
 ```python
 def test_login_sets_http_only_cookie(client, inspector_credentials):
@@ -317,17 +317,17 @@ def test_logout_revokes_cookie(client, logged_in_inspector):
     assert client.get("/api/auth/me").status_code == 401
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_auth_routes.py -q`.
 
 Expected: FAIL with 404 routes.
 
-- [ ] **Step 3: Extend request IDs and error handlers for authentication**
+- [x] **Step 3: Extend request IDs and error handlers for authentication**
 
 Retain the inspection plan's request-ID middleware. Add stable `invalid_credentials`, `authentication_required`, `forbidden`, and `session_expired` error codes to the shared `AppError` path. Confirm handlers for application, FastAPI HTTP, request-validation, and unexpected exceptions return the shared envelope without exposing stack traces.
 
-- [ ] **Step 4: Implement login, logout, and current-user routes**
+- [x] **Step 4: Implement login, logout, and current-user routes**
 
 Use `LoginRequest(username: str, password: str)` with length bounds. Login returns the same generic 401 for unknown user, wrong password, or inactive user; on success it updates `last_login_at`, revokes earlier active sessions for that user, issues one new session, and calls:
 
@@ -345,7 +345,7 @@ response.set_cookie(
 
 Logout is idempotent, revokes a present token, deletes the cookie, and returns 204. `/me` returns only `id`, `username`, `display_name`, and `role`.
 
-- [ ] **Step 5: Run route and full API tests**
+- [x] **Step 5: Run route and full API tests**
 
 Run:
 
@@ -357,7 +357,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS; existing route tests use an authenticated client fixture where protection is introduced in Task 5.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add backend/app/errors.py backend/app/auth backend/app/main.py backend/tests/conftest.py backend/tests/test_auth_routes.py

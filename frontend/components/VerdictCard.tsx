@@ -33,11 +33,15 @@ export function VerdictCard({ verdict }: { verdict: Verdict }) {
       <dl className="grid grid-cols-2 gap-3 border-t border-slate-100 pt-3 text-xs">
         <div>
           <dt className="text-slate-500">Confidence</dt>
-          <dd className="mt-1 font-semibold text-slate-800">{Math.round(verdict.confidence * 100)}%</dd>
+          <dd className="mt-1 font-semibold text-slate-800">
+            {Math.round(verdict.confidence * 100)}%
+          </dd>
         </div>
         <div>
           <dt className="text-slate-500">Assessment method</dt>
-          <dd className="mt-1 font-semibold text-slate-800">{methods[verdict.measurement_method]}</dd>
+          <dd className="mt-1 font-semibold text-slate-800">
+            {methods[verdict.measurement_method]}
+          </dd>
         </div>
       </dl>
     </article>

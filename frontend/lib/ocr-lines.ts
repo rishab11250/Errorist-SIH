@@ -15,18 +15,16 @@ export function groupWordsIntoLines(words: OCRWord[]): OCRLine[] {
       (left, right) =>
         centerY(left.word) - centerY(right.word) ||
         left.word.bbox[0] - right.word.bbox[0] ||
-        left.index - right.index,
+        left.index - right.index
     );
   const groups: Array<Array<{ word: OCRWord; index: number }>> = [];
 
   for (const item of indexed) {
     const match = groups.find((group) => {
       const medianHeight = upperMedian(group.map(({ word }) => word.bbox[3]));
-      const meanY =
-        group.reduce((sum, value) => sum + centerY(value.word), 0) / group.length;
+      const meanY = group.reduce((sum, value) => sum + centerY(value.word), 0) / group.length;
       return (
-        Math.abs(centerY(item.word) - meanY) <=
-        Math.max(medianHeight, item.word.bbox[3]) * 0.6
+        Math.abs(centerY(item.word) - meanY) <= Math.max(medianHeight, item.word.bbox[3]) * 0.6
       );
     });
     if (match) {
@@ -37,9 +35,7 @@ export function groupWordsIntoLines(words: OCRWord[]): OCRLine[] {
   }
 
   return groups.map((group) => {
-    group.sort(
-      (left, right) => left.word.bbox[0] - right.word.bbox[0] || left.index - right.index,
-    );
+    group.sort((left, right) => left.word.bbox[0] - right.word.bbox[0] || left.index - right.index);
     const x0 = Math.min(...group.map(({ word }) => word.bbox[0]));
     const y0 = Math.min(...group.map(({ word }) => word.bbox[1]));
     const x1 = Math.max(...group.map(({ word }) => word.bbox[0] + word.bbox[2]));

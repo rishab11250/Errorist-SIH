@@ -29,7 +29,7 @@ describe('login form', () => {
       http.post('/api/auth/login', async ({ request }) => {
         received = await request.json();
         return HttpResponse.json({ user: INSPECTOR });
-      }),
+      })
     );
     const onAuthenticated = vi.fn();
     render(<LoginForm onAuthenticated={onAuthenticated} />);
@@ -38,7 +38,7 @@ describe('login form', () => {
     expect(received).toEqual({ username: 'inspector', password: 'correct password' });
     expect(fetchSpy).toHaveBeenCalledWith(
       '/api/auth/login',
-      expect.objectContaining({ credentials: 'include' }),
+      expect.objectContaining({ credentials: 'include' })
     );
     expect(onAuthenticated).toHaveBeenCalledWith(INSPECTOR);
     fetchSpy.mockRestore();
@@ -53,15 +53,15 @@ describe('login form', () => {
             detail: 'Username or password is incorrect.',
             request_id: 'r1',
           },
-          { status: 401 },
-        ),
-      ),
+          { status: 401 }
+        )
+      )
     );
     render(<LoginForm onAuthenticated={() => undefined} />);
     const user = await enterCredentials();
     await user.click(screen.getByRole('button', { name: 'Sign in' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Username or password is incorrect.',
+      'Username or password is incorrect.'
     );
   });
 

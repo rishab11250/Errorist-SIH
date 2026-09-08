@@ -22,7 +22,10 @@ export interface OCRRunResult {
   imageHeight: number;
 }
 
-export async function runOCR(file: File, onProgress?: (progress: number) => void): Promise<OCRRunResult> {
+export async function runOCR(
+  file: File,
+  onProgress?: (progress: number) => void
+): Promise<OCRRunResult> {
   const imageDataUrl = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);

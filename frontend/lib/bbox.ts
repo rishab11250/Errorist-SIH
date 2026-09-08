@@ -8,7 +8,7 @@ export function normaliseBbox(bboxPx: Bbox, imageWidth: number, imageHeight: num
 export function denormaliseBbox(
   bboxNorm: Bbox,
   displayWidth: number,
-  displayHeight: number,
+  displayHeight: number
 ): { x: number; y: number; w: number; h: number } {
   const [x, y, w, h] = bboxNorm;
   return { x: x * displayWidth, y: y * displayHeight, w: w * displayWidth, h: h * displayHeight };

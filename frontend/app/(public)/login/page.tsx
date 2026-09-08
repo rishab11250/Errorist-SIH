@@ -21,7 +21,9 @@ function LoginContent() {
           <span className="mb-4 grid size-11 place-items-center rounded-md bg-primary text-primary-foreground">
             <ShieldCheck aria-hidden="true" className="size-6" />
           </span>
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary">Secure workspace</p>
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+            Secure workspace
+          </p>
           <h1 className="mt-2 text-h1">Sign in to LMPC Inspector</h1>
           <p className="mt-3 text-muted-foreground">
             Access inspections, evidence, review history, and auditable reports.
@@ -40,7 +42,9 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<main className="grid min-h-screen place-items-center">Loading sign in…</main>}>
+    <Suspense
+      fallback={<main className="grid min-h-screen place-items-center">Loading sign in…</main>}
+    >
       <LoginContent />
     </Suspense>
   );

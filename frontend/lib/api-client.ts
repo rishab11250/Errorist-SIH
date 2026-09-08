@@ -9,7 +9,7 @@ export class ApiError extends Error {
     public readonly status: number,
     public readonly code: string,
     public readonly detail: string,
-    public readonly requestId?: string,
+    public readonly requestId?: string
   ) {
     super(detail);
     this.name = 'ApiError';
@@ -35,7 +35,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
       response.status,
       body?.error ?? `http_${response.status}`,
       body?.detail ?? response.statusText ?? 'The request could not be completed.',
-      body?.request_id,
+      body?.request_id
     );
   }
   if (response.status === 204) return undefined as T;

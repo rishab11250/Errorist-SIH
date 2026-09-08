@@ -51,7 +51,7 @@ export function ScanProgress({ stages, currentStage, className }: ScanProgressPr
                 'relative z-10 flex size-11 items-center justify-center rounded-full border-2 bg-background font-heading text-sm font-semibold',
                 complete && 'border-pass bg-pass text-white',
                 current && 'border-primary text-primary',
-                !complete && !current && 'border-border text-muted-foreground',
+                !complete && !current && 'border-border text-muted-foreground'
               )}
             >
               {complete ? <Check aria-hidden="true" className="size-5" /> : index + 1}

@@ -17,7 +17,11 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
       <h1 className="text-h1">Dashboard</h1>
-      {error ? <div role="alert" className="text-fail">{error}</div> : null}
+      {error ? (
+        <div role="alert" className="text-fail">
+          {error}
+        </div>
+      ) : null}
       {!data && !error ? <p role="status">Loading dashboard…</p> : null}
       {data ? (
         <>

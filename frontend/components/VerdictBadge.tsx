@@ -26,7 +26,9 @@ export function statusClass(status: VerdictStatus): string {
 
 export function VerdictBadge({ status }: { status: VerdictStatus }) {
   return (
-    <span className={`inline-block rounded px-2.5 py-1 text-xs font-semibold ${statusClass(status)}`}>
+    <span
+      className={`inline-block rounded px-2.5 py-1 text-xs font-semibold ${statusClass(status)}`}
+    >
       {statusLabel(status)}
     </span>
   );

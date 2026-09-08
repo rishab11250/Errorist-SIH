@@ -32,7 +32,7 @@
 - Produces: `pnpm format` for writes and `pnpm format:check` for read-only verification.
 - Preserves: existing TypeScript, Vitest, and Next.js behavior.
 
-- [ ] **Step 1: Install the pinned local formatter**
+- [x] **Step 1: Install the pinned local formatter**
 
 Run:
 
@@ -43,7 +43,7 @@ pnpm add -D --save-exact prettier@3.6.2
 
 Expected: exit 0; `prettier` appears under `devDependencies` with exact version `3.6.2`, and `pnpm-lock.yaml` is updated without a paid or private registry.
 
-- [ ] **Step 2: Add deterministic configuration, exclusions, and scripts**
+- [x] **Step 2: Add deterministic configuration, exclusions, and scripts**
 
 Create `frontend/prettier.config.mjs`:
 
@@ -78,7 +78,7 @@ Add these entries to `frontend/package.json` under `scripts`:
 "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,css,json,yaml,yml}\""
 ```
 
-- [ ] **Step 3: Verify the formatting check detects current drift**
+- [x] **Step 3: Verify the formatting check detects current drift**
 
 Run:
 
@@ -89,7 +89,7 @@ pnpm format:check
 
 Expected: non-zero exit with at least one matching frontend source file reported as needing formatting; ignored Markdown, `pnpm-lock.yaml`, `.next`, and `node_modules` do not appear.
 
-- [ ] **Step 4: Apply the scoped formatting pass**
+- [x] **Step 4: Apply the scoped formatting pass**
 
 Run:
 
@@ -100,7 +100,7 @@ pnpm format
 
 Expected: exit 0; only allowed frontend source and configuration extensions are rewritten. Inspect `git status --short` and confirm no generated/dependency path is staged or newly tracked.
 
-- [ ] **Step 5: Verify formatting and application behavior**
+- [x] **Step 5: Verify formatting and application behavior**
 
 Run:
 
@@ -114,7 +114,7 @@ pnpm build
 
 Expected: all commands exit 0, with all frontend tests passing and the Next.js production build completing successfully.
 
-- [ ] **Step 6: Commit the formatter and resulting frontend formatting**
+- [x] **Step 6: Commit the formatter and resulting frontend formatting**
 
 Run:
 

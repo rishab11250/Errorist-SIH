@@ -52,7 +52,7 @@ export function NumberTicker({
           ref.current.textContent = formatNumber(latest, decimalPlaces, locale);
         }
       }),
-    [decimalPlaces, locale, reduceMotion, springValue],
+    [decimalPlaces, locale, reduceMotion, springValue]
   );
 
   return (

@@ -31,7 +31,7 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
       setError(
         reason instanceof ApiError
           ? reason.detail
-          : 'Sign-in is unavailable right now. Check the server and try again.',
+          : 'Sign-in is unavailable right now. Check the server and try again.'
       );
     } finally {
       setBusy(false);
@@ -83,7 +83,10 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
         </div>
       </div>
       {error ? (
-        <div role="alert" className="rounded-md border border-fail/30 bg-fail/10 p-3 text-sm text-fail">
+        <div
+          role="alert"
+          className="rounded-md border border-fail/30 bg-fail/10 p-3 text-sm text-fail"
+        >
           <p className="font-semibold">Unable to sign in</p>
           <p>{error}</p>
         </div>

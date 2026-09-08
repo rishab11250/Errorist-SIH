@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  BarChart3,
-  ClipboardCheck,
-  History,
-  LogOut,
-  Menu,
-  ShieldCheck,
-  Users,
-} from 'lucide-react';
+import { BarChart3, ClipboardCheck, History, LogOut, Menu, ShieldCheck, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -45,7 +37,7 @@ function Navigation({ user, onNavigate }: { user: AuthUser; onNavigate?: () => v
               'flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-semibold transition-colors',
               active
                 ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
           >
             <Icon aria-hidden="true" className="size-5 shrink-0" />

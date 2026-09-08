@@ -1,11 +1,16 @@
 from __future__ import annotations
 
-import fcntl
 import os
+import sys
 import time
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
+
+if sys.platform == "win32":
+    import msvcrt
+else:
+    import fcntl
 
 from alembic import command
 from alembic.config import Config
@@ -67,17 +72,18 @@ def _sqlite_affinity(declared_type: str) -> str:
 
 @contextmanager
 def _database_lock(db_path: Path, timeout_seconds: float = LOCK_TIMEOUT_SECONDS) -> Iterator[None]:
-    # Lock the database inode itself so startup does not leave a sidecar artifact.
-    # SQLite uses byte-range locks; Linux flock locks are independent and only
-    # serialize this application's migration entry point.
-    descriptor = os.open(db_path, os.O_CREAT | os.O_RDWR, 0o600)
+    lock_path = db_path if sys.platform != "win32" else db_path.parent / f"{db_path.name}.lock"
+    descriptor = os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o600)
     deadline = time.monotonic() + timeout_seconds
     try:
         while True:
             try:
-                fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                if sys.platform == "win32":
+                    msvcrt.locking(descriptor, msvcrt.LK_NBLCK, 1)
+                else:
+                    fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 break
-            except BlockingIOError as error:
+            except (BlockingIOError, OSError) as error:
                 if time.monotonic() >= deadline:
                     raise MigrationLockTimeout(
                         f"timed out after {timeout_seconds:g}s waiting to migrate {db_path}"
@@ -85,7 +91,13 @@ def _database_lock(db_path: Path, timeout_seconds: float = LOCK_TIMEOUT_SECONDS)
                 time.sleep(0.05)
         yield
     finally:
-        fcntl.flock(descriptor, fcntl.LOCK_UN)
+        if sys.platform == "win32":
+            try:
+                msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
+            except OSError:
+                pass
+        else:
+            fcntl.flock(descriptor, fcntl.LOCK_UN)
         os.close(descriptor)
 
 

@@ -130,10 +130,6 @@ def _ordered_query(query: Select[tuple[Scan]], sort: ScanSort) -> Select[tuple[S
     return query.order_by(Scan.created_at.desc(), Scan.id.desc())
 
 
-def _thumbnail(scan: Scan) -> str:
-    return scan.image_b64[:200] + "..." if len(scan.image_b64) > 200 else scan.image_b64
-
-
 def _history_item(scan: Scan) -> dict:
     summary = {
         status: sum(verdict.status == status for verdict in scan.verdicts)
@@ -141,8 +137,8 @@ def _history_item(scan: Scan) -> dict:
     }
     return {
         "scan_id": scan.id,
-        "thumbnail_b64": _thumbnail(scan),
-        "thumbnail": _thumbnail(scan),
+        "thumbnail_b64": scan.image_b64,
+        "thumbnail": scan.image_b64,
         "overall_status": scan.overall_status,
         "verdict_count": len(scan.verdicts),
         "product": scan.product_name,

@@ -89,6 +89,7 @@ def export_scans_csv(
         query = query.order_by(Scan.created_at.asc(), Scan.id.asc())
     else:
         query = query.order_by(Scan.created_at.desc(), Scan.id.desc())
+    query = query.limit(5000)
     scans = session.execute(query).unique().scalars().all()
     reports = tuple(build_report_model(scan) for scan in scans)
     active_json = json.dumps(

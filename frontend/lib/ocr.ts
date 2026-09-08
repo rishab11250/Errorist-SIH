@@ -5,21 +5,32 @@ import { groupWordsIntoLines } from './ocr-lines';
 import type { OCRLine, OCRWord } from './types';
 
 let worker: Worker | null = null;
-let progressListener: ((progress: number) => void) | undefined;
+let _progressListener: ((progress: number) => void) | undefined;
 export const OCR_ASSET_PATHS = {
   workerPath: '/tesseract/worker.min.js',
   corePath: '/tesseract/core',
   langPath: '/tesseract/lang',
 } as const;
 
+let _workerBusy = false;
+
 async function getWorker(onProgress?: (progress: number) => void): Promise<Worker> {
-  progressListener = onProgress;
+  if (_workerBusy) {
+    throw new Error('An OCR operation is already in progress. Please wait.');
+  }
+  _progressListener = onProgress;
+  _workerBusy = true;
   if (worker) return worker;
   worker = await createWorker('eng', undefined, {
     ...OCR_ASSET_PATHS,
-    logger: (message) => progressListener?.(message.progress),
+    logger: (message) => _progressListener?.(message.progress),
   });
   return worker;
+}
+
+function releaseWorker() {
+  _workerBusy = false;
+  _progressListener = undefined;
 }
 
 export interface OCRRunResult {
@@ -55,21 +66,25 @@ export async function runOCR(
   });
   throwIfAborted(signal);
   const activeWorker = await getWorker(onProgress);
-  const { data } = await activeWorker.recognize(imageDataUrl);
-  throwIfAborted(signal);
-  const words = (data.words ?? []).map((word) => {
-    const { x0, y0, x1, y1 } = word.bbox;
+  try {
+    const { data } = await activeWorker.recognize(imageDataUrl);
+    throwIfAborted(signal);
+    const words = (data.words ?? []).map((word) => {
+      const { x0, y0, x1, y1 } = word.bbox;
+      return {
+        text: word.text,
+        confidence: word.confidence / 100,
+        bbox: normaliseBbox([x0, y0, x1 - x0, y1 - y0], dimensions.width, dimensions.height),
+      };
+    });
     return {
-      text: word.text,
-      confidence: word.confidence / 100,
-      bbox: normaliseBbox([x0, y0, x1 - x0, y1 - y0], dimensions.width, dimensions.height),
+      words,
+      lines: groupWordsIntoLines(words),
+      imageDataUrl,
+      imageWidth: dimensions.width,
+      imageHeight: dimensions.height,
     };
-  });
-  return {
-    words,
-    lines: groupWordsIntoLines(words),
-    imageDataUrl,
-    imageWidth: dimensions.width,
-    imageHeight: dimensions.height,
-  };
+  } finally {
+    releaseWorker();
+  }
 }

@@ -45,10 +45,14 @@ export default function ScanResultPage() {
   useEffect(() => {
     setResult(cachedResult(scanId));
     getScan(scanId)
-      .then((data) =>
+      .then((data) => {
+        const b64 = data.scan.image_b64;
+        let mime = 'image/png';
+        if (b64.startsWith('/9j/')) mime = 'image/jpeg';
+        else if (b64.startsWith('UklGR')) mime = 'image/webp';
         setResult({
           scanId,
-          imageDataUrl: `data:image/png;base64,${data.scan.image_b64}`,
+          imageDataUrl: `data:${mime};base64,${b64}`,
           imageWidth: data.scan.image_meta.width,
           imageHeight: data.scan.image_meta.height,
           verdicts: data.verdicts,
@@ -57,8 +61,8 @@ export default function ScanResultPage() {
           processingStatus: data.scan.processing_status,
           analysisVersion: data.scan.analysis_version,
           reviewActions: data.review_actions ?? [],
-        })
-      )
+        });
+      })
       .catch((reason) => {
         if (!cachedResult(scanId)) {
           setError(

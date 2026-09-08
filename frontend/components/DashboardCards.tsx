@@ -1,9 +1,5 @@
-export interface DashboardData {
-  total_scans: number;
-  pass_rate: number;
-  top_failed_rule: string | null;
-  recent_activity: Array<{ scan_id: number; overall_status: string; created_at: string }>;
-}
+import type { DashboardData } from '@/lib/operations';
+
 export function DashboardCards({ data }: { data: DashboardData }) {
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -16,8 +12,8 @@ export function DashboardCards({ data }: { data: DashboardData }) {
 }
 function Card({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="rounded border bg-white p-4">
-      <div className="text-xs uppercase text-slate-500">{label}</div>
+    <div className="rounded border bg-card p-4">
+      <div className="text-xs uppercase text-muted-foreground">{label}</div>
       <div className={`mt-1 text-xl font-bold ${mono ? 'font-mono text-sm' : ''}`}>{value}</div>
     </div>
   );

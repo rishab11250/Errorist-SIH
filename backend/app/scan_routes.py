@@ -195,6 +195,11 @@ def get_scan(
     scan = authorized_scan(session, current_user, scan_id)
     if scan is None:
         raise HTTPException(status_code=404, detail="scan_not_found")
+    # Eagerly load relationships to avoid N+1 queries
+    session.refresh(scan, attribute_names=["verdicts", "review_actions"])
+    for action in scan.review_actions:
+        if action.actor is None:
+            session.refresh(action, attribute_names=["actor"])
     return {
         "scan": {
             "id": scan.id,

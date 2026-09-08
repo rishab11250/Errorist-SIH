@@ -2,6 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --surface: 0 0% 100%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 32%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 174 48% 92%;
+    --secondary-foreground: 176 72% 20%;
+    --muted: 215 25% 94%;
+    --muted-foreground: 215 19% 35%;
+    --accent: 42 100% 92%;
+    --accent-foreground: 28 78% 22%;
+    --accent-strong: 34 93% 48%;
+    --destructive: 0 72% 44%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 25% 84%;
+    --input: 214 25% 78%;
+    --ring: 221 83% 45%;
+    --pass: 154 67% 31%;
+    --fail: 0 72% 44%;
+    --warn: 32 91% 38%;
+    --review: 267 58% 45%;
+    --na: 215 16% 40%;
+    --radius: 0.625rem;
+    --shadow-surface: 0 1px 2px rgb(15 23 42 / 0.06), 0 8px 24px rgb(15 23 42 / 0.06);
+    --motion-fast: 150ms;
+    --motion-standard: 200ms;
+    --motion-deliberate: 300ms;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background font-body text-body text-foreground antialiased;
+    min-width: 20rem;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+@layer utilities {
+  .surface-panel {
+    @apply rounded-lg border bg-surface shadow-surface;
+  }
+
+  .touch-target {
+    @apply min-h-control min-w-control;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

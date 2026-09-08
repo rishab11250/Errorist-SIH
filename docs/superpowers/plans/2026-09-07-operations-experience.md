@@ -722,7 +722,7 @@ git commit -m "feat(backend): export auditable PDF DOCX and CSV reports"
 **Interfaces:**
 - Produces: shared accessible primitives, semantic tokens, font classes, and test environment.
 
-- [ ] **Step 1: Install free runtime/test dependencies**
+- [x] **Step 1: Install free runtime/test dependencies**
 
 Run:
 
@@ -734,7 +734,7 @@ pnpm add -D @testing-library/jest-dom @testing-library/react@16.3.3 @testing-lib
 
 Expected: exit 0 and lockfile changes contain no paid/private registry.
 
-- [ ] **Step 2: Write primitive behavior tests**
+- [x] **Step 2: Write primitive behavior tests**
 
 Configure Vitest for `jsdom`, path alias `@`, and `tests/setup.ts` importing `@testing-library/jest-dom/vitest`. Create `tests/server.ts` with an MSW `setupServer`, start/reset/close it from setup hooks, and add tests:
 
@@ -753,13 +753,13 @@ it('dialog has a keyboard-reachable title and close control', async () => {
 });
 ```
 
-- [ ] **Step 3: Verify failure**
+- [x] **Step 3: Verify failure**
 
 Run `cd /home/wind/Projects/sih/frontend && pnpm test:run -- tests/ui-primitives.test.tsx`.
 
 Expected: FAIL before the primitives/configuration exist.
 
-- [ ] **Step 4: Add shadcn-compatible open-code primitives**
+- [x] **Step 4: Add shadcn-compatible open-code primitives**
 
 Create `components.json` with this compatibility configuration, then generate only the required open-code primitives:
 
@@ -797,11 +797,11 @@ Expected: the named local files are created under `components/ui`; inspect and n
 
 Do not run an “add all” command. Every primitive must be used by a planned screen or omitted.
 
-- [ ] **Step 5: Add semantic tokens and local fonts**
+- [x] **Step 5: Add semantic tokens and local fonts**
 
 Import the two Fontsource packages in `app/layout.tsx`. Define CSS variables and Tailwind mappings for background/surface/foreground/border/primary/accent plus `pass`, `fail`, `warn`, `review`, and `na`. Add type tokens using `clamp()`, 4/8px spacing rhythm, a single radius/elevation scale, 2px focus ring, 44px minimum touch target, and reduced-motion rules.
 
-- [ ] **Step 6: Add the approved free accent mix**
+- [x] **Step 6: Add the approved free accent mix**
 
 Create three locally owned, token-normalized files:
 
@@ -811,7 +811,7 @@ Create three locally owned, token-normalized files:
 
 Remove pointer tracking and large dependencies; use Motion only for number/progress transitions, add `useReducedMotion`, and mark decorative SVG/CSS layers `aria-hidden`. Record source URL, access date, license, local filename, and modifications in `THIRD_PARTY_NOTICES.md`. If the source page does not expose a compatible open license at implementation time, do not copy it: implement the same functional need with existing primitives and record the rejected source in the notice file.
 
-- [ ] **Step 7: Run UI tests, type check, and build**
+- [x] **Step 7: Run UI tests, type check, and build**
 
 Run:
 
@@ -824,7 +824,7 @@ pnpm build
 
 Expected: PASS and no runtime font request appears in the build output.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add frontend/package.json frontend/pnpm-lock.yaml frontend/tailwind.config.ts frontend/app/globals.css frontend/app/layout.tsx frontend/components.json frontend/components/ui frontend/lib/cn.ts frontend/vitest.config.ts frontend/tests/setup.ts frontend/tests/server.ts frontend/tests/ui-primitives.test.tsx frontend/THIRD_PARTY_NOTICES.md

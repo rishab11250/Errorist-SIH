@@ -58,31 +58,124 @@ export async function runOCR(
     reader.readAsDataURL(file);
   });
   throwIfAborted(signal);
-  const dimensions = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+  const { width, height, imageElement } = await new Promise<{
+    width: number;
+    height: number;
+    imageElement: HTMLImageElement;
+  }>((resolve, reject) => {
     const image = new Image();
-    image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+    image.onload = () =>
+      resolve({ width: image.naturalWidth, height: image.naturalHeight, imageElement: image });
     image.onerror = reject;
     image.src = imageDataUrl;
   });
   throwIfAborted(signal);
+
+  let recognizeTarget: string = imageDataUrl;
+  let offsetX = 0;
+  let offsetY = 0;
+  let cropWidth = width;
+  let cropHeight = height;
+  let scale = 1;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (ctx) {
+    ctx.drawImage(imageElement, 0, 0, width, height);
+    const imgData = ctx.getImageData(0, 0, width, height);
+    const data = imgData.data;
+
+    let top = 0;
+    for (let y = 0; y < height; y++) {
+      let hasContent = false;
+      for (let x = 0; x < width; x += 8) {
+        const idx = (y * width + x) * 4;
+        if (data[idx] < 240 || data[idx + 1] < 240 || data[idx + 2] < 240) {
+          hasContent = true;
+          break;
+        }
+      }
+      if (hasContent) {
+        top = Math.max(0, y - 4);
+        break;
+      }
+    }
+
+    let bottom = height;
+    for (let y = height - 1; y >= 0; y--) {
+      let hasContent = false;
+      for (let x = 0; x < width; x += 8) {
+        const idx = (y * width + x) * 4;
+        if (data[idx] < 240 || data[idx + 1] < 240 || data[idx + 2] < 240) {
+          hasContent = true;
+          break;
+        }
+      }
+      if (hasContent) {
+        bottom = Math.min(height, y + 4);
+        break;
+      }
+    }
+
+    const contentH = bottom - top;
+    if (contentH > 20 && contentH < height * 0.85) {
+      offsetY = top;
+      cropHeight = contentH;
+    }
+
+    const effectiveH = cropHeight;
+    if (effectiveH < 450) {
+      scale = Math.min(4, Math.max(2, Math.ceil(500 / effectiveH)));
+    }
+
+    if (offsetY > 0 || scale > 1) {
+      const ocrCanvas = document.createElement('canvas');
+      ocrCanvas.width = cropWidth * scale;
+      ocrCanvas.height = cropHeight * scale;
+      const ocrCtx = ocrCanvas.getContext('2d');
+      if (ocrCtx) {
+        ocrCtx.imageSmoothingEnabled = true;
+        ocrCtx.imageSmoothingQuality = 'high';
+        ocrCtx.drawImage(
+          imageElement,
+          offsetX,
+          offsetY,
+          cropWidth,
+          cropHeight,
+          0,
+          0,
+          ocrCanvas.width,
+          ocrCanvas.height
+        );
+        recognizeTarget = ocrCanvas.toDataURL('image/png');
+      }
+    }
+  }
+
   const activeWorker = await getWorker(onProgress);
   try {
-    const { data } = await activeWorker.recognize(imageDataUrl);
+    const { data } = await activeWorker.recognize(recognizeTarget);
     throwIfAborted(signal);
     const words = (data.words ?? []).map((word) => {
       const { x0, y0, x1, y1 } = word.bbox;
+      const origX = offsetX + x0 / scale;
+      const origY = offsetY + y0 / scale;
+      const origW = (x1 - x0) / scale;
+      const origH = (y1 - y0) / scale;
       return {
         text: word.text,
         confidence: word.confidence / 100,
-        bbox: normaliseBbox([x0, y0, x1 - x0, y1 - y0], dimensions.width, dimensions.height),
+        bbox: normaliseBbox([origX, origY, origW, origH], width, height),
       };
     });
     return {
       words,
       lines: groupWordsIntoLines(words),
       imageDataUrl,
-      imageWidth: dimensions.width,
-      imageHeight: dimensions.height,
+      imageWidth: width,
+      imageHeight: height,
     };
   } finally {
     releaseWorker();

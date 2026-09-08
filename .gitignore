@@ -35,3 +35,11 @@ backend/tests/eval/images/*.png
 data/
 *.sqlite
 *.sqlite3
+*.db.lock
+*.traineddata
+
+# Test labels (binary photos)
+real_test_labels/*.jpg
+real_test_labels/*.jpeg
+real_test_labels/*.png
+!real_test_labels/*.json

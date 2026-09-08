@@ -12,15 +12,22 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Literal
 
+import reportlab
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 from app.evaluation import KNOWN_RULE_IDS, MANIFEST_COLUMNS
 
 SEED = 26034
 CANVAS_SIZE = (1200, 900)
+_REPORTLAB_FONTS = Path(reportlab.__file__).parent / "fonts"
 FONT_CANDIDATES = (
     Path("/usr/share/fonts/TTF/DejaVuSans.ttf"),
     Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
+    _REPORTLAB_FONTS / "DejaVuSans.ttf",
+    _REPORTLAB_FONTS / "Vera.ttf",
+    Path("C:/Windows/Fonts/DejaVuSans.ttf"),
+    Path("C:/Windows/Fonts/arial.ttf"),
+    Path("/System/Library/Fonts/Supplemental/Arial.ttf"),
 )
 Mode = Literal["retail_image", "ecommerce_listing"]
 

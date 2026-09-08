@@ -32,11 +32,18 @@ def extract_mfg_date(
             name="mfg_date", value=None, bbox=None, confidence=0.0, evidence_spans=[]
         )
 
+    word_spans: list[tuple[OCRWord, int, int]] = []
+    current_pos = 0
+    for word in ocr_words:
+        start = current_pos
+        end = start + len(word.text)
+        word_spans.append((word, start, end))
+        current_pos = end + 1
+
     matched_words = [
         word
-        for word in ocr_words
-        if match.start() <= text.find(word.text) + len(word.text)
-        and text.find(word.text) <= match.end()
+        for word, w_start, w_end in word_spans
+        if not (w_end < match.start() or w_start > match.end())
     ]
     if not matched_words:
         return ExtractedField(

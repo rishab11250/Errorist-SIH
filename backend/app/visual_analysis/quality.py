@@ -140,10 +140,15 @@ def analyze_quality(
     coverage = _union_area(_clamped_boxes(words)) * 100.0
     confidence_median, confidence_lower_quartile = _confidence_distribution(words)
 
+    # Sharp digital documents or screenshots with high OCR confidence have white backgrounds,
+    # not camera flash / specular glare that degrades readability.
+    is_clean_document = sharpness >= 80.0 and confidence_median >= 80.0
+    effective_glare = 0.0 if is_clean_document else glare_fraction
+
     metrics = (
         _metric("sharpness", sharpness, "score", "laplacian_variance"),
         _metric("contrast", contrast, "score", "grayscale_standard_deviation"),
-        _metric("glare", glare_fraction * 100.0, "percent", "bright_pixel_fraction"),
+        _metric("glare", effective_glare * 100.0, "percent", "bright_pixel_fraction"),
         _metric("skew", skew, "degrees", "minimum_area_rectangle", skew_confidence),
         _metric(
             "perspective",
@@ -172,9 +177,9 @@ def analyze_quality(
         retake_failures.append("contrast")
     elif contrast < QUALITY_THRESHOLDS["contrast_warn"]:
         warning_failures.append("contrast")
-    if glare_fraction > QUALITY_THRESHOLDS["glare_retake_fraction"]:
+    if effective_glare > QUALITY_THRESHOLDS["glare_retake_fraction"]:
         retake_failures.append("glare")
-    elif glare_fraction > QUALITY_THRESHOLDS["glare_warn_fraction"]:
+    elif effective_glare > QUALITY_THRESHOLDS["glare_warn_fraction"]:
         warning_failures.append("glare")
     if skew > QUALITY_THRESHOLDS["skew_retake_degrees"]:
         retake_failures.append("skew")
@@ -190,7 +195,7 @@ def analyze_quality(
     else:
         status = "acceptable"
 
-    glare_quality = 100.0 - glare_fraction * 100.0
+    glare_quality = 100.0 - effective_glare * 100.0
     skew_quality = max(0.0, 100.0 - skew / 45.0 * 100.0)
     score = (
         0.35 * sharpness

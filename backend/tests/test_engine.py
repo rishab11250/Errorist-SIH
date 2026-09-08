@@ -221,3 +221,43 @@ def test_overall_precedence() -> None:
 def test_legacy_extracted_mapping_remains_supported(rules: RulesConfig) -> None:
     verdict = _by_id(run_engine(_complete_extracted(), rules, ScanContext()))["r6_1_e_mrp"]
     assert verdict.status == "pass"
+
+
+def test_net_quantity_accepts_unit_attached_to_digits(rules: RulesConfig) -> None:
+    extracted = _complete_extracted()
+    extracted["net_quantity"] = _ext("net_quantity", "70g", conf=0.95)
+    verdict = _by_id(run_engine(_analysis(extracted=extracted), rules, ScanContext()))[
+        "r6_1_c_net_quantity"
+    ]
+    assert verdict.status == "pass"
+
+
+def test_ecommerce_aggregate_visibility_passes_when_core_declarations_present(
+    rules: RulesConfig,
+) -> None:
+    extracted = _complete_extracted()
+    verdict = _by_id(
+        run_engine(
+            _analysis(extracted=extracted),
+            rules,
+            ScanContext(mode="ecommerce_listing"),
+        )
+    )["r6_10_ecommerce_declarations"]
+    assert verdict.status == "pass"
+    assert "All mandatory e-commerce declarations" in verdict.reasoning
+
+
+def test_ecommerce_aggregate_visibility_fails_when_core_declaration_missing(
+    rules: RulesConfig,
+) -> None:
+    extracted = _complete_extracted()
+    extracted["mrp"] = _ext("mrp", None)
+    verdict = _by_id(
+        run_engine(
+            _analysis(extracted=extracted),
+            rules,
+            ScanContext(mode="ecommerce_listing"),
+        )
+    )["r6_10_ecommerce_declarations"]
+    assert verdict.status == "fail"
+    assert "missing: mrp" in (verdict.failure_message or "")

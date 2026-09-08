@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -78,9 +79,9 @@ export default function ScanResultPage() {
         <div role="alert" className="rounded-lg border border-fail/30 bg-fail/10 p-5 text-fail">
           <h1 className="text-h2">Unable to load inspection</h1>
           <p className="mt-2">{error}</p>
-          <a href="/" className="mt-4 inline-flex min-h-11 items-center font-semibold underline">
+          <Link href="/" className="mt-4 inline-flex min-h-11 items-center font-semibold underline">
             Start a new inspection
-          </a>
+          </Link>
         </div>
       </div>
     );

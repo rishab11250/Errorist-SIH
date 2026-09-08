@@ -6,7 +6,10 @@ Usage: cd backend && .venv/bin/python -m scripts.seed_demo
 from __future__ import annotations
 
 import base64
+import io
 from datetime import UTC, datetime, timedelta
+
+from PIL import Image
 
 from app import db
 
@@ -58,6 +61,13 @@ CITATIONS = {
 }
 
 
+def _demo_image_b64() -> str:
+    img = Image.new("RGB", (400, 600), color=(240, 240, 240))
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return base64.b64encode(buf.getvalue()).decode("ascii")
+
+
 def main(db_path: str = "lmpc.db") -> None:
     """Create the local database and insert three representative demo scans."""
     db.init_db(db_path)
@@ -65,6 +75,9 @@ def main(db_path: str = "lmpc.db") -> None:
         raise RuntimeError("DB not initialized")
     session = db.SessionLocal()
     try:
+        demo_image = _demo_image_b64()
+        first_user = session.query(db.User).first()
+        owner_id = first_user.id if first_user else None
         now = datetime.now(UTC)
         for index, spec in enumerate(DEMO_SCANS):
             session.add(
@@ -72,7 +85,8 @@ def main(db_path: str = "lmpc.db") -> None:
                     created_at=now - timedelta(hours=index * 2),
                     mode=spec["mode"],
                     category=spec["category"],
-                    image_b64=base64.b64encode(b"demo-png-bytes").decode("ascii"),
+                    image_b64=demo_image,
+                    owner_user_id=owner_id,
                     image_meta={"width": 400, "height": 600, "dpi": 72, "orientation": 1},
                     ocr_payload=[],
                     overall_status=spec["overall_status"],

@@ -85,15 +85,12 @@ def _subfield_present(check: CheckConfig, extracted: ExtractedField | None) -> d
             ),
         }
     if check.rule_id == "r6_1_c_net_quantity":
+        found_units = [m.lower() for m in re.findall(r"[a-zA-Z]+", text)]
         return {
             "net_quantity_value": bool(re.search(r"\d", text)),
             "net_quantity_unit": bool(
                 check.requires_unit_in
-                and any(
-                    unit.lower() == match.group(1).lower()
-                    for unit in check.requires_unit_in
-                    for match in re.finditer(r"\b([a-zA-Z]+)\b", text)
-                )
+                and any(unit.lower() in found_units for unit in check.requires_unit_in)
             ),
         }
     if check.rule_id == "r6_1_a_address":
@@ -227,6 +224,87 @@ def _readability_rule_verdict(
     )
 
 
+def _aggregate_visibility_rule_verdict(
+    check: CheckConfig,
+    analysis: AnalysisInput,
+    context: ScanContext,
+    rules: RulesConfig,
+) -> Verdict:
+    if context.mode != "ecommerce_listing":
+        return _verdict(
+            check,
+            rules,
+            status="na",
+            reasoning="Rule is not applicable to this evidence mode.",
+            confidence=1.0,
+            evidence="Rule not applicable to supplied context",
+        )
+
+    core_declarations = ["mrp", "net_quantity", "manufacturer_address"]
+    extracted = analysis.extracted
+    missing_fields: list[str] = []
+    found_evidence: list[str] = []
+    boxes: list[tuple[float, float, float, float]] = []
+    confidences: list[float] = [analysis.quality.score / 100.0]
+
+    for field_name in core_declarations:
+        field = extracted.get(field_name)
+        if field is None or not field.value:
+            missing_fields.append(field_name)
+        else:
+            found_evidence.append(f"{field_name}: {field.value}")
+            confidences.append(field.confidence)
+            if field.bbox is not None:
+                boxes.append(field.bbox)
+            boxes.extend(field.evidence_spans)
+
+    for extra_field in ["consumer_care", "best_before", "common_name", "country_origin", "unit_price"]:
+        field = extracted.get(extra_field)
+        if field is not None and field.value:
+            found_evidence.append(f"{extra_field}: {field.value}")
+            confidences.append(field.confidence)
+            if field.bbox is not None:
+                boxes.append(field.bbox)
+            boxes.extend(field.evidence_spans)
+
+    confidence = round(max(0.0, min(1.0, min(confidences))), 4)
+    boxes = list(dict.fromkeys(boxes))
+    evidence = "; ".join(found_evidence)
+
+    if analysis.quality.status in {"retake_recommended", "unreadable"}:
+        return _verdict(
+            check,
+            rules,
+            status="manual_review",
+            reasoning="Image quality is insufficient to support an automatic compliance decision.",
+            confidence=confidence,
+            evidence=evidence,
+            evidence_bboxes=boxes,
+        )
+
+    if missing_fields:
+        return _verdict(
+            check,
+            rules,
+            status="fail",
+            reasoning=f"Listing evidence is missing mandatory declarations: {', '.join(missing_fields)}.",
+            confidence=confidence,
+            evidence=evidence,
+            evidence_bboxes=boxes,
+            failure_message=f"{check.failure_message} (missing: {', '.join(missing_fields)})",
+        )
+
+    return _verdict(
+        check,
+        rules,
+        status="pass",
+        reasoning="All mandatory e-commerce declarations are present and visible in the submitted listing.",
+        confidence=confidence,
+        evidence=evidence,
+        evidence_bboxes=boxes,
+    )
+
+
 def _verdict_for_check(
     check: CheckConfig,
     analysis: AnalysisInput,
@@ -253,6 +331,8 @@ def _verdict_for_check(
         )
     if check.check_type == "readability":
         return _readability_rule_verdict(check, analysis, rules)
+    if check.check_type == "aggregate_visibility":
+        return _aggregate_visibility_rule_verdict(check, analysis, context, rules)
 
     extracted = analysis.extracted.get(check.field)
     readability = analysis.readability.get(check.field)

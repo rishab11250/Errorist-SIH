@@ -52,7 +52,7 @@ checks:
     check_type: presence_and_format
     severity: critical
     requires: [mrp_value, tax_inclusive_phrase]
-    tax_inclusive_phrase_regex: '(?i)\b(?:incl\.?|inclusive)\s*(?:of\s+)?all\s+taxes?\b'
+    tax_inclusive_phrase_regex: '(?i)\b(?:incl\.?|inclusive|nciusive)\s*(?:of\s+)?(?:all|ail)?\s*taxes?\b'
     failure_message: "MRP must be declared and accompanied by 'Inclusive of all taxes'"
   - rule_id: r6_1_c_net_quantity
     citation: "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011"

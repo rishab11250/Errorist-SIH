@@ -1,0 +1,4409 @@
+[
+  {
+    "testCase": {
+      "id": "case_1_clean_balaji",
+      "name": "Balaji Wafers Back Panel (Clean, flat)",
+      "file": "balaji_1.jpg",
+      "mode": "retail_image",
+      "category": "food",
+      "imported": "domestic",
+      "description": "Clean flat back panel: Net Qty 25g, MRP Rs 5.00 incl taxes, USP Rs 0.20/g, Rajkot PIN 360024",
+      "expected": {
+        "r6_1_e_mrp": "pass",
+        "r6_1_c_net_quantity": "pass",
+        "r6_1_a_address": "pass",
+        "r6_2_consumer_care": "pass/warn",
+        "r6_1_d_mfg_date": "na",
+        "r6_1_b_common_name": "pass",
+        "r6_1_aa_country_origin": "na",
+        "r6_1_a_importer_address": "na",
+        "r6_1_da_best_before": "pass/warn",
+        "r6_1_f_dimensions": "na",
+        "r6_11_unit_sale_price": "pass",
+        "r6_10_ecommerce_declarations": "na",
+        "r7_font_size": "manual_review/pass"
+      }
+    },
+    "durationMs": 4568,
+    "ocr": {
+      "wordCount": 140,
+      "lineCount": 29,
+      "rawTextPreview": "Hg “ Ney vE ™ d ; ah WY YEN ¢ £ NCREBIENTS. liana” 1 (ON MOLE, RE RENTS % aan 2 : Les Flow Er i Ay Gl EAE ENT (MS S51 NOUR I5AR, AIT cGUATO® WAT. AND NATURE IDENTICAL FLAVOURING LANCER (IN 627. dor) 1 PRIKA EXTRACT (INS 1600) oi OR AN | Pi IETARY an - NAMKEEN 3 po OCC ETNG SE cp YEE _ NUTRIriwiAL IN",
+      "rawTextFull": "Hg “ Ney vE ™ d ; ah WY YEN ¢ £ NCREBIENTS. liana” 1 (ON MOLE, RE RENTS % aan 2 : Les Flow Er i Ay Gl EAE ENT (MS S51 NOUR I5AR, AIT cGUATO® WAT. AND NATURE IDENTICAL FLAVOURING LANCER (IN 627. dor) 1 PRIKA EXTRACT (INS 1600) oi OR AN | Pi IETARY an - NAMKEEN 3 po OCC ETNG SE cp YEE _ NUTRIriwiAL INFCRMATION* PER 109 | “Row PERT 1 3 Ek —— : 514 Keal 8% TOTAL SUGARS : 1% a —_ = % BE | 70 | 6 ‘APPROXIMATE VALUES | GUIDELINE DAILY AMOUNT T0 “RECOMMEE 8 fr AERAGE ADL PER DAY (2000 AL DET 15 545 2 SERVING PER PACKAGE®: | SERVING SEX NET WEIGHT 25 AS i pO OONLOFAL GS): 5.00 (| UNITSALE PRICE 00 PER 1 6.00. vp, Fo"
+    },
+    "quality": {
+      "status": "usable_with_warnings",
+      "score": 67.87,
+      "metrics": [
+        {
+          "name": "sharpness",
+          "value": 77.5273,
+          "unit": "score",
+          "confidence": 1,
+          "method": "laplacian_variance",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "contrast",
+          "value": 43.0208,
+          "unit": "score",
+          "confidence": 1,
+          "method": "grayscale_standard_deviation",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "glare",
+          "value": 0.0992,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "bright_pixel_fraction",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "skew",
+          "value": 0,
+          "unit": "degrees",
+          "confidence": 1,
+          "method": "minimum_area_rectangle",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "perspective",
+          "value": 0,
+          "unit": "score",
+          "confidence": 0,
+          "method": "quadrilateral_rectangularity",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "text_coverage",
+          "value": 22.5233,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "ocr_bbox_union",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_distribution",
+          "value": 39.3179,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "median",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_lower_quartile",
+          "value": 14.5388,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "lower_quartile",
+          "evidence_bboxes": []
+        }
+      ],
+      "guidance": [
+        "Hold the camera steady and tap to focus on the declaration panel."
+      ]
+    },
+    "overallStatus": "fail",
+    "verdictMap": {
+      "r6_1_e_mrp": {
+        "status": "fail",
+        "confidence": 0.6787,
+        "evidence": "",
+        "bbox_count": 1,
+        "evidence_bboxes": [
+          [
+            0.28996447602131437,
+            0.87175,
+            0.08348134991119005,
+            0.03375
+          ]
+        ],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)"
+      },
+      "r6_1_c_net_quantity": {
+        "status": "fail",
+        "confidence": 0.6787,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: net_quantity_value, net_quantity_unit.",
+        "failure_message": "Net quantity must be declared in metric units (g/kg/ml/l) (missing: net_quantity_value, net_quantity_unit)"
+      },
+      "r6_1_a_address": {
+        "status": "fail",
+        "confidence": 0.6787,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)"
+      },
+      "r6_2_consumer_care": {
+        "status": "fail",
+        "confidence": 0.6787,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)"
+      },
+      "r6_1_d_mfg_date": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_1_b_common_name": {
+        "status": "fail",
+        "confidence": 0.6787,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)"
+      },
+      "r6_1_aa_country_origin": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_a_importer_address": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_da_best_before": {
+        "status": "fail",
+        "confidence": 0.6787,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)"
+      },
+      "r6_1_f_dimensions": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_11_unit_sale_price": {
+        "status": "manual_review",
+        "confidence": 0.6787,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "failure_message": null
+      },
+      "r6_10_ecommerce_declarations": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "failure_message": null
+      },
+      "r7_font_size": {
+        "status": "manual_review",
+        "confidence": 0.6787000000000001,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "No declaration readability measurements are available.",
+        "failure_message": null
+      }
+    },
+    "verdictsRaw": [
+      {
+        "rule_id": "r6_1_e_mrp",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [
+          [
+            0.28996447602131437,
+            0.87175,
+            0.08348134991119005,
+            0.03375
+          ]
+        ],
+        "confidence": 0.6787,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "measurement_method": "not_measurable",
+        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_c_net_quantity",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6787,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: net_quantity_value, net_quantity_unit.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Net quantity must be declared in metric units (g/kg/ml/l) (missing: net_quantity_value, net_quantity_unit)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_address",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6787,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_2_consumer_care",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(2) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6787,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_d_mfg_date",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_b_common_name",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6787,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_aa_country_origin",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_importer_address",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_da_best_before",
+        "status": "fail",
+        "severity": "warning",
+        "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6787,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_f_dimensions",
+        "status": "na",
+        "severity": "warning",
+        "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_11_unit_sale_price",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 6(11) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6787,
+        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_10_ecommerce_declarations",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(10) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r7_font_size",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 7 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6787000000000001,
+        "reasoning": "No declaration readability measurements are available.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      }
+    ]
+  },
+  {
+    "testCase": {
+      "id": "case_2_clean_good_day",
+      "name": "Britannia Good Day Label Strip (Clean, flat)",
+      "file": "good_day_2.jpg",
+      "mode": "retail_image",
+      "category": "food",
+      "imported": "domestic",
+      "description": "Clean horizontal label strip: Britannia Industries Ltd, Kolkata 700 017, email, phone",
+      "expected": {
+        "r6_1_a_address": "pass",
+        "r6_2_consumer_care": "pass",
+        "r6_1_d_mfg_date": "na",
+        "r6_1_aa_country_origin": "na",
+        "r6_1_a_importer_address": "na",
+        "r6_1_f_dimensions": "na",
+        "r6_10_ecommerce_declarations": "na"
+      }
+    },
+    "durationMs": 2960,
+    "ocr": {
+      "wordCount": 174,
+      "lineCount": 21,
+      "rawTextPreview": "INGREDIENTS: REFINED WHEAT £04 | WGREDIENTS: REFINED Wh EAT FLOUR [A DAL £02 » PM Ne 8 OND FLO R (MAIDA ED BLE VE 0 . ie) Sunk sas BUTTER (6%., RAISING AGEN LE VE Say — Sant > AL ND RaAVO = CL NG AGENTS It LE DOL (PALM ), SUGAR CASHEW $1 conus A AGE [S000E) 8 S00GTH, 10DISES SUBAR CASHEW NUTS 4 2 we",
+      "rawTextFull": "INGREDIENTS: REFINED WHEAT £04 | WGREDIENTS: REFINED Wh EAT FLOUR [A DAL £02 » PM Ne 8 OND FLO R (MAIDA ED BLE VE 0 . ie) Sunk sas BUTTER (6%., RAISING AGEN LE VE Say — Sant > AL ND RaAVO = CL NG AGENTS It LE DOL (PALM ), SUGAR CASHEW $1 conus A AGE [S000E) 8 S00GTH, 10DISES SUBAR CASHEW NUTS 4 2 wees bers in brackets DANES CA an A Eaanal Ll SED S/ 4 ND EM od 15 (459 INVER] | CONTA Ese: ape sternativast No - 0 ARTIFIL (AL (MILX AN VAL 0 EMULSIFERS 2.01, 720) CONTAINS WHEAT. UTS ¥ LX AND SOYA Lt. fag : ) ) VANILLA} AV OM IBSE 4 od In, Zo) 1 | Ad Via, mi . A o —y - ro oi STORE A COOL, HYGIENIC AND ORY PLACE. Th i. Srv dara nheaind : AN} RICTRIES of oe. NSFER CONTENTS ¢ LL INGERF Sopranos DES 10, aig ha : + a“ S130 1 TUG J * A 4 a So pi"
+    },
+    "quality": {
+      "status": "retake_recommended",
+      "score": 75.26,
+      "metrics": [
+        {
+          "name": "sharpness",
+          "value": 100,
+          "unit": "score",
+          "confidence": 1,
+          "method": "laplacian_variance",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "contrast",
+          "value": 46.043,
+          "unit": "score",
+          "confidence": 1,
+          "method": "grayscale_standard_deviation",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "glare",
+          "value": 74.0112,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "bright_pixel_fraction",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "skew",
+          "value": 0,
+          "unit": "degrees",
+          "confidence": 1,
+          "method": "minimum_area_rectangle",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "perspective",
+          "value": 98.535,
+          "unit": "score",
+          "confidence": 0.4983,
+          "method": "quadrilateral_rectangularity",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "text_coverage",
+          "value": 6.755,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "ocr_bbox_union",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_distribution",
+          "value": 44.568,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "median",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_lower_quartile",
+          "value": 20.8597,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "lower_quartile",
+          "evidence_bboxes": []
+        }
+      ],
+      "guidance": [
+        "Tilt the package or light source to remove reflections from the label."
+      ]
+    },
+    "overallStatus": "manual_review",
+    "verdictMap": {
+      "r6_1_e_mrp": {
+        "status": "manual_review",
+        "confidence": 0.7526,
+        "evidence": "",
+        "bbox_count": 1,
+        "evidence_bboxes": [
+          [
+            0.6895,
+            0.4295,
+            0.082,
+            0.018
+          ]
+        ],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_1_c_net_quantity": {
+        "status": "manual_review",
+        "confidence": 0.7526,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_1_a_address": {
+        "status": "manual_review",
+        "confidence": 0.7526,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_2_consumer_care": {
+        "status": "manual_review",
+        "confidence": 0.7526,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_1_d_mfg_date": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_1_b_common_name": {
+        "status": "manual_review",
+        "confidence": 0.7526,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_1_aa_country_origin": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_a_importer_address": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_da_best_before": {
+        "status": "manual_review",
+        "confidence": 0.7526,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_1_f_dimensions": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_11_unit_sale_price": {
+        "status": "manual_review",
+        "confidence": 0.7526,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_10_ecommerce_declarations": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "failure_message": null
+      },
+      "r7_font_size": {
+        "status": "manual_review",
+        "confidence": 0.7526,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "No declaration readability measurements are available.",
+        "failure_message": null
+      }
+    },
+    "verdictsRaw": [
+      {
+        "rule_id": "r6_1_e_mrp",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [
+          [
+            0.6895,
+            0.4295,
+            0.082,
+            0.018
+          ]
+        ],
+        "confidence": 0.7526,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_c_net_quantity",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.7526,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_address",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.7526,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_2_consumer_care",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(2) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.7526,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_d_mfg_date",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_b_common_name",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.7526,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_aa_country_origin",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_importer_address",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_da_best_before",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.7526,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_f_dimensions",
+        "status": "na",
+        "severity": "warning",
+        "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_11_unit_sale_price",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 6(11) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.7526,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_10_ecommerce_declarations",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(10) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r7_font_size",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 7 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.7526,
+        "reasoning": "No declaration readability measurements are available.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      }
+    ]
+  },
+  {
+    "testCase": {
+      "id": "case_3_angle_good_day",
+      "name": "Britannia Good Day Packaging (Perspective angle / hand-held)",
+      "file": "good_day_1.jpg",
+      "mode": "retail_image",
+      "category": "food",
+      "imported": "domestic",
+      "description": "Pack held at slight 3D perspective angle with partial lighting gradient",
+      "expected": {
+        "r6_1_d_mfg_date": "na",
+        "r6_1_aa_country_origin": "na",
+        "r6_1_a_importer_address": "na",
+        "r6_1_f_dimensions": "na",
+        "r6_10_ecommerce_declarations": "na"
+      }
+    },
+    "durationMs": 4921,
+    "ocr": {
+      "wordCount": 191,
+      "lineCount": 35,
+      "rawTextPreview": "4 Co 9 3 hs i F ey aa g ! pr - o RR he we i & & ’ - . sre -r- YAbo.., Say : oo” 3 >. \\ » EL an, Po bo © Por So... Lo pH MALES: b E protein-6.69. Carbonydrate «¥.7g, ” ; Repos -21.90. Aden Slr TnI p— Ton WR F 4 IE\" z Rr — PE Eap— re r aT 3 on: 1 - ' y Salk — Eh Ve’ ] ' lt = 3 ’ oN p , CIHLAR MEAS HIT",
+      "rawTextFull": "4 Co 9 3 hs i F ey aa g ! pr - o RR he we i & & ’ - . sre -r- YAbo.., Say : oo” 3 >. \\ » EL an, Po bo © Por So... Lo pH MALES: b E protein-6.69. Carbonydrate «¥.7g, ” ; Repos -21.90. Aden Slr TnI p— Ton WR F 4 IE\" z Rr — PE Eap— re r aT 3 on: 1 - ' y Salk — Eh Ve’ ] ' lt = 3 ’ oN p , CIHLAR MEAS HITS 5 : 1 ERT CI =i ¢ SY SSIRIWED WHEAT FLOUR (MAIDA), REFINED PALM 01 SUGAR, CASHEW NUTS (15%), INVERT SUGAR SY : & . “8 A113 FRS [2224i} 471 R 477] ANT AVOLIR ATR ABUSING AGENTS [503(i) & 5000, I0DISED © AS (32211), 471 & 47: AVIS NR pr ARMIKAND VANILLA) FLAVOURING SUBSTA! ON MSinckets as per International Numbe: { ASHER, NUTS MILK AND SO U STREF r KI} | WA : Mtl BRITANN IND e LOT N 4 3 addre TAS A : ip WE or xm: : oh MN LR ; oi] - ¢ = 0 ¥"
+    },
+    "quality": {
+      "status": "usable_with_warnings",
+      "score": 61.27,
+      "metrics": [
+        {
+          "name": "sharpness",
+          "value": 49.443,
+          "unit": "score",
+          "confidence": 1,
+          "method": "laplacian_variance",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "contrast",
+          "value": 55.9174,
+          "unit": "score",
+          "confidence": 1,
+          "method": "grayscale_standard_deviation",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "glare",
+          "value": 0.1035,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "bright_pixel_fraction",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "skew",
+          "value": 0,
+          "unit": "degrees",
+          "confidence": 0.7459,
+          "method": "minimum_area_rectangle",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "perspective",
+          "value": 0,
+          "unit": "score",
+          "confidence": 0,
+          "method": "quadrilateral_rectangularity",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "text_coverage",
+          "value": 7.1528,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "ocr_bbox_union",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_distribution",
+          "value": 29.5225,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "median",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_lower_quartile",
+          "value": 9.9734,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "lower_quartile",
+          "evidence_bboxes": []
+        }
+      ],
+      "guidance": [
+        "Hold the camera steady and tap to focus on the declaration panel."
+      ]
+    },
+    "overallStatus": "fail",
+    "verdictMap": {
+      "r6_1_e_mrp": {
+        "status": "fail",
+        "confidence": 0.6127,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)"
+      },
+      "r6_1_c_net_quantity": {
+        "status": "manual_review",
+        "confidence": 0,
+        "evidence": "7g",
+        "bbox_count": 3,
+        "evidence_bboxes": [
+          [
+            0.388640873015873,
+            0.19642857142857142,
+            0.06820436507936507,
+            0.012235449735449735
+          ],
+          [
+            0.4623015873015873,
+            0.1984126984126984,
+            0.04563492063492063,
+            0.010582010582010581
+          ],
+          [
+            0.388640873015873,
+            0.19642857142857142,
+            0.11929563492063489,
+            0.012566137566137559
+          ]
+        ],
+        "reasoning": "OCR confidence is below the automatic-decision threshold.",
+        "failure_message": null
+      },
+      "r6_1_a_address": {
+        "status": "fail",
+        "confidence": 0.6127,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)"
+      },
+      "r6_2_consumer_care": {
+        "status": "fail",
+        "confidence": 0.6127,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)"
+      },
+      "r6_1_d_mfg_date": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_1_b_common_name": {
+        "status": "fail",
+        "confidence": 0.6127,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)"
+      },
+      "r6_1_aa_country_origin": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_a_importer_address": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_da_best_before": {
+        "status": "fail",
+        "confidence": 0.6127,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)"
+      },
+      "r6_1_f_dimensions": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_11_unit_sale_price": {
+        "status": "manual_review",
+        "confidence": 0.6127,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "failure_message": null
+      },
+      "r6_10_ecommerce_declarations": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "failure_message": null
+      },
+      "r7_font_size": {
+        "status": "manual_review",
+        "confidence": 0,
+        "evidence": "Physical scale cannot be established automatically from this image.",
+        "bbox_count": 2,
+        "evidence_bboxes": [
+          [
+            0.388640873015873,
+            0.19642857142857142,
+            0.06820436507936507,
+            0.012235449735449735
+          ],
+          [
+            0.4623015873015873,
+            0.1984126984126984,
+            0.04563492063492063,
+            0.010582010582010581
+          ]
+        ],
+        "reasoning": "At least one Rule 7 measurement requires manual review.",
+        "failure_message": null
+      }
+    },
+    "verdictsRaw": [
+      {
+        "rule_id": "r6_1_e_mrp",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6127,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "measurement_method": "not_measurable",
+        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_c_net_quantity",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+        "evidence": "7g",
+        "evidence_bboxes": [
+          [
+            0.388640873015873,
+            0.19642857142857142,
+            0.06820436507936507,
+            0.012235449735449735
+          ],
+          [
+            0.4623015873015873,
+            0.1984126984126984,
+            0.04563492063492063,
+            0.010582010582010581
+          ],
+          [
+            0.388640873015873,
+            0.19642857142857142,
+            0.11929563492063489,
+            0.012566137566137559
+          ]
+        ],
+        "confidence": 0,
+        "reasoning": "OCR confidence is below the automatic-decision threshold.",
+        "measurement_method": "relative_readability",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_address",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6127,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_2_consumer_care",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(2) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6127,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_d_mfg_date",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_b_common_name",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6127,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_aa_country_origin",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_importer_address",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_da_best_before",
+        "status": "fail",
+        "severity": "warning",
+        "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6127,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_f_dimensions",
+        "status": "na",
+        "severity": "warning",
+        "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_11_unit_sale_price",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 6(11) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.6127,
+        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_10_ecommerce_declarations",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(10) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r7_font_size",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 7 of LMPC Rules 2011",
+        "evidence": "Physical scale cannot be established automatically from this image.",
+        "evidence_bboxes": [
+          [
+            0.388640873015873,
+            0.19642857142857142,
+            0.06820436507936507,
+            0.012235449735449735
+          ],
+          [
+            0.4623015873015873,
+            0.1984126984126984,
+            0.04563492063492063,
+            0.010582010582010581
+          ]
+        ],
+        "confidence": 0,
+        "reasoning": "At least one Rule 7 measurement requires manual review.",
+        "measurement_method": "relative_readability",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      }
+    ]
+  },
+  {
+    "testCase": {
+      "id": "case_4_wrinkle_parle_g",
+      "name": "Parle-G Wrapper (Wrinkled foil / finger occlusion)",
+      "file": "parle_g_2.jpg",
+      "mode": "retail_image",
+      "category": "food",
+      "imported": "domestic",
+      "description": "Hand holding wrinkled foil pack with finger touch and barcode",
+      "expected": {
+        "r6_1_d_mfg_date": "na",
+        "r6_1_aa_country_origin": "na",
+        "r6_1_a_importer_address": "na",
+        "r6_1_f_dimensions": "na",
+        "r6_10_ecommerce_declarations": "na"
+      }
+    },
+    "durationMs": 3867,
+    "ocr": {
+      "wordCount": 143,
+      "lineCount": 35,
+      "rawTextPreview": "é ¢ _— . > \" he of; 5 oh A | ? ed —— - wb us OF WEGET ARLE Omri 12. / l va | mG : yr, A 1 ; 7.1 - Av UGE CONDITIONS STORE m A CODY WYGIEMIC AND DRY #4 ACE . i —— a 4 nmin | ——~ Ex NE Rr my J EET TERRE ET A . —_— I'L — =D © : $V | / - | NUTRITIONAL INFORMATION. | | | \\ ) at . 7% 2 : \\ é & nT CFRVE ST",
+      "rawTextFull": "é ¢ _— . > \" he of; 5 oh A | ? ed —— - wb us OF WEGET ARLE Omri 12. / l va | mG : yr, A 1 ; 7.1 - Av UGE CONDITIONS STORE m A CODY WYGIEMIC AND DRY #4 ACE . i —— a 4 nmin | ——~ Ex NE Rr my J EET TERRE ET A . —_— I'L — =D © : $V | / - | NUTRITIONAL INFORMATION. | | | \\ ) at . 7% 2 : \\ é & nT CFRVE STZ a PER SERV] MOH NOBTRI 2d Ea =n ho ROU moma so GE | SOLAN o = IEE\" « % y vA ~~ 3 Pn + ‘ ITE. = isyIiuvasima 1 de Ea aad —_—— - a — = - hd Fe : \" 8 2 Wg g »"
+    },
+    "quality": {
+      "status": "acceptable",
+      "score": 81.55,
+      "metrics": [
+        {
+          "name": "sharpness",
+          "value": 100,
+          "unit": "score",
+          "confidence": 1,
+          "method": "laplacian_variance",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "contrast",
+          "value": 66.4131,
+          "unit": "score",
+          "confidence": 1,
+          "method": "grayscale_standard_deviation",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "glare",
+          "value": 0.3813,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "bright_pixel_fraction",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "skew",
+          "value": 0,
+          "unit": "degrees",
+          "confidence": 1,
+          "method": "minimum_area_rectangle",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "perspective",
+          "value": 0,
+          "unit": "score",
+          "confidence": 0,
+          "method": "quadrilateral_rectangularity",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "text_coverage",
+          "value": 8.9615,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "ocr_bbox_union",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_distribution",
+          "value": 35.1699,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "median",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_lower_quartile",
+          "value": 12.4706,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "lower_quartile",
+          "evidence_bboxes": []
+        }
+      ],
+      "guidance": []
+    },
+    "overallStatus": "fail",
+    "verdictMap": {
+      "r6_1_e_mrp": {
+        "status": "fail",
+        "confidence": 0.8155,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)"
+      },
+      "r6_1_c_net_quantity": {
+        "status": "fail",
+        "confidence": 0.8155,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: net_quantity_value, net_quantity_unit.",
+        "failure_message": "Net quantity must be declared in metric units (g/kg/ml/l) (missing: net_quantity_value, net_quantity_unit)"
+      },
+      "r6_1_a_address": {
+        "status": "fail",
+        "confidence": 0.8155,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)"
+      },
+      "r6_2_consumer_care": {
+        "status": "fail",
+        "confidence": 0.8155,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)"
+      },
+      "r6_1_d_mfg_date": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_1_b_common_name": {
+        "status": "fail",
+        "confidence": 0.8155,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)"
+      },
+      "r6_1_aa_country_origin": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_a_importer_address": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_da_best_before": {
+        "status": "fail",
+        "confidence": 0.8155,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)"
+      },
+      "r6_1_f_dimensions": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_11_unit_sale_price": {
+        "status": "manual_review",
+        "confidence": 0.8155,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "failure_message": null
+      },
+      "r6_10_ecommerce_declarations": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "failure_message": null
+      },
+      "r7_font_size": {
+        "status": "manual_review",
+        "confidence": 0.8155,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "No declaration readability measurements are available.",
+        "failure_message": null
+      }
+    },
+    "verdictsRaw": [
+      {
+        "rule_id": "r6_1_e_mrp",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8155,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "measurement_method": "not_measurable",
+        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_c_net_quantity",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8155,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: net_quantity_value, net_quantity_unit.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Net quantity must be declared in metric units (g/kg/ml/l) (missing: net_quantity_value, net_quantity_unit)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_address",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8155,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_2_consumer_care",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(2) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8155,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_d_mfg_date",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_b_common_name",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8155,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_aa_country_origin",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_importer_address",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_da_best_before",
+        "status": "fail",
+        "severity": "warning",
+        "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8155,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_f_dimensions",
+        "status": "na",
+        "severity": "warning",
+        "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_11_unit_sale_price",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 6(11) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8155,
+        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_10_ecommerce_declarations",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(10) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r7_font_size",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 7 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8155,
+        "reasoning": "No declaration readability measurements are available.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      }
+    ]
+  },
+  {
+    "testCase": {
+      "id": "case_5_glare_bourbon",
+      "name": "Britannia Bourbon Foil Wrapper (Metallic glare)",
+      "file": "bourbon_2.jpg",
+      "mode": "retail_image",
+      "category": "food",
+      "imported": "domestic",
+      "description": "Shiny reflective foil wrapper with bright specular glare spots",
+      "expected": {
+        "r6_1_d_mfg_date": "na",
+        "r6_1_aa_country_origin": "na",
+        "r6_1_a_importer_address": "na",
+        "r6_1_f_dimensions": "na",
+        "r6_10_ecommerce_declarations": "na"
+      }
+    },
+    "durationMs": 4811,
+    "ocr": {
+      "wordCount": 368,
+      "lineCount": 68,
+      "rawTextPreview": "Fh Fs T% 5 Bd g; FR SRG oar RR bs Be he he A a Ie 1 TCE Re a Riot slid ah IE 2 yA Bo he HS 20, pgs. a) grew i Lk Se 12) 3 es 1 TEE Vay WAR = ; a Ae THT ll or ais ox S$ Gat a Ric 7% i f Go TaEN Te Me Bes HY br pr. Ee @ Er ie ad a Es fa 8 gar 4 i % in : i i Rs ga iE o& \" 3 KY. 5 A ¥ pt ww # SEE = AR G",
+      "rawTextFull": "Fh Fs T% 5 Bd g; FR SRG oar RR bs Be he he A a Ie 1 TCE Re a Riot slid ah IE 2 yA Bo he HS 20, pgs. a) grew i Lk Se 12) 3 es 1 TEE Vay WAR = ; a Ae THT ll or ais ox S$ Gat a Ric 7% i f Go TaEN Te Me Bes HY br pr. Ee @ Er ie ad a Es fa 8 gar 4 i % in : i i Rs ga iE o& \" 3 KY. 5 A ¥ pt ww # SEE = AR Ge TAT gh TOR * ft fa THE = f fai. LT 80 ia SN 3 3 Cha i rp 2 3 4 Fs 1 ola 1 RSs : ar. i ; 3 7 : oe : 2 5 E REL : iY = Gs oa § Fi 1 hry HR, ei 3 Lyon) “of 3 Sgt ai in Ne Bs % 5 Hi § Gh: 3 EEE BRE \" * fe” 4 PR hei 2 EF FF Ei r:: LAL eg dil ; i L7 ¥¥Y Tri : - - qe ¢ wie » a ] | 8.7 ¥ 1 a a # 3 ’ - y Bh : ; $ | Be : 7 i :  ] Pp 4 Tonga . £ ] K | E LJ A TF TENA 5 ww >. \\ » a ~N 8 ERY: BBE AS 4 Beth od A 1 n 1 he Re i a cA ogg - : a Ee in 5 Ee 3 ) . 5 ag : g , 4 ] : Pp 4 . TE 4 & z 1 »il . i 8 Ss DEE ’ - Li A . . i i 3 A I* ER b x TSF AL uf \\ : ; § 1 ® . . ; : L LA ’ 3 i A nage — ili. og ER in sions Tp rat ’ : -. § pr Re hi ae gg | I APRA Ah - ry ‘ v ; J P ns : 1 SE a 3 CRE Bais Be : attr. eu i 4 Se - ;"
+    },
+    "quality": {
+      "status": "retake_recommended",
+      "score": 52.79,
+      "metrics": [
+        {
+          "name": "sharpness",
+          "value": 34.826,
+          "unit": "score",
+          "confidence": 1,
+          "method": "laplacian_variance",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "contrast",
+          "value": 42.4182,
+          "unit": "score",
+          "confidence": 1,
+          "method": "grayscale_standard_deviation",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "glare",
+          "value": 0,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "bright_pixel_fraction",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "skew",
+          "value": 0,
+          "unit": "degrees",
+          "confidence": 0.7636,
+          "method": "minimum_area_rectangle",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "perspective",
+          "value": 0,
+          "unit": "score",
+          "confidence": 0,
+          "method": "quadrilateral_rectangularity",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "text_coverage",
+          "value": 3.2183,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "ocr_bbox_union",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_distribution",
+          "value": 25.6194,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "median",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_lower_quartile",
+          "value": 10.4411,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "lower_quartile",
+          "evidence_bboxes": []
+        }
+      ],
+      "guidance": [
+        "Hold the camera steady and tap to focus on the declaration panel."
+      ]
+    },
+    "overallStatus": "manual_review",
+    "verdictMap": {
+      "r6_1_e_mrp": {
+        "status": "manual_review",
+        "confidence": 0.5279,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_1_c_net_quantity": {
+        "status": "manual_review",
+        "confidence": 0.5279,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_1_a_address": {
+        "status": "manual_review",
+        "confidence": 0.5279,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_2_consumer_care": {
+        "status": "manual_review",
+        "confidence": 0.5279,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_1_d_mfg_date": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_1_b_common_name": {
+        "status": "manual_review",
+        "confidence": 0.5279,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_1_aa_country_origin": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_a_importer_address": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_da_best_before": {
+        "status": "manual_review",
+        "confidence": 0.5279,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_1_f_dimensions": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_11_unit_sale_price": {
+        "status": "manual_review",
+        "confidence": 0.5279,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
+      },
+      "r6_10_ecommerce_declarations": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "failure_message": null
+      },
+      "r7_font_size": {
+        "status": "manual_review",
+        "confidence": 0.5279,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "No declaration readability measurements are available.",
+        "failure_message": null
+      }
+    },
+    "verdictsRaw": [
+      {
+        "rule_id": "r6_1_e_mrp",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.5279,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_c_net_quantity",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.5279,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_address",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.5279,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_2_consumer_care",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(2) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.5279,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_d_mfg_date",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_b_common_name",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.5279,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_aa_country_origin",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_importer_address",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_da_best_before",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.5279,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_f_dimensions",
+        "status": "na",
+        "severity": "warning",
+        "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_11_unit_sale_price",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 6(11) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.5279,
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_10_ecommerce_declarations",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(10) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r7_font_size",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 7 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.5279,
+        "reasoning": "No declaration readability measurements are available.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      }
+    ]
+  },
+  {
+    "testCase": {
+      "id": "case_6_missing_maggi",
+      "name": "Maggi Front/Side Panel (Missing MRP, PIN, Mfg Date)",
+      "file": "maggi_2.jpg",
+      "mode": "retail_image",
+      "category": "food",
+      "imported": "domestic",
+      "description": "Panel with common name and FSSAI, but missing MRP, missing manufacturer address PIN code",
+      "expected": {
+        "r6_1_e_mrp": "fail",
+        "r6_1_a_address": "fail",
+        "r6_1_b_common_name": "pass/fail",
+        "r6_1_d_mfg_date": "na",
+        "r6_1_aa_country_origin": "na",
+        "r6_1_a_importer_address": "na",
+        "r6_1_f_dimensions": "na",
+        "r6_10_ecommerce_declarations": "na"
+      }
+    },
+    "durationMs": 1071,
+    "ocr": {
+      "wordCount": 99,
+      "lineCount": 25,
+      "rawTextPreview": "Rl, 4S KNOW YOUR PORTION Jj NUTRITIONAL INFORMATION  [Ifaserveis70g  INUTRITION® Per | Per | Xo b INFORMATION 100g fserve| Px ome A Energy (kcal) | 386 [269] 13%] : : Carbohydrate (g) 59.6 161.7] 16% ; PER) Total Sugars (g) 181.3] 1% iin -Added Sugars (g) 11 [08] - : Total Fat (g) 12.5[88] 13% INGRE",
+      "rawTextFull": "Rl, 4S KNOW YOUR PORTION Jj NUTRITIONAL INFORMATION  [Ifaserveis70g  INUTRITION® Per | Per | Xo b INFORMATION 100g fserve| Px ome A Energy (kcal) | 386 [269] 13%] : : Carbohydrate (g) 59.6 161.7] 16% ; PER) Total Sugars (g) 181.3] 1% iin -Added Sugars (g) 11 [08] - : Total Fat (g) 12.5[88] 13% INGREDIENTS -Saluraled Ft () mre | 8.25.8 234 ¢ RETINER WEAR TOUT. Trans Fat (g) (not more than) [0.13 10.10] - : 4 wo» [Sodium (mg) 1000.0(700.0] 29% ’ villi g CK {im A \\ i 2a, STORAGE ADVICE Lic.No. 1001201100016! RTT | »"
+    },
+    "quality": {
+      "status": "acceptable",
+      "score": 80.69,
+      "metrics": [
+        {
+          "name": "sharpness",
+          "value": 100,
+          "unit": "score",
+          "confidence": 1,
+          "method": "laplacian_variance",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "contrast",
+          "value": 62.782,
+          "unit": "score",
+          "confidence": 1,
+          "method": "grayscale_standard_deviation",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "glare",
+          "value": 0.0259,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "bright_pixel_fraction",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "skew",
+          "value": 0,
+          "unit": "degrees",
+          "confidence": 1,
+          "method": "minimum_area_rectangle",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "perspective",
+          "value": 0,
+          "unit": "score",
+          "confidence": 0,
+          "method": "quadrilateral_rectangularity",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "text_coverage",
+          "value": 17.0522,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "ocr_bbox_union",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_distribution",
+          "value": 65.2921,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "median",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_lower_quartile",
+          "value": 35.7997,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "lower_quartile",
+          "evidence_bboxes": []
+        }
+      ],
+      "guidance": []
+    },
+    "overallStatus": "fail",
+    "verdictMap": {
+      "r6_1_e_mrp": {
+        "status": "fail",
+        "confidence": 0.8069,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)"
+      },
+      "r6_1_c_net_quantity": {
+        "status": "manual_review",
+        "confidence": 0,
+        "evidence": "70g",
+        "bbox_count": 3,
+        "evidence_bboxes": [
+          [
+            0.672752808988764,
+            0.03955375253549696,
+            0.20084269662921347,
+            0.030425963488843813
+          ],
+          [
+            0.4241573033707865,
+            0.08417849898580122,
+            0.2710674157303371,
+            0.030425963488843813
+          ],
+          [
+            0.4241573033707865,
+            0.03955375253549696,
+            0.449438202247191,
+            0.07505070993914809
+          ]
+        ],
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "failure_message": null
+      },
+      "r6_1_a_address": {
+        "status": "fail",
+        "confidence": 0.8069,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)"
+      },
+      "r6_2_consumer_care": {
+        "status": "fail",
+        "confidence": 0.8069,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)"
+      },
+      "r6_1_d_mfg_date": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_1_b_common_name": {
+        "status": "fail",
+        "confidence": 0.8069,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)"
+      },
+      "r6_1_aa_country_origin": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_a_importer_address": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_da_best_before": {
+        "status": "fail",
+        "confidence": 0.8069,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)"
+      },
+      "r6_1_f_dimensions": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_11_unit_sale_price": {
+        "status": "manual_review",
+        "confidence": 0.8069,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "failure_message": null
+      },
+      "r6_10_ecommerce_declarations": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "failure_message": null
+      },
+      "r7_font_size": {
+        "status": "manual_review",
+        "confidence": 0,
+        "evidence": "Physical scale cannot be established automatically from this image.",
+        "bbox_count": 2,
+        "evidence_bboxes": [
+          [
+            0.672752808988764,
+            0.03955375253549696,
+            0.20084269662921347,
+            0.030425963488843813
+          ],
+          [
+            0.4241573033707865,
+            0.08417849898580122,
+            0.2710674157303371,
+            0.030425963488843813
+          ]
+        ],
+        "reasoning": "At least one Rule 7 measurement requires manual review.",
+        "failure_message": null
+      }
+    },
+    "verdictsRaw": [
+      {
+        "rule_id": "r6_1_e_mrp",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8069,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "measurement_method": "not_measurable",
+        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_c_net_quantity",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+        "evidence": "70g",
+        "evidence_bboxes": [
+          [
+            0.672752808988764,
+            0.03955375253549696,
+            0.20084269662921347,
+            0.030425963488843813
+          ],
+          [
+            0.4241573033707865,
+            0.08417849898580122,
+            0.2710674157303371,
+            0.030425963488843813
+          ],
+          [
+            0.4241573033707865,
+            0.03955375253549696,
+            0.449438202247191,
+            0.07505070993914809
+          ]
+        ],
+        "confidence": 0,
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "measurement_method": "relative_readability",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_address",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8069,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_2_consumer_care",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(2) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8069,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_d_mfg_date",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_b_common_name",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8069,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_aa_country_origin",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_importer_address",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_da_best_before",
+        "status": "fail",
+        "severity": "warning",
+        "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8069,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_f_dimensions",
+        "status": "na",
+        "severity": "warning",
+        "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_11_unit_sale_price",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 6(11) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.8069,
+        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_10_ecommerce_declarations",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(10) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r7_font_size",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 7 of LMPC Rules 2011",
+        "evidence": "Physical scale cannot be established automatically from this image.",
+        "evidence_bboxes": [
+          [
+            0.672752808988764,
+            0.03955375253549696,
+            0.20084269662921347,
+            0.030425963488843813
+          ],
+          [
+            0.4241573033707865,
+            0.08417849898580122,
+            0.2710674157303371,
+            0.030425963488843813
+          ]
+        ],
+        "confidence": 0,
+        "reasoning": "At least one Rule 7 measurement requires manual review.",
+        "measurement_method": "relative_readability",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      }
+    ]
+  },
+  {
+    "testCase": {
+      "id": "case_7_ecom_haldiram",
+      "name": "Haldiram Aloo Bhujia (E-commerce product listing)",
+      "file": "ecom_haldiram.png",
+      "mode": "ecommerce_listing",
+      "category": "food",
+      "imported": "domestic",
+      "description": "E-commerce product card with complete mandatory declarations",
+      "expected": {
+        "r6_1_e_mrp": "pass",
+        "r6_1_c_net_quantity": "pass",
+        "r6_1_a_address": "pass",
+        "r6_2_consumer_care": "pass",
+        "r6_1_d_mfg_date": "na",
+        "r6_1_b_common_name": "pass",
+        "r6_1_aa_country_origin": "na",
+        "r6_1_a_importer_address": "na",
+        "r6_1_da_best_before": "pass",
+        "r6_1_f_dimensions": "na",
+        "r6_11_unit_sale_price": "pass",
+        "r7_font_size": "na"
+      }
+    },
+    "durationMs": 1084,
+    "ocr": {
+      "wordCount": 109,
+      "lineCount": 16,
+      "rawTextPreview": "HALDIRAM’S NAGPUR Haldiram's Nagpur Bhujia Sev - Crispy Savoury Noodles MRP X55.00 (nciusive of ail taxes) Unit Sale Price: 30.28/19 | Mandatory Product Information Generic / Common Name Spiced Tepary Bean and Gram Flour Noodles (Bhujia Namkeen) Net Quantity 200g Country of Origin India Manufacturer",
+      "rawTextFull": "HALDIRAM’S NAGPUR Haldiram's Nagpur Bhujia Sev - Crispy Savoury Noodles MRP X55.00 (nciusive of ail taxes) Unit Sale Price: 30.28/19 | Mandatory Product Information Generic / Common Name Spiced Tepary Bean and Gram Flour Noodles (Bhujia Namkeen) Net Quantity 200g Country of Origin India Manufacturer / Packer Name Haldiram Foods International Pvt. Ltd., 20 Km Stone, Vill. Gumthala, & Address Bhandara Road, Nagpur - 441104, Maharashtra, India Executive, Customer Care Cell, Haldiram Foods International Pvt. ‘Consumer Care Details Ltd., Nagpur - 441104. Email: customercare@haldirams.com | Tel: +91 712 2779451 Best Before / Expiry Best Before 6 Months from Date of Packaging Date of Manufacture / Packaging Pkg Date: 08/2026"
+    },
+    "quality": {
+      "status": "acceptable",
+      "score": 72.09,
+      "metrics": [
+        {
+          "name": "sharpness",
+          "value": 100,
+          "unit": "score",
+          "confidence": 1,
+          "method": "laplacian_variance",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "contrast",
+          "value": 31.3736,
+          "unit": "score",
+          "confidence": 1,
+          "method": "grayscale_standard_deviation",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "glare",
+          "value": 0,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "bright_pixel_fraction",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "skew",
+          "value": 2.2648,
+          "unit": "degrees",
+          "confidence": 1,
+          "method": "minimum_area_rectangle",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "perspective",
+          "value": 0,
+          "unit": "score",
+          "confidence": 0,
+          "method": "quadrilateral_rectangularity",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "text_coverage",
+          "value": 9.6791,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "ocr_bbox_union",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_distribution",
+          "value": 94.5159,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "median",
+          "evidence_bboxes": []
+        },
+        {
+          "name": "ocr_confidence_lower_quartile",
+          "value": 91.783,
+          "unit": "percent",
+          "confidence": 1,
+          "method": "lower_quartile",
+          "evidence_bboxes": []
+        }
+      ],
+      "guidance": []
+    },
+    "overallStatus": "fail",
+    "verdictMap": {
+      "r6_1_e_mrp": {
+        "status": "manual_review",
+        "confidence": 0,
+        "evidence": "MRP 55.00 (Inclusive of all taxes)",
+        "bbox_count": 6,
+        "evidence_bboxes": [
+          [
+            0.10125,
+            0.2418918918918919,
+            0.07,
+            0.024324324324324326
+          ],
+          [
+            0.29875,
+            0.2527027027027027,
+            0.0725,
+            0.016216216216216217
+          ],
+          [
+            0.37375,
+            0.23648648648648649,
+            0.01875,
+            0.0445945945945946
+          ],
+          [
+            0.3975,
+            0.23648648648648649,
+            0.0175,
+            0.0445945945945946
+          ],
+          [
+            0.42125,
+            0.2527027027027027,
+            0.045,
+            0.016216216216216217
+          ],
+          [
+            0.10125,
+            0.23648648648648649,
+            0.365,
+            0.04459459459459461
+          ]
+        ],
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "failure_message": null
+      },
+      "r6_1_c_net_quantity": {
+        "status": "manual_review",
+        "confidence": 0,
+        "evidence": "200g",
+        "bbox_count": 3,
+        "evidence_bboxes": [
+          [
+            0.12625,
+            0.48243243243243245,
+            0.06875,
+            0.01756756756756757
+          ],
+          [
+            0.36375,
+            0.48243243243243245,
+            0.0425,
+            0.01756756756756757
+          ],
+          [
+            0.12625,
+            0.48243243243243245,
+            0.28,
+            0.017567567567567555
+          ]
+        ],
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "failure_message": null
+      },
+      "r6_1_a_address": {
+        "status": "manual_review",
+        "confidence": 0,
+        "evidence": "Manufacturer / Packer Name Haldiram Foods International Pvt. Ltd., 20 Km Stone, Vill. Gumthala, & Address Bhandara Road, Nagpur 441104, Maharashtra, India -",
+        "bbox_count": 1,
+        "evidence_bboxes": [
+          [
+            0.56875,
+            0.6162162162162163,
+            0.05875,
+            0.014864864864864866
+          ]
+        ],
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "failure_message": null
+      },
+      "r6_2_consumer_care": {
+        "status": "fail",
+        "confidence": 0.7209,
+        "evidence": "",
+        "bbox_count": 1,
+        "evidence_bboxes": [
+          [
+            0.59375,
+            0.6959459459459459,
+            0.23875,
+            0.014864864864864866
+          ]
+        ],
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)"
+      },
+      "r6_1_d_mfg_date": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this product category.",
+        "failure_message": null
+      },
+      "r6_1_b_common_name": {
+        "status": "manual_review",
+        "confidence": 0,
+        "evidence": "Spiced Tepary Bean and Gram Flour Noodles (Bhujia Namkeen)",
+        "bbox_count": 22,
+        "evidence_bboxes": [
+          [
+            0.1,
+            0.28783783783783784,
+            0.035,
+            0.014864864864864866
+          ],
+          [
+            0.14125,
+            0.28783783783783784,
+            0.03375,
+            0.014864864864864866
+          ],
+          [
+            0.18125,
+            0.28783783783783784,
+            0.04375,
+            0.014864864864864866
+          ],
+          [
+            0.2325,
+            0.28783783783783784,
+            0.08625,
+            0.01891891891891892
+          ],
+          [
+            0.0775,
+            0.3635135135135135,
+            0.005,
+            0.02837837837837838
+          ],
+          [
+            0.09375,
+            0.37027027027027026,
+            0.10375,
+            0.021621621621621623
+          ],
+          [
+            0.20375,
+            0.37027027027027026,
+            0.07375,
+            0.016216216216216217
+          ],
+          [
+            0.28375,
+            0.37027027027027026,
+            0.11125,
+            0.016216216216216217
+          ],
+          [
+            0.0925,
+            0.4283783783783784,
+            0.06,
+            0.013513513513513514
+          ],
+          [
+            0.1575,
+            0.4283783783783784,
+            0.0075,
+            0.016216216216216217
+          ],
+          [
+            0.17,
+            0.4283783783783784,
+            0.0725,
+            0.013513513513513514
+          ],
+          [
+            0.24875,
+            0.4283783783783784,
+            0.04625,
+            0.013513513513513514
+          ],
+          [
+            0.36375,
+            0.4283783783783784,
+            0.05125,
+            0.01756756756756757
+          ],
+          [
+            0.42,
+            0.4283783783783784,
+            0.05375,
+            0.01756756756756757
+          ],
+          [
+            0.47875,
+            0.4283783783783784,
+            0.0375,
+            0.013513513513513514
+          ],
+          [
+            0.5225,
+            0.4283783783783784,
+            0.02875,
+            0.013513513513513514
+          ],
+          [
+            0.5575,
+            0.4283783783783784,
+            0.0425,
+            0.013513513513513514
+          ],
+          [
+            0.60625,
+            0.4283783783783784,
+            0.04,
+            0.013513513513513514
+          ],
+          [
+            0.65125,
+            0.4283783783783784,
+            0.065,
+            0.013513513513513514
+          ],
+          [
+            0.7225,
+            0.4283783783783784,
+            0.05375,
+            0.01756756756756757
+          ],
+          [
+            0.7825,
+            0.4283783783783784,
+            0.08,
+            0.016216216216216217
+          ],
+          [
+            0.0775,
+            0.28783783783783784,
+            0.7849999999999999,
+            0.1581081081081081
+          ]
+        ],
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "failure_message": null
+      },
+      "r6_1_aa_country_origin": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_a_importer_address": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this import status.",
+        "failure_message": null
+      },
+      "r6_1_da_best_before": {
+        "status": "manual_review",
+        "confidence": 0,
+        "evidence": "/ Expiry Best Before 6 Months from Date of Packaging",
+        "bbox_count": 27,
+        "evidence_bboxes": [
+          [
+            0.0925,
+            0.6959459459459459,
+            0.08125,
+            0.013513513513513514
+          ],
+          [
+            0.17875,
+            0.6959459459459459,
+            0.035,
+            0.013513513513513514
+          ],
+          [
+            0.22,
+            0.6959459459459459,
+            0.0525,
+            0.013513513513513514
+          ],
+          [
+            0.36375,
+            0.6959459459459459,
+            0.0325,
+            0.014864864864864866
+          ],
+          [
+            0.4025,
+            0.6959459459459459,
+            0.06,
+            0.01756756756756757
+          ],
+          [
+            0.4675,
+            0.7040540540540541,
+            0.005,
+            0.0013513513513513514
+          ],
+          [
+            0.4775,
+            0.6959459459459459,
+            0.05875,
+            0.013513513513513514
+          ],
+          [
+            0.5425,
+            0.6959459459459459,
+            0.045,
+            0.013513513513513514
+          ],
+          [
+            0.59375,
+            0.6959459459459459,
+            0.23875,
+            0.014864864864864866
+          ],
+          [
+            0.83875,
+            0.6945945945945946,
+            0.0025,
+            0.01891891891891892
+          ],
+          [
+            0.8475,
+            0.6959459459459459,
+            0.025,
+            0.013513513513513514
+          ],
+          [
+            0.88,
+            0.6959459459459459,
+            0.02625,
+            0.013513513513513514
+          ],
+          [
+            0.3625,
+            0.7216216216216216,
+            0.02625,
+            0.013513513513513514
+          ],
+          [
+            0.39375,
+            0.7216216216216216,
+            0.06375,
+            0.013513513513513514
+          ],
+          [
+            0.09375,
+            0.7756756756756756,
+            0.0325,
+            0.013513513513513514
+          ],
+          [
+            0.1325,
+            0.7756756756756756,
+            0.05,
+            0.013513513513513514
+          ],
+          [
+            0.1875,
+            0.7756756756756756,
+            0.0075,
+            0.016216216216216217
+          ],
+          [
+            0.20125,
+            0.7756756756756756,
+            0.0475,
+            0.01756756756756757
+          ],
+          [
+            0.36375,
+            0.7756756756756756,
+            0.03375,
+            0.013513513513513514
+          ],
+          [
+            0.4025,
+            0.7756756756756756,
+            0.05125,
+            0.013513513513513514
+          ],
+          [
+            0.45875,
+            0.7756756756756756,
+            0.00875,
+            0.013513513513513514
+          ],
+          [
+            0.47375,
+            0.7756756756756756,
+            0.06,
+            0.013513513513513514
+          ],
+          [
+            0.53875,
+            0.7756756756756756,
+            0.0375,
+            0.013513513513513514
+          ],
+          [
+            0.5825,
+            0.7756756756756756,
+            0.03625,
+            0.013513513513513514
+          ],
+          [
+            0.62375,
+            0.7756756756756756,
+            0.01625,
+            0.013513513513513514
+          ],
+          [
+            0.64625,
+            0.7756756756756756,
+            0.07875,
+            0.01756756756756757
+          ],
+          [
+            0.0925,
+            0.6945945945945946,
+            0.81375,
+            0.09864864864864864
+          ]
+        ],
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "failure_message": null
+      },
+      "r6_1_f_dimensions": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "failure_message": null
+      },
+      "r6_11_unit_sale_price": {
+        "status": "manual_review",
+        "confidence": 0.7209,
+        "evidence": "",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "failure_message": null
+      },
+      "r6_10_ecommerce_declarations": {
+        "status": "pass",
+        "confidence": 0.7135,
+        "evidence": "mrp: MRP 55.00 (Inclusive of all taxes); net_quantity: 200g; manufacturer_address: Manufacturer / Packer Name Haldiram Foods International Pvt. Ltd., 20 Km Stone, Vill. Gumthala, & Address Bhandara Road, Nagpur 441104, Maharashtra, India -; best_before: / Expiry Best Before 6 Months from Date of Packaging; common_name: Spiced Tepary Bean and Gram Flour Noodles (Bhujia Namkeen); country_origin: dia",
+        "bbox_count": 65,
+        "evidence_bboxes": [
+          [
+            0.10125,
+            0.23648648648648649,
+            0.365,
+            0.04459459459459461
+          ],
+          [
+            0.10125,
+            0.2418918918918919,
+            0.07,
+            0.024324324324324326
+          ],
+          [
+            0.29875,
+            0.2527027027027027,
+            0.0725,
+            0.016216216216216217
+          ],
+          [
+            0.37375,
+            0.23648648648648649,
+            0.01875,
+            0.0445945945945946
+          ],
+          [
+            0.3975,
+            0.23648648648648649,
+            0.0175,
+            0.0445945945945946
+          ],
+          [
+            0.42125,
+            0.2527027027027027,
+            0.045,
+            0.016216216216216217
+          ],
+          [
+            0.12625,
+            0.48243243243243245,
+            0.06875,
+            0.01756756756756757
+          ],
+          [
+            0.36375,
+            0.48243243243243245,
+            0.0425,
+            0.01756756756756757
+          ],
+          [
+            0.0925,
+            0.5905405405405405,
+            0.805,
+            0.04324324324324336
+          ],
+          [
+            0.56875,
+            0.6162162162162163,
+            0.05875,
+            0.014864864864864866
+          ],
+          [
+            0.0925,
+            0.6945945945945946,
+            0.81375,
+            0.09864864864864864
+          ],
+          [
+            0.0925,
+            0.6959459459459459,
+            0.08125,
+            0.013513513513513514
+          ],
+          [
+            0.17875,
+            0.6959459459459459,
+            0.035,
+            0.013513513513513514
+          ],
+          [
+            0.22,
+            0.6959459459459459,
+            0.0525,
+            0.013513513513513514
+          ],
+          [
+            0.36375,
+            0.6959459459459459,
+            0.0325,
+            0.014864864864864866
+          ],
+          [
+            0.4025,
+            0.6959459459459459,
+            0.06,
+            0.01756756756756757
+          ],
+          [
+            0.4675,
+            0.7040540540540541,
+            0.005,
+            0.0013513513513513514
+          ],
+          [
+            0.4775,
+            0.6959459459459459,
+            0.05875,
+            0.013513513513513514
+          ],
+          [
+            0.5425,
+            0.6959459459459459,
+            0.045,
+            0.013513513513513514
+          ],
+          [
+            0.59375,
+            0.6959459459459459,
+            0.23875,
+            0.014864864864864866
+          ],
+          [
+            0.83875,
+            0.6945945945945946,
+            0.0025,
+            0.01891891891891892
+          ],
+          [
+            0.8475,
+            0.6959459459459459,
+            0.025,
+            0.013513513513513514
+          ],
+          [
+            0.88,
+            0.6959459459459459,
+            0.02625,
+            0.013513513513513514
+          ],
+          [
+            0.3625,
+            0.7216216216216216,
+            0.02625,
+            0.013513513513513514
+          ],
+          [
+            0.39375,
+            0.7216216216216216,
+            0.06375,
+            0.013513513513513514
+          ],
+          [
+            0.09375,
+            0.7756756756756756,
+            0.0325,
+            0.013513513513513514
+          ],
+          [
+            0.1325,
+            0.7756756756756756,
+            0.05,
+            0.013513513513513514
+          ],
+          [
+            0.1875,
+            0.7756756756756756,
+            0.0075,
+            0.016216216216216217
+          ],
+          [
+            0.20125,
+            0.7756756756756756,
+            0.0475,
+            0.01756756756756757
+          ],
+          [
+            0.36375,
+            0.7756756756756756,
+            0.03375,
+            0.013513513513513514
+          ],
+          [
+            0.4025,
+            0.7756756756756756,
+            0.05125,
+            0.013513513513513514
+          ],
+          [
+            0.45875,
+            0.7756756756756756,
+            0.00875,
+            0.013513513513513514
+          ],
+          [
+            0.47375,
+            0.7756756756756756,
+            0.06,
+            0.013513513513513514
+          ],
+          [
+            0.53875,
+            0.7756756756756756,
+            0.0375,
+            0.013513513513513514
+          ],
+          [
+            0.5825,
+            0.7756756756756756,
+            0.03625,
+            0.013513513513513514
+          ],
+          [
+            0.62375,
+            0.7756756756756756,
+            0.01625,
+            0.013513513513513514
+          ],
+          [
+            0.64625,
+            0.7756756756756756,
+            0.07875,
+            0.01756756756756757
+          ],
+          [
+            0.0775,
+            0.28783783783783784,
+            0.7849999999999999,
+            0.1581081081081081
+          ],
+          [
+            0.1,
+            0.28783783783783784,
+            0.035,
+            0.014864864864864866
+          ],
+          [
+            0.14125,
+            0.28783783783783784,
+            0.03375,
+            0.014864864864864866
+          ],
+          [
+            0.18125,
+            0.28783783783783784,
+            0.04375,
+            0.014864864864864866
+          ],
+          [
+            0.2325,
+            0.28783783783783784,
+            0.08625,
+            0.01891891891891892
+          ],
+          [
+            0.0775,
+            0.3635135135135135,
+            0.005,
+            0.02837837837837838
+          ],
+          [
+            0.09375,
+            0.37027027027027026,
+            0.10375,
+            0.021621621621621623
+          ],
+          [
+            0.20375,
+            0.37027027027027026,
+            0.07375,
+            0.016216216216216217
+          ],
+          [
+            0.28375,
+            0.37027027027027026,
+            0.11125,
+            0.016216216216216217
+          ],
+          [
+            0.0925,
+            0.4283783783783784,
+            0.06,
+            0.013513513513513514
+          ],
+          [
+            0.1575,
+            0.4283783783783784,
+            0.0075,
+            0.016216216216216217
+          ],
+          [
+            0.17,
+            0.4283783783783784,
+            0.0725,
+            0.013513513513513514
+          ],
+          [
+            0.24875,
+            0.4283783783783784,
+            0.04625,
+            0.013513513513513514
+          ],
+          [
+            0.36375,
+            0.4283783783783784,
+            0.05125,
+            0.01756756756756757
+          ],
+          [
+            0.42,
+            0.4283783783783784,
+            0.05375,
+            0.01756756756756757
+          ],
+          [
+            0.47875,
+            0.4283783783783784,
+            0.0375,
+            0.013513513513513514
+          ],
+          [
+            0.5225,
+            0.4283783783783784,
+            0.02875,
+            0.013513513513513514
+          ],
+          [
+            0.5575,
+            0.4283783783783784,
+            0.0425,
+            0.013513513513513514
+          ],
+          [
+            0.60625,
+            0.4283783783783784,
+            0.04,
+            0.013513513513513514
+          ],
+          [
+            0.65125,
+            0.4283783783783784,
+            0.065,
+            0.013513513513513514
+          ],
+          [
+            0.7225,
+            0.4283783783783784,
+            0.05375,
+            0.01756756756756757
+          ],
+          [
+            0.7825,
+            0.4283783783783784,
+            0.08,
+            0.016216216216216217
+          ],
+          [
+            0.0925,
+            0.4283783783783784,
+            0.7699999999999999,
+            0.12567567567567567
+          ],
+          [
+            0.09375,
+            0.48243243243243245,
+            0.0275,
+            0.013513513513513514
+          ],
+          [
+            0.0925,
+            0.5364864864864864,
+            0.06375,
+            0.01756756756756757
+          ],
+          [
+            0.1625,
+            0.5364864864864864,
+            0.01625,
+            0.013513513513513514
+          ],
+          [
+            0.1825,
+            0.5364864864864864,
+            0.04875,
+            0.01756756756756757
+          ],
+          [
+            0.36375,
+            0.5364864864864864,
+            0.03875,
+            0.013513513513513514
+          ]
+        ],
+        "reasoning": "All mandatory e-commerce declarations are present and visible in the submitted listing.",
+        "failure_message": null
+      },
+      "r7_font_size": {
+        "status": "na",
+        "confidence": 1,
+        "evidence": "Rule not applicable to supplied context",
+        "bbox_count": 0,
+        "evidence_bboxes": [],
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "failure_message": null
+      }
+    },
+    "verdictsRaw": [
+      {
+        "rule_id": "r6_1_e_mrp",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+        "evidence": "MRP 55.00 (Inclusive of all taxes)",
+        "evidence_bboxes": [
+          [
+            0.10125,
+            0.2418918918918919,
+            0.07,
+            0.024324324324324326
+          ],
+          [
+            0.29875,
+            0.2527027027027027,
+            0.0725,
+            0.016216216216216217
+          ],
+          [
+            0.37375,
+            0.23648648648648649,
+            0.01875,
+            0.0445945945945946
+          ],
+          [
+            0.3975,
+            0.23648648648648649,
+            0.0175,
+            0.0445945945945946
+          ],
+          [
+            0.42125,
+            0.2527027027027027,
+            0.045,
+            0.016216216216216217
+          ],
+          [
+            0.10125,
+            0.23648648648648649,
+            0.365,
+            0.04459459459459461
+          ]
+        ],
+        "confidence": 0,
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "measurement_method": "relative_readability",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_c_net_quantity",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+        "evidence": "200g",
+        "evidence_bboxes": [
+          [
+            0.12625,
+            0.48243243243243245,
+            0.06875,
+            0.01756756756756757
+          ],
+          [
+            0.36375,
+            0.48243243243243245,
+            0.0425,
+            0.01756756756756757
+          ],
+          [
+            0.12625,
+            0.48243243243243245,
+            0.28,
+            0.017567567567567555
+          ]
+        ],
+        "confidence": 0,
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "measurement_method": "relative_readability",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_address",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+        "evidence": "Manufacturer / Packer Name Haldiram Foods International Pvt. Ltd., 20 Km Stone, Vill. Gumthala, & Address Bhandara Road, Nagpur 441104, Maharashtra, India -",
+        "evidence_bboxes": [
+          [
+            0.56875,
+            0.6162162162162163,
+            0.05875,
+            0.014864864864864866
+          ]
+        ],
+        "confidence": 0,
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "measurement_method": "relative_readability",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_2_consumer_care",
+        "status": "fail",
+        "severity": "critical",
+        "citation": "Rule 6(2) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [
+          [
+            0.59375,
+            0.6959459459459459,
+            0.23875,
+            0.014864864864864866
+          ]
+        ],
+        "confidence": 0.7209,
+        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "measurement_method": "not_measurable",
+        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)",
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_d_mfg_date",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this product category.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_b_common_name",
+        "status": "manual_review",
+        "severity": "critical",
+        "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+        "evidence": "Spiced Tepary Bean and Gram Flour Noodles (Bhujia Namkeen)",
+        "evidence_bboxes": [
+          [
+            0.1,
+            0.28783783783783784,
+            0.035,
+            0.014864864864864866
+          ],
+          [
+            0.14125,
+            0.28783783783783784,
+            0.03375,
+            0.014864864864864866
+          ],
+          [
+            0.18125,
+            0.28783783783783784,
+            0.04375,
+            0.014864864864864866
+          ],
+          [
+            0.2325,
+            0.28783783783783784,
+            0.08625,
+            0.01891891891891892
+          ],
+          [
+            0.0775,
+            0.3635135135135135,
+            0.005,
+            0.02837837837837838
+          ],
+          [
+            0.09375,
+            0.37027027027027026,
+            0.10375,
+            0.021621621621621623
+          ],
+          [
+            0.20375,
+            0.37027027027027026,
+            0.07375,
+            0.016216216216216217
+          ],
+          [
+            0.28375,
+            0.37027027027027026,
+            0.11125,
+            0.016216216216216217
+          ],
+          [
+            0.0925,
+            0.4283783783783784,
+            0.06,
+            0.013513513513513514
+          ],
+          [
+            0.1575,
+            0.4283783783783784,
+            0.0075,
+            0.016216216216216217
+          ],
+          [
+            0.17,
+            0.4283783783783784,
+            0.0725,
+            0.013513513513513514
+          ],
+          [
+            0.24875,
+            0.4283783783783784,
+            0.04625,
+            0.013513513513513514
+          ],
+          [
+            0.36375,
+            0.4283783783783784,
+            0.05125,
+            0.01756756756756757
+          ],
+          [
+            0.42,
+            0.4283783783783784,
+            0.05375,
+            0.01756756756756757
+          ],
+          [
+            0.47875,
+            0.4283783783783784,
+            0.0375,
+            0.013513513513513514
+          ],
+          [
+            0.5225,
+            0.4283783783783784,
+            0.02875,
+            0.013513513513513514
+          ],
+          [
+            0.5575,
+            0.4283783783783784,
+            0.0425,
+            0.013513513513513514
+          ],
+          [
+            0.60625,
+            0.4283783783783784,
+            0.04,
+            0.013513513513513514
+          ],
+          [
+            0.65125,
+            0.4283783783783784,
+            0.065,
+            0.013513513513513514
+          ],
+          [
+            0.7225,
+            0.4283783783783784,
+            0.05375,
+            0.01756756756756757
+          ],
+          [
+            0.7825,
+            0.4283783783783784,
+            0.08,
+            0.016216216216216217
+          ],
+          [
+            0.0775,
+            0.28783783783783784,
+            0.7849999999999999,
+            0.1581081081081081
+          ]
+        ],
+        "confidence": 0,
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "measurement_method": "relative_readability",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_aa_country_origin",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_a_importer_address",
+        "status": "na",
+        "severity": "critical",
+        "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this import status.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_da_best_before",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+        "evidence": "/ Expiry Best Before 6 Months from Date of Packaging",
+        "evidence_bboxes": [
+          [
+            0.0925,
+            0.6959459459459459,
+            0.08125,
+            0.013513513513513514
+          ],
+          [
+            0.17875,
+            0.6959459459459459,
+            0.035,
+            0.013513513513513514
+          ],
+          [
+            0.22,
+            0.6959459459459459,
+            0.0525,
+            0.013513513513513514
+          ],
+          [
+            0.36375,
+            0.6959459459459459,
+            0.0325,
+            0.014864864864864866
+          ],
+          [
+            0.4025,
+            0.6959459459459459,
+            0.06,
+            0.01756756756756757
+          ],
+          [
+            0.4675,
+            0.7040540540540541,
+            0.005,
+            0.0013513513513513514
+          ],
+          [
+            0.4775,
+            0.6959459459459459,
+            0.05875,
+            0.013513513513513514
+          ],
+          [
+            0.5425,
+            0.6959459459459459,
+            0.045,
+            0.013513513513513514
+          ],
+          [
+            0.59375,
+            0.6959459459459459,
+            0.23875,
+            0.014864864864864866
+          ],
+          [
+            0.83875,
+            0.6945945945945946,
+            0.0025,
+            0.01891891891891892
+          ],
+          [
+            0.8475,
+            0.6959459459459459,
+            0.025,
+            0.013513513513513514
+          ],
+          [
+            0.88,
+            0.6959459459459459,
+            0.02625,
+            0.013513513513513514
+          ],
+          [
+            0.3625,
+            0.7216216216216216,
+            0.02625,
+            0.013513513513513514
+          ],
+          [
+            0.39375,
+            0.7216216216216216,
+            0.06375,
+            0.013513513513513514
+          ],
+          [
+            0.09375,
+            0.7756756756756756,
+            0.0325,
+            0.013513513513513514
+          ],
+          [
+            0.1325,
+            0.7756756756756756,
+            0.05,
+            0.013513513513513514
+          ],
+          [
+            0.1875,
+            0.7756756756756756,
+            0.0075,
+            0.016216216216216217
+          ],
+          [
+            0.20125,
+            0.7756756756756756,
+            0.0475,
+            0.01756756756756757
+          ],
+          [
+            0.36375,
+            0.7756756756756756,
+            0.03375,
+            0.013513513513513514
+          ],
+          [
+            0.4025,
+            0.7756756756756756,
+            0.05125,
+            0.013513513513513514
+          ],
+          [
+            0.45875,
+            0.7756756756756756,
+            0.00875,
+            0.013513513513513514
+          ],
+          [
+            0.47375,
+            0.7756756756756756,
+            0.06,
+            0.013513513513513514
+          ],
+          [
+            0.53875,
+            0.7756756756756756,
+            0.0375,
+            0.013513513513513514
+          ],
+          [
+            0.5825,
+            0.7756756756756756,
+            0.03625,
+            0.013513513513513514
+          ],
+          [
+            0.62375,
+            0.7756756756756756,
+            0.01625,
+            0.013513513513513514
+          ],
+          [
+            0.64625,
+            0.7756756756756756,
+            0.07875,
+            0.01756756756756757
+          ],
+          [
+            0.0925,
+            0.6945945945945946,
+            0.81375,
+            0.09864864864864864
+          ]
+        ],
+        "confidence": 0,
+        "reasoning": "Readability or placement evidence requires manual review.",
+        "measurement_method": "relative_readability",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_1_f_dimensions",
+        "status": "na",
+        "severity": "warning",
+        "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_11_unit_sale_price",
+        "status": "manual_review",
+        "severity": "warning",
+        "citation": "Rule 6(11) of LMPC Rules 2011",
+        "evidence": "",
+        "evidence_bboxes": [],
+        "confidence": 0.7209,
+        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r6_10_ecommerce_declarations",
+        "status": "pass",
+        "severity": "critical",
+        "citation": "Rule 6(10) of LMPC Rules 2011",
+        "evidence": "mrp: MRP 55.00 (Inclusive of all taxes); net_quantity: 200g; manufacturer_address: Manufacturer / Packer Name Haldiram Foods International Pvt. Ltd., 20 Km Stone, Vill. Gumthala, & Address Bhandara Road, Nagpur 441104, Maharashtra, India -; best_before: / Expiry Best Before 6 Months from Date of Packaging; common_name: Spiced Tepary Bean and Gram Flour Noodles (Bhujia Namkeen); country_origin: dia",
+        "evidence_bboxes": [
+          [
+            0.10125,
+            0.23648648648648649,
+            0.365,
+            0.04459459459459461
+          ],
+          [
+            0.10125,
+            0.2418918918918919,
+            0.07,
+            0.024324324324324326
+          ],
+          [
+            0.29875,
+            0.2527027027027027,
+            0.0725,
+            0.016216216216216217
+          ],
+          [
+            0.37375,
+            0.23648648648648649,
+            0.01875,
+            0.0445945945945946
+          ],
+          [
+            0.3975,
+            0.23648648648648649,
+            0.0175,
+            0.0445945945945946
+          ],
+          [
+            0.42125,
+            0.2527027027027027,
+            0.045,
+            0.016216216216216217
+          ],
+          [
+            0.12625,
+            0.48243243243243245,
+            0.06875,
+            0.01756756756756757
+          ],
+          [
+            0.36375,
+            0.48243243243243245,
+            0.0425,
+            0.01756756756756757
+          ],
+          [
+            0.0925,
+            0.5905405405405405,
+            0.805,
+            0.04324324324324336
+          ],
+          [
+            0.56875,
+            0.6162162162162163,
+            0.05875,
+            0.014864864864864866
+          ],
+          [
+            0.0925,
+            0.6945945945945946,
+            0.81375,
+            0.09864864864864864
+          ],
+          [
+            0.0925,
+            0.6959459459459459,
+            0.08125,
+            0.013513513513513514
+          ],
+          [
+            0.17875,
+            0.6959459459459459,
+            0.035,
+            0.013513513513513514
+          ],
+          [
+            0.22,
+            0.6959459459459459,
+            0.0525,
+            0.013513513513513514
+          ],
+          [
+            0.36375,
+            0.6959459459459459,
+            0.0325,
+            0.014864864864864866
+          ],
+          [
+            0.4025,
+            0.6959459459459459,
+            0.06,
+            0.01756756756756757
+          ],
+          [
+            0.4675,
+            0.7040540540540541,
+            0.005,
+            0.0013513513513513514
+          ],
+          [
+            0.4775,
+            0.6959459459459459,
+            0.05875,
+            0.013513513513513514
+          ],
+          [
+            0.5425,
+            0.6959459459459459,
+            0.045,
+            0.013513513513513514
+          ],
+          [
+            0.59375,
+            0.6959459459459459,
+            0.23875,
+            0.014864864864864866
+          ],
+          [
+            0.83875,
+            0.6945945945945946,
+            0.0025,
+            0.01891891891891892
+          ],
+          [
+            0.8475,
+            0.6959459459459459,
+            0.025,
+            0.013513513513513514
+          ],
+          [
+            0.88,
+            0.6959459459459459,
+            0.02625,
+            0.013513513513513514
+          ],
+          [
+            0.3625,
+            0.7216216216216216,
+            0.02625,
+            0.013513513513513514
+          ],
+          [
+            0.39375,
+            0.7216216216216216,
+            0.06375,
+            0.013513513513513514
+          ],
+          [
+            0.09375,
+            0.7756756756756756,
+            0.0325,
+            0.013513513513513514
+          ],
+          [
+            0.1325,
+            0.7756756756756756,
+            0.05,
+            0.013513513513513514
+          ],
+          [
+            0.1875,
+            0.7756756756756756,
+            0.0075,
+            0.016216216216216217
+          ],
+          [
+            0.20125,
+            0.7756756756756756,
+            0.0475,
+            0.01756756756756757
+          ],
+          [
+            0.36375,
+            0.7756756756756756,
+            0.03375,
+            0.013513513513513514
+          ],
+          [
+            0.4025,
+            0.7756756756756756,
+            0.05125,
+            0.013513513513513514
+          ],
+          [
+            0.45875,
+            0.7756756756756756,
+            0.00875,
+            0.013513513513513514
+          ],
+          [
+            0.47375,
+            0.7756756756756756,
+            0.06,
+            0.013513513513513514
+          ],
+          [
+            0.53875,
+            0.7756756756756756,
+            0.0375,
+            0.013513513513513514
+          ],
+          [
+            0.5825,
+            0.7756756756756756,
+            0.03625,
+            0.013513513513513514
+          ],
+          [
+            0.62375,
+            0.7756756756756756,
+            0.01625,
+            0.013513513513513514
+          ],
+          [
+            0.64625,
+            0.7756756756756756,
+            0.07875,
+            0.01756756756756757
+          ],
+          [
+            0.0775,
+            0.28783783783783784,
+            0.7849999999999999,
+            0.1581081081081081
+          ],
+          [
+            0.1,
+            0.28783783783783784,
+            0.035,
+            0.014864864864864866
+          ],
+          [
+            0.14125,
+            0.28783783783783784,
+            0.03375,
+            0.014864864864864866
+          ],
+          [
+            0.18125,
+            0.28783783783783784,
+            0.04375,
+            0.014864864864864866
+          ],
+          [
+            0.2325,
+            0.28783783783783784,
+            0.08625,
+            0.01891891891891892
+          ],
+          [
+            0.0775,
+            0.3635135135135135,
+            0.005,
+            0.02837837837837838
+          ],
+          [
+            0.09375,
+            0.37027027027027026,
+            0.10375,
+            0.021621621621621623
+          ],
+          [
+            0.20375,
+            0.37027027027027026,
+            0.07375,
+            0.016216216216216217
+          ],
+          [
+            0.28375,
+            0.37027027027027026,
+            0.11125,
+            0.016216216216216217
+          ],
+          [
+            0.0925,
+            0.4283783783783784,
+            0.06,
+            0.013513513513513514
+          ],
+          [
+            0.1575,
+            0.4283783783783784,
+            0.0075,
+            0.016216216216216217
+          ],
+          [
+            0.17,
+            0.4283783783783784,
+            0.0725,
+            0.013513513513513514
+          ],
+          [
+            0.24875,
+            0.4283783783783784,
+            0.04625,
+            0.013513513513513514
+          ],
+          [
+            0.36375,
+            0.4283783783783784,
+            0.05125,
+            0.01756756756756757
+          ],
+          [
+            0.42,
+            0.4283783783783784,
+            0.05375,
+            0.01756756756756757
+          ],
+          [
+            0.47875,
+            0.4283783783783784,
+            0.0375,
+            0.013513513513513514
+          ],
+          [
+            0.5225,
+            0.4283783783783784,
+            0.02875,
+            0.013513513513513514
+          ],
+          [
+            0.5575,
+            0.4283783783783784,
+            0.0425,
+            0.013513513513513514
+          ],
+          [
+            0.60625,
+            0.4283783783783784,
+            0.04,
+            0.013513513513513514
+          ],
+          [
+            0.65125,
+            0.4283783783783784,
+            0.065,
+            0.013513513513513514
+          ],
+          [
+            0.7225,
+            0.4283783783783784,
+            0.05375,
+            0.01756756756756757
+          ],
+          [
+            0.7825,
+            0.4283783783783784,
+            0.08,
+            0.016216216216216217
+          ],
+          [
+            0.0925,
+            0.4283783783783784,
+            0.7699999999999999,
+            0.12567567567567567
+          ],
+          [
+            0.09375,
+            0.48243243243243245,
+            0.0275,
+            0.013513513513513514
+          ],
+          [
+            0.0925,
+            0.5364864864864864,
+            0.06375,
+            0.01756756756756757
+          ],
+          [
+            0.1625,
+            0.5364864864864864,
+            0.01625,
+            0.013513513513513514
+          ],
+          [
+            0.1825,
+            0.5364864864864864,
+            0.04875,
+            0.01756756756756757
+          ],
+          [
+            0.36375,
+            0.5364864864864864,
+            0.03875,
+            0.013513513513513514
+          ]
+        ],
+        "confidence": 0.7135,
+        "reasoning": "All mandatory e-commerce declarations are present and visible in the submitted listing.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      },
+      {
+        "rule_id": "r7_font_size",
+        "status": "na",
+        "severity": "warning",
+        "citation": "Rule 7 of LMPC Rules 2011",
+        "evidence": "Rule not applicable to supplied context",
+        "evidence_bboxes": [],
+        "confidence": 1,
+        "reasoning": "Rule is not applicable to this evidence mode.",
+        "measurement_method": "not_measurable",
+        "failure_message": null,
+        "rule_version": "2026-09"
+      }
+    ]
+  }
+]

@@ -14,16 +14,17 @@ def _meta():
 
 def test_extracts_address_with_pin():
     words = [
-        _word("ACME", 0.95, 10, 10, 50),
-        _word("FOODS", 0.94, 65, 10, 60),
+        _word("Mfg:", 0.90, 10, 10, 40),
+        _word("by:", 0.90, 55, 10, 25),
+        _word("ACME", 0.95, 85, 10, 50),
+        _word("FOODS", 0.94, 140, 10, 60),
         _word("PVT", 0.92, 10, 35, 40),
         _word("LTD", 0.93, 55, 35, 35),
-        _word("Mfg:", 0.90, 10, 60, 40),
-        _word("Plot", 0.91, 55, 60, 35),
-        _word("12", 0.95, 95, 60, 20),
-        _word("Mumbai", 0.90, 120, 60, 60),
-        _word("400001", 0.95, 185, 60, 55),
-        _word("India", 0.9, 245, 60, 45),
+        _word("Plot", 0.91, 10, 60, 35),
+        _word("12", 0.95, 50, 60, 20),
+        _word("Mumbai", 0.90, 75, 60, 60),
+        _word("400001", 0.95, 140, 60, 55),
+        _word("India", 0.9, 200, 60, 45),
     ]
     result = extract_manufacturer_address(words, _meta(), r"\b([1-9][0-9]{5})\b")
     assert result.value is not None
@@ -94,3 +95,29 @@ def test_marks_imported_by_keyword():
     )
     assert result.value is not None
     assert "110002" in result.value
+
+
+def test_manufacturer_below_other_declarations_excludes_prior_lines():
+    words = [
+        _word("BrandX", 0.95, 10, 10, 60),
+        _word("Net", 0.95, 10, 35, 30),
+        _word("Qty:", 0.95, 45, 35, 30),
+        _word("500g", 0.95, 80, 35, 40),
+        _word("MRP", 0.95, 10, 60, 30),
+        _word("Rs.99", 0.95, 45, 60, 40),
+        _word("Mfg:", 0.90, 10, 85, 40),
+        _word("Acme", 0.95, 55, 85, 45),
+        _word("Foods", 0.95, 105, 85, 50),
+        _word("Plot", 0.91, 10, 110, 35),
+        _word("12", 0.95, 50, 110, 20),
+        _word("Delhi", 0.90, 75, 110, 50),
+        _word("110001", 0.95, 130, 110, 55),
+    ]
+    result = extract_manufacturer_address(words, _meta(), r"\b([1-9][0-9]{5})\b")
+    assert result.value is not None
+    assert "110001" in result.value
+    assert "Acme" in result.value
+    assert "BrandX" not in result.value
+    assert "500g" not in result.value
+    assert "99" not in result.value
+

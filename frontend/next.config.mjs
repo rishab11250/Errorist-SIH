@@ -4,7 +4,7 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   "img-src 'self' data: blob:",
   "worker-src 'self' blob:",
-  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
   "connect-src 'self'",

@@ -16,7 +16,7 @@ SECTION_KEYWORDS = re.compile(
 
 def extract_consumer_care(
     ocr_words: list[OCRWord],
-    image_meta: ImageMeta,  # noqa: ARG001
+    image_meta: ImageMeta,
     email_regex: str,
     phone_regex: str,
 ) -> ExtractedField | None:
@@ -25,7 +25,14 @@ def extract_consumer_care(
     phone_re = re.compile(phone_regex)
 
     email_words = [word for word in ocr_words if email_re.search(word.text)]
-    phone_words = [word for word in ocr_words if phone_re.search(word.text)]
+    phone_words: list[OCRWord] = []
+    for i in range(len(ocr_words)):
+        for window in range(1, 5):
+            if i + window <= len(ocr_words):
+                chunk = "".join(ocr_words[j].text for j in range(i, i + window))
+                if phone_re.search(chunk):
+                    phone_words.extend(ocr_words[i : i + window])
+                    break
 
     if not email_words or not phone_words:
         return ExtractedField(
@@ -41,7 +48,19 @@ def extract_consumer_care(
         )
     )
 
-    block = [word for word in ocr_words if 0 <= word.bbox[1] - section_y <= 200]
+    is_normalized = bool(
+        ocr_words
+        and all(
+            w.bbox[0] <= 1.0 and w.bbox[1] <= 1.0 and w.bbox[2] <= 1.0 and w.bbox[3] <= 1.0
+            for w in ocr_words
+        )
+    )
+    max_delta_y = (
+        200.0 / image_meta.height
+        if (is_normalized and image_meta.height > 0)
+        else 200.0
+    )
+    block = [word for word in ocr_words if 0 <= word.bbox[1] - section_y <= max_delta_y]
     block_text = " ".join(word.text for word in block)
     has_email = bool(email_re.search(block_text))
     has_phone = bool(phone_re.search(block_text))

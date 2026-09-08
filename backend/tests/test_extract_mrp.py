@@ -74,3 +74,23 @@ def test_phrase_too_far_vertically_misses_match():
         ).value
         is None
     )
+
+
+def test_mrp_evidence_bboxes_excludes_far_words():
+    consumer_care_bbox = (0.02, 0.85, 0.20, 0.05)
+    words = [
+        OCRWord("MRP", 0.95, (0.02, 0.30, 0.08, 0.04)),
+        OCRWord("Rs.199", 0.94, (0.11, 0.30, 0.12, 0.04)),
+        OCRWord("Inclusive", 0.92, (0.24, 0.30, 0.14, 0.04)),
+        OCRWord("of", 0.95, (0.39, 0.30, 0.04, 0.04)),
+        OCRWord("all", 0.95, (0.44, 0.30, 0.05, 0.04)),
+        OCRWord("taxes", 0.93, (0.50, 0.30, 0.08, 0.04)),
+        OCRWord("Customer", 0.90, (0.02, 0.80, 0.15, 0.04)),
+        OCRWord("care@acme.com", 0.92, consumer_care_bbox),
+    ]
+    result = extract_mrp(words, ImageMeta(1000, 1000), PHRASE)
+    assert result is not None
+    assert result.value == "199"
+    assert consumer_care_bbox not in result.evidence_spans
+    assert len(result.evidence_spans) <= 6
+

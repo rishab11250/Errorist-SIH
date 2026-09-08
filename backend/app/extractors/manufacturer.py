@@ -8,7 +8,7 @@ from app.domain import ExtractedField, ImageMeta, OCRWord
 from app.extractors.base import avg_confidence, merge_bboxes
 
 ROLE_KEYWORDS = re.compile(
-    r"\b(?:mfg|mfd|mfd\.?|manufactured\s+by|packed\s+by|imported\s+by|marketed\s+by|manufactured\s+for)\b",
+    r"\b(?:mfg|mfd|mfd\.?|manufactured\s+by|packed\s+by|imported\s+by|marketed\s+by|manufactured\s+for|manufacturer|packer)\b",
     re.IGNORECASE,
 )
 ADDRESS_HINT = re.compile(
@@ -17,7 +17,7 @@ ADDRESS_HINT = re.compile(
 )
 
 
-def _group_into_lines(words: list[OCRWord], y_tolerance: int = 10) -> list[list[OCRWord]]:
+def _group_into_lines(words: list[OCRWord], y_tolerance: float = 10.0) -> list[list[OCRWord]]:
     if not words:
         return []
     sorted_w = sorted(words, key=lambda w: (w.bbox[1], w.bbox[0]))
@@ -42,18 +42,37 @@ def extract_manufacturer_address(
     ocr_words: list[OCRWord], image_meta: ImageMeta, pin_regex: str
 ) -> ExtractedField | None:
     pin_re = re.compile(pin_regex)
-    lines = _group_into_lines(ocr_words, max(10, image_meta.height // 100))
+    is_normalized = bool(
+        ocr_words
+        and all(
+            w.bbox[0] <= 1.0 and w.bbox[1] <= 1.0 and w.bbox[2] <= 1.0 and w.bbox[3] <= 1.0
+            for w in ocr_words
+        )
+    )
+    if is_normalized:
+        y_tol = (
+            max(10.0, float(image_meta.height // 100)) / image_meta.height
+            if image_meta.height > 0
+            else 0.02
+        )
+    else:
+        y_tol = float(max(10, image_meta.height // 100))
+    lines = _group_into_lines(ocr_words, y_tol)
     start_idx = next(
         (i for i, line in enumerate(lines) if ROLE_KEYWORDS.search(_line_text(line))), None
     )
     if start_idx is None:
         return ExtractedField("manufacturer_address", None, None, 0.0, [])
-    block_lines = lines[: start_idx + 1]
-    for j in range(start_idx + 1, min(start_idx + 7, len(lines))):
-        if _line_is_address(lines[j], pin_re):
-            block_lines.append(lines[j])
-        elif len(block_lines) >= 2:
-            break
+    block_lines = lines[start_idx : start_idx + 1]
+    has_pin = any(pin_re.search(w.text) for w in block_lines[0])
+    if not has_pin:
+        for j in range(start_idx + 1, min(start_idx + 7, len(lines))):
+            if _line_is_address(lines[j], pin_re):
+                block_lines.append(lines[j])
+                if any(pin_re.search(w.text) for w in lines[j]):
+                    break
+            elif len(block_lines) >= 2:
+                break
     block_words = [w for line in block_lines for w in line]
     pin_bbox = next((w.bbox for w in block_words if pin_re.search(w.text)), None)
     return ExtractedField(

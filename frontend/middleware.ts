@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { safeNextPath } from './lib/api-client';
 
-const SESSION_COOKIE = 'lmpc_session';
+const SESSION_COOKIE = process.env.LMPC_COOKIE_NAME || 'lmpc_session';
 
 export function middleware(request: NextRequest) {
   const hasSession = Boolean(request.cookies.get(SESSION_COOKIE)?.value);

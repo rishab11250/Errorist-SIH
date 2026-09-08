@@ -3,9 +3,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import RepositoryPage from '@/app/(workspace)/history/page';
 import { UserTable, type ManagedUser } from '@/components/auth/UserTable';
 import { StatusChart } from '@/components/dashboard/StatusChart';
+import { RepositoryPage } from '@/components/repository/RepositoryPage';
 import { WorkspaceShell } from '@/components/WorkspaceShell';
 import { server } from './server';
 
@@ -58,7 +58,7 @@ describe('operations workspace', () => {
         return HttpResponse.json({ items: [], page: 1, page_size: 20, total: 0 });
       })
     );
-    render(<RepositoryPage searchParams={{}} />);
+    render(<RepositoryPage initialSearchParams={{}} />);
     const user = userEvent.setup();
     await user.type(screen.getByRole('searchbox'), 'tea');
     await user.selectOptions(screen.getByLabelText('Mode'), 'ecommerce_listing');

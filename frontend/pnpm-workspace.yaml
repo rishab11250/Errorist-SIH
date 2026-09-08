@@ -2,3 +2,5 @@ allowBuilds:
   esbuild: true
   msw: true
   tesseract.js: true
+overrides:
+  postcss: 8.5.28

@@ -43,13 +43,13 @@ app = FastAPI(
 )
 install_error_handlers(app)
 
-# CORS: allow local dev frontend on 3000
+_browser_origins = AuthSettings.from_env().allowed_browser_origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:8000"],
+    allow_origins=list(_browser_origins),
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "X-Request-ID"],
 )
 
 app.include_router(scan_router)

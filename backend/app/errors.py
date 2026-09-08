@@ -13,6 +13,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.responses import Response
 
+from app.settings import AuthSettings
+
 logger = logging.getLogger(__name__)
 
 _REQUEST_ID = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
@@ -68,6 +70,53 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
         return response
 
 
+class BrowserRequestSecurityMiddleware(BaseHTTPMiddleware):
+    """Reject unsafe browser mutations before request bodies reach a route."""
+
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: RequestResponseEndpoint,
+    ) -> Response:
+        if request.url.path.startswith("/api/") and request.method in {"POST", "PATCH", "DELETE"}:
+            settings = getattr(request.app.state, "auth_settings", AuthSettings())
+            origin = request.headers.get("origin")
+            if origin is not None and origin.rstrip("/") not in settings.allowed_browser_origins:
+                return JSONResponse(
+                    status_code=403,
+                    content=error_body(
+                        "cross_origin_request",
+                        "This browser origin is not allowed to modify application data.",
+                        _request_id(request),
+                    ),
+                )
+            if request.headers.get("sec-fetch-site", "").lower() == "cross-site":
+                return JSONResponse(
+                    status_code=403,
+                    content=error_body(
+                        "cross_origin_request",
+                        "Cross-site browser requests cannot modify application data.",
+                        _request_id(request),
+                    ),
+                )
+            content_length = request.headers.get("content-length")
+            has_body = request.headers.get("transfer-encoding") is not None or (
+                content_length is not None and content_length != "0"
+            )
+            if has_body:
+                content_type = request.headers.get("content-type", "").split(";", 1)[0].strip()
+                if content_type.lower() != "application/json":
+                    return JSONResponse(
+                        status_code=415,
+                        content=error_body(
+                            "unsupported_media_type",
+                            "JSON API requests must use Content-Type: application/json.",
+                            _request_id(request),
+                        ),
+                    )
+        return await call_next(request)
+
+
 async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
@@ -109,6 +158,7 @@ async def unexpected_error_handler(request: Request, exc: Exception) -> JSONResp
 
 def install_error_handlers(app: FastAPI) -> None:
     """Register the request-ID middleware and all shared exception handlers."""
+    app.add_middleware(BrowserRequestSecurityMiddleware)
     app.add_middleware(RequestIDMiddleware)
     app.add_exception_handler(AppError, app_error_handler)
     app.add_exception_handler(StarletteHTTPException, http_error_handler)

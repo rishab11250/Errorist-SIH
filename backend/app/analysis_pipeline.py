@@ -154,12 +154,12 @@ def normalize_ocr(request: ScanRequest) -> tuple[tuple[OCRWord, ...], tuple[OCRL
     return words, tuple(lines)
 
 
-def _decode(request: ScanRequest):
+def _decode(request: ScanRequest, *, max_image_bytes: int, max_image_pixels: int):
     try:
         return decode_image(
             request.image_b64,
-            max_bytes=MAX_IMAGE_BYTES,
-            max_pixels=MAX_IMAGE_PIXELS,
+            max_bytes=max_image_bytes,
+            max_pixels=max_image_pixels,
         )
     except ImageDecodeError as exc:
         mapping = {
@@ -179,10 +179,20 @@ def _decode(request: ScanRequest):
         raise PipelineError(status, error, detail, "decode_image") from exc
 
 
-def analyze_scan(request: ScanRequest, rules: RulesConfig) -> AnalysisResult:
+def analyze_scan(
+    request: ScanRequest,
+    rules: RulesConfig,
+    *,
+    max_image_bytes: int | None = None,
+    max_image_pixels: int | None = None,
+) -> AnalysisResult:
     """Run the complete analysis sequence once for a validated scan request."""
 
-    decoded = _decode(request)
+    decoded = _decode(
+        request,
+        max_image_bytes=MAX_IMAGE_BYTES if max_image_bytes is None else max_image_bytes,
+        max_image_pixels=MAX_IMAGE_PIXELS if max_image_pixels is None else max_image_pixels,
+    )
     words, lines = normalize_ocr(request)
     if not words:
         raise PipelineError(

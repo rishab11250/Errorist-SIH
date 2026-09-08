@@ -28,3 +28,10 @@ Accessed 2026-09-08. Only free source and packages are used; no paid blocks or t
 - Reviewed source: https://ui.aceternity.com/components/spotlight
 - Result: the component was listed as free, but the page did not expose a compatible open-source license at implementation time. No Aceternity source code was copied.
 - Local alternative: `components/ui/spotlight.tsx` is an original, static CSS treatment implementing the same decorative need without pointer tracking, animation, or additional dependencies.
+
+## Tesseract.js offline OCR assets
+
+- Sources: `tesseract.js` 5.1.1 (Apache-2.0), `tesseract.js-core` 5.1.1 (Apache-2.0), and `@tesseract.js-data/eng` 1.0.0 (MIT).
+- Local files: `public/tesseract/worker.min.js`, `public/tesseract/core/*`, and `public/tesseract/lang/eng.traineddata.gz`.
+- Distributed license texts: `public/tesseract/licenses/`.
+- Purpose: serve the OCR worker, WebAssembly variants, and English model from this application so label inspection does not depend on a CDN or runtime internet access.

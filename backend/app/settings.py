@@ -21,6 +21,10 @@ class AuthSettings(BaseModel):
     max_image_pixels: int = Field(default=24_000_000, gt=0)
     database_path: Path = Path("lmpc.db")
     backend_origin: str = "http://127.0.0.1:8000"
+    allowed_browser_origins: tuple[str, ...] = (
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+    )
 
     @field_validator("cookie_secure", mode="before")
     @classmethod
@@ -51,6 +55,32 @@ class AuthSettings(BaseModel):
             raise ValueError("must not include a path, query, or fragment")
         return value.rstrip("/")
 
+    @field_validator("allowed_browser_origins", mode="before")
+    @classmethod
+    def parse_allowed_origins(cls, value: object) -> object:
+        if isinstance(value, str):
+            value = tuple(part.strip() for part in value.split(",") if part.strip())
+        return value
+
+    @field_validator("allowed_browser_origins")
+    @classmethod
+    def validate_allowed_origins(cls, values: tuple[str, ...]) -> tuple[str, ...]:
+        if not values:
+            raise ValueError("must include at least one browser origin")
+        normalized: list[str] = []
+        for value in values:
+            if value == "*":
+                raise ValueError("must not contain a wildcard origin")
+            parsed = urlsplit(value)
+            if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+                raise ValueError("must contain only absolute http or https origins")
+            if parsed.path not in {"", "/"} or parsed.query or parsed.fragment:
+                raise ValueError("origins must not include a path, query, or fragment")
+            origin = value.rstrip("/")
+            if origin not in normalized:
+                normalized.append(origin)
+        return tuple(normalized)
+
     @classmethod
     def from_env(cls) -> AuthSettings:
         """Load the supported environment variables and validate them together."""
@@ -62,6 +92,7 @@ class AuthSettings(BaseModel):
             "max_image_pixels": "LMPC_MAX_IMAGE_PIXELS",
             "database_path": "LMPC_DB_PATH",
             "backend_origin": "LMPC_BACKEND_ORIGIN",
+            "allowed_browser_origins": "LMPC_ALLOWED_BROWSER_ORIGINS",
         }
         values = {
             field: os.environ[environment]

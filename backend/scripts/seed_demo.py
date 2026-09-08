@@ -2,17 +2,51 @@
 
 Usage: cd backend && .venv/bin/python -m scripts.seed_demo
 """
+
 from __future__ import annotations
 
 import base64
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from app import db
 
 DEMO_SCANS = [
-    {"mode": "retail_image", "category": "non_food", "overall_status": "pass", "verdicts": [("r6_1_e_mrp", "pass"), ("r6_1_c_net_quantity", "pass"), ("r6_1_a_address", "pass"), ("r6_2_consumer_care", "pass"), ("r6_1_d_mfg_date", "pass")]},
-    {"mode": "retail_image", "category": "food", "overall_status": "fail", "verdicts": [("r6_1_e_mrp", "fail"), ("r6_1_c_net_quantity", "pass"), ("r6_1_a_address", "pass"), ("r6_2_consumer_care", "fail"), ("r6_1_d_mfg_date", "na")]},
-    {"mode": "retail_image", "category": "non_food", "overall_status": "mixed", "verdicts": [("r6_1_e_mrp", "pass"), ("r6_1_c_net_quantity", "warn"), ("r6_1_a_address", "pass"), ("r6_2_consumer_care", "pass"), ("r6_1_d_mfg_date", "pass")]},
+    {
+        "mode": "retail_image",
+        "category": "non_food",
+        "overall_status": "pass",
+        "verdicts": [
+            ("r6_1_e_mrp", "pass"),
+            ("r6_1_c_net_quantity", "pass"),
+            ("r6_1_a_address", "pass"),
+            ("r6_2_consumer_care", "pass"),
+            ("r6_1_d_mfg_date", "pass"),
+        ],
+    },
+    {
+        "mode": "retail_image",
+        "category": "food",
+        "overall_status": "fail",
+        "verdicts": [
+            ("r6_1_e_mrp", "fail"),
+            ("r6_1_c_net_quantity", "pass"),
+            ("r6_1_a_address", "pass"),
+            ("r6_2_consumer_care", "fail"),
+            ("r6_1_d_mfg_date", "na"),
+        ],
+    },
+    {
+        "mode": "retail_image",
+        "category": "non_food",
+        "overall_status": "mixed",
+        "verdicts": [
+            ("r6_1_e_mrp", "pass"),
+            ("r6_1_c_net_quantity", "warn"),
+            ("r6_1_a_address", "pass"),
+            ("r6_2_consumer_care", "pass"),
+            ("r6_1_d_mfg_date", "pass"),
+        ],
+    },
 ]
 
 CITATIONS = {
@@ -31,7 +65,7 @@ def main(db_path: str = "lmpc.db") -> None:
         raise RuntimeError("DB not initialized")
     session = db.SessionLocal()
     try:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         for index, spec in enumerate(DEMO_SCANS):
             session.add(
                 db.Scan(

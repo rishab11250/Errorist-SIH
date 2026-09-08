@@ -1076,11 +1076,11 @@ git commit -m "feat(frontend): add searchable operations and admin views"
 **Interfaces:**
 - Verifies: security headers/requests, keyboard and reduced-motion behavior, setup and role documentation.
 
-- [ ] **Step 1: Add regression tests**
+- [x] **Step 1: Add regression tests**
 
 Backend tests reject unsupported content type, cross-origin mutation, oversized/decompression-bomb images, invalid cookie, inactive user, CSV formula payloads, and unauthorized exports. Frontend tests cover visible focus, icon accessible names, dialog focus return, error `role=alert`, toast `aria-live=polite`, 44px control classes, non-color status text, and reduced-motion disabling transforms.
 
-- [ ] **Step 2: Run tests to expose gaps**
+- [x] **Step 2: Run tests to expose gaps**
 
 Run:
 
@@ -1093,7 +1093,7 @@ pnpm test:run -- tests/accessibility-regressions.test.tsx
 
 Expected: FAIL only on the uncovered security/accessibility behavior.
 
-- [ ] **Step 3: Implement the security/accessibility closures and document operation**
+- [x] **Step 3: Implement the security/accessibility closures and document operation**
 
 Add `LMPC_ALLOWED_BROWSER_ORIGINS` as a comma-separated exact-origin setting with local defaults `http://127.0.0.1:3000,http://localhost:3000`. For `POST`, `PATCH`, and `DELETE`, middleware rejects a present `Origin` outside that set and rejects `Sec-Fetch-Site: cross-site`; body-bearing JSON API routes reject a content type other than `application/json` with `unsupported_media_type`. Keep bodyless logout valid. Do not use wildcard origins with credentialed cookies.
 
@@ -1101,7 +1101,7 @@ Add `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, and this 
 
 For frontend failures, add only the focus, live-region, target-size, semantic-status, and reduced-motion behavior named by the assertions. Document dependency installation without `uv`, migration, bootstrap, login, role matrix, cookie production settings, allowed-origin configuration, same-origin proxy, upload limits, backup/restore, report formats, and no-runtime-network requirement. Include exact local commands and example environment variables without real secrets.
 
-- [ ] **Step 4: Run the workstream gate**
+- [x] **Step 4: Run the workstream gate**
 
 Run:
 
@@ -1117,7 +1117,7 @@ pnpm build
 
 Expected: all commands PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add README.md backend/README.md frontend/README.md backend/app/errors.py backend/app/main.py backend/app/settings.py backend/app/auth backend/app/exports backend/tests/test_security_regressions.py frontend/app/globals.css frontend/components/ui frontend/components/WorkspaceShell.tsx frontend/components/inspection frontend/components/repository frontend/components/dashboard frontend/tests/accessibility-regressions.test.tsx
@@ -1126,10 +1126,10 @@ git commit -m "fix: harden and document the inspection workspace"
 
 ## Operations experience completion gate
 
-- [ ] Fresh database upgrades to `0003_operations` and a copied legacy database retains existing scans.
-- [ ] Anonymous, inspector, other-inspector, inactive-user, and administrator cases match the permission matrix.
-- [ ] PDF/DOCX parity and filtered CSV tests pass.
-- [ ] Repository URLs restore filters and pages after navigation.
-- [ ] Mobile 375px and desktop 1440px layouts have no horizontal overflow.
-- [ ] Keyboard-only and reduced-motion critical paths complete.
-- [ ] No paid/private component dependency or runtime network asset is present.
+- [x] Fresh database upgrades to `0003_operations` and a copied legacy database retains existing scans.
+- [x] Anonymous, inspector, other-inspector, inactive-user, and administrator cases match the permission matrix.
+- [x] PDF/DOCX parity and filtered CSV tests pass.
+- [x] Repository URLs restore filters and pages after navigation.
+- [x] Mobile 375px and desktop 1440px layouts have no horizontal overflow.
+- [x] Keyboard-only and reduced-motion critical paths complete.
+- [x] No paid/private component dependency or runtime network asset is present.

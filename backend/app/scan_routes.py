@@ -9,12 +9,13 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.analysis_pipeline import PipelineError, analyze_scan
-from app.auth.dependencies import authorized_scan, require_user
+from app.auth.dependencies import authorized_scan, get_auth_settings, require_user
 from app.db import Scan, User, VerdictRow, get_session
 from app.domain import AnalysisResult, ExtractedField, QualitySummary, Verdict
 from app.errors import AppError
 from app.models import ScanAnalysisResponse, ScanRequest
 from app.rules_loader import get_active_rules
+from app.settings import AuthSettings
 
 router = APIRouter(prefix="/api", tags=["scan"])
 
@@ -126,6 +127,7 @@ def create_scan(
     request: Request,
     session: Annotated[Session, Depends(get_session)],
     current_user: Annotated[User, Depends(require_user)],
+    settings: Annotated[AuthSettings, Depends(get_auth_settings)],
 ) -> ScanAnalysisResponse:
     rules = get_active_rules()
     request_id = request.state.request_id
@@ -149,7 +151,12 @@ def create_scan(
     session.refresh(scan)
 
     try:
-        result = analyze_scan(req, rules)
+        result = analyze_scan(
+            req,
+            rules,
+            max_image_bytes=settings.max_upload_bytes,
+            max_image_pixels=settings.max_image_pixels,
+        )
         _store_complete(scan, result)
         session.commit()
         session.refresh(scan)

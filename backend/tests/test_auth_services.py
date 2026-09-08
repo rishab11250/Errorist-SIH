@@ -90,6 +90,7 @@ def test_auth_settings_load_defaults(monkeypatch) -> None:
         "LMPC_MAX_IMAGE_PIXELS",
         "LMPC_DB_PATH",
         "LMPC_BACKEND_ORIGIN",
+        "LMPC_ALLOWED_BROWSER_ORIGINS",
     ):
         monkeypatch.delenv(name, raising=False)
 
@@ -101,6 +102,10 @@ def test_auth_settings_load_defaults(monkeypatch) -> None:
     assert settings.max_image_pixels == 24_000_000
     assert str(settings.database_path) == "lmpc.db"
     assert settings.backend_origin == "http://127.0.0.1:8000"
+    assert settings.allowed_browser_origins == (
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+    )
 
 
 @pytest.mark.parametrize("value", ["yes", "on", "", "TRUE "])

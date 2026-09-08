@@ -6,11 +6,17 @@ import type { OCRLine, OCRWord } from './types';
 
 let worker: Worker | null = null;
 let progressListener: ((progress: number) => void) | undefined;
+export const OCR_ASSET_PATHS = {
+  workerPath: '/tesseract/worker.min.js',
+  corePath: '/tesseract/core',
+  langPath: '/tesseract/lang',
+} as const;
 
 async function getWorker(onProgress?: (progress: number) => void): Promise<Worker> {
   progressListener = onProgress;
   if (worker) return worker;
   worker = await createWorker('eng', undefined, {
+    ...OCR_ASSET_PATHS,
     logger: (message) => progressListener?.(message.progress),
   });
   return worker;

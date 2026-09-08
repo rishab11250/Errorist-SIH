@@ -15,7 +15,7 @@ interface Props {
 }
 
 type CaptureStage = 'ready' | 'reading' | 'ocr' | 'analyzing' | 'saving' | 'complete' | 'error';
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 10_000_000;
 const progressStages = [
   { id: 'prepare', label: 'Prepare' },
   { id: 'ocr', label: 'Read text' },

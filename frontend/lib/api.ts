@@ -1,10 +1,11 @@
 import type { ScanRequest, ScanResponse, StoredScanResponse } from './types';
 import { apiFetch } from './api-client';
 
-export async function postScan(request: ScanRequest): Promise<ScanResponse> {
+export async function postScan(request: ScanRequest, signal?: AbortSignal): Promise<ScanResponse> {
   return apiFetch<ScanResponse>('/api/scan', {
     method: 'POST',
     body: JSON.stringify(request),
+    signal,
   });
 }
 

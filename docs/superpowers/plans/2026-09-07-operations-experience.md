@@ -929,7 +929,7 @@ git commit -m "feat(frontend): add authenticated inspection workspace"
 - Consumes: version-2 scan response and review API.
 - Produces: accessible retail/screenshot capture, progress, annotated verdict selection, and review actions.
 
-- [ ] **Step 1: Write critical interaction tests**
+- [x] **Step 1: Write critical interaction tests**
 
 ```tsx
 it('changes capture guidance when screenshot mode is selected', async () => {
@@ -949,21 +949,21 @@ it('selecting a verdict highlights its evidence and announces details', async ()
 
 Test loading, cancellation before API submission, retry after OCR/API error, quality guidance, no-text response, review validation, and reduced-motion progress.
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/frontend && pnpm test:run -- tests/inspection-ui.test.tsx`.
 
 Expected: FAIL before the new components exist.
 
-- [ ] **Step 3: Implement capture stages and validation**
+- [x] **Step 3: Implement capture stages and validation**
 
 Use stages `ready`, `reading`, `ocr`, `analyzing`, `saving`, `complete`, and `error`. Accept JPEG/PNG/WebP up to the backend-configured 10 MB user-visible limit. Retail mode enables `capture="environment"`; listing mode does not. Show preview dimensions, a replace action, one primary Start inspection button, progress, and an AbortController-backed cancel before POST begins.
 
-- [ ] **Step 4: Implement results and review**
+- [x] **Step 4: Implement results and review**
 
 Show overall status, quality panel, evidence image, filterable verdict list, exports, and review history. Clicking or focusing a verdict activates matching SVG rectangles with thicker stroke and accessible text. Each card shows status, citation, evidence, confidence, reasoning, method, and failure guidance. The review form supports the four actions and enforces notes for false positive/follow-up before calling the API.
 
-- [ ] **Step 5: Run focused tests and responsive build**
+- [x] **Step 5: Run focused tests and responsive build**
 
 Run:
 
@@ -976,7 +976,7 @@ pnpm build
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add 'frontend/app/(workspace)/page.tsx' 'frontend/app/(workspace)/scan/[id]/page.tsx' frontend/components/inspection frontend/tests/inspection-ui.test.tsx

@@ -72,6 +72,7 @@ export interface ExtractedField {
 }
 
 export interface Verdict {
+  id?: number;
   rule_id: string;
   status: VerdictStatus;
   severity: Severity;
@@ -83,6 +84,17 @@ export interface Verdict {
   measurement_method: MeasurementMethod;
   failure_message: string | null;
   rule_version: string;
+  review_state?: string;
+}
+
+export interface ReviewAction {
+  id: number;
+  verdict_id: number | null;
+  action: 'confirmed' | 'false_positive' | 'resolved' | 'needs_follow_up';
+  note: string;
+  actor_user_id: number;
+  actor_display_name: string;
+  created_at: string;
 }
 
 export interface ScanAnalysisResponse {
@@ -112,4 +124,5 @@ export interface StoredScanResponse {
     processing_error_code: string | null;
   };
   verdicts: Verdict[];
+  review_actions: ReviewAction[];
 }

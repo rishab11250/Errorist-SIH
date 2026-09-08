@@ -534,7 +534,7 @@ git commit -m "feat(backend): enforce scan ownership and audit reviews"
 - Produces: `ScanFilters`, `list_authorized_scans`, `dashboard_for_filters`.
 - Returns: `{items, page, page_size, total}` from `/api/history`.
 
-- [ ] **Step 1: Write pagination/filter/search tests**
+- [x] **Step 1: Write pagination/filter/search tests**
 
 ```python
 def test_history_combines_filters_and_has_stable_pagination(inspector_client, scan_factory):
@@ -558,13 +558,13 @@ def test_dashboard_uses_same_filter_semantics(inspector_client, scan_factory):
 
 Also test `rule_id`, `verdict_status`, category, UTC inclusive dates, admin `owner_id`, inspector rejection of `owner_id`, invalid sort, page bounds, and tie ordering by `created_at DESC, id DESC`.
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_scan_repository.py tests/test_dashboard_routes.py -q`.
 
 Expected: FAIL against the current list response and limited filters.
 
-- [ ] **Step 3: Implement typed filters and authorized SQL queries**
+- [x] **Step 3: Implement typed filters and authorized SQL queries**
 
 Define:
 
@@ -585,11 +585,11 @@ class ScanFilters(BaseModel):
 
 Use SQLAlchemy expressions and `exists()` for verdict filters. Escape `%`, `_`, and the escape character in text search; search product name, serialized OCR text, rule ID, and verdict evidence. Count on the filtered subquery before applying limit/offset. Do not deserialize all scans in Python.
 
-- [ ] **Step 4: Return filter-aware dashboard data**
+- [x] **Step 4: Return filter-aware dashboard data**
 
 Return total scans, status counts, pass rate, top five failed rules, daily trend, and five recent authorized scans from the same base query. Use zero rather than division errors for empty results.
 
-- [ ] **Step 5: Run focused and full backend tests**
+- [x] **Step 5: Run focused and full backend tests**
 
 Run:
 
@@ -601,7 +601,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add backend/app/repositories backend/app/dashboard_routes.py backend/tests/test_scan_repository.py backend/tests/test_dashboard_routes.py

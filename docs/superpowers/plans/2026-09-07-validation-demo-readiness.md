@@ -169,7 +169,7 @@ git commit -m "feat(eval): define versioned evidence dataset contract"
 **Interfaces:**
 - Produces: 30 deterministic synthetic examples plus six team-captured photographs covering three physical products under multiple conditions, with redistributable OCR fixtures and annotations.
 
-- [ ] **Step 1: Lock the case matrix in a generator test**
+- [x] **Step 1: Lock the case matrix in a generator test**
 
 The generator exports `CASE_DEFINITIONS`; test exact coverage:
 
@@ -219,13 +219,13 @@ Add these six test-split capture rows after the synthetic matrix:
 
 The capture rows use `mode=retail_image`, `source_classification=team_captured`, truthful category/import context, and reviewer-verified expected verdicts. This is the acceptance evidence for three physical products photographed under multiple conditions; synthetic renderings cannot satisfy that gate.
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_generate_synthetic_eval.py -q`.
 
 Expected: FAIL because the generator does not exist.
 
-- [ ] **Step 3: Implement deterministic generation for the 30 synthetic rows**
+- [x] **Step 3: Implement deterministic generation for the 30 synthetic rows**
 
 Use Pillow with a fixed canvas size, local DejaVu Sans font, seeded random generator `26034`, and explicit template functions `retail_label(case)` and `listing_screenshot(case)`. Retail images draw a package panel and exact declarations; screenshot images draw a neutral browser/listing layout without third-party names/logos. Apply condition transforms with Pillow:
 
@@ -242,7 +242,7 @@ TRANSFORMS = {
 
 Derive OCR fixtures from the generator’s exact positioned text tokens, normalizing their boxes and assigning confidence 0.98 for clean text, 0.68 for degraded text, and 0.40 for unreadable/clipped tokens. Do not call the OCR engine to create ground truth.
 
-- [ ] **Step 4: Generate into a temporary directory and verify determinism**
+- [x] **Step 4: Generate into a temporary directory and verify determinism**
 
 Run:
 
@@ -255,7 +255,7 @@ diff -qr /tmp/lmpc-eval-a /tmp/lmpc-eval-b
 
 Expected: generator reports 30 examples and `diff` exits 0.
 
-- [ ] **Step 5: Implement and test the team-capture importer**
+- [x] **Step 5: Implement and test the team-capture importer**
 
 `import_team_captures.py` accepts `--input-dir` and `--dataset`. The input directory contains `captures.json` plus exactly six referenced JPEG/PNG/WebP files. Each capture record contains `example_id`, `product_id`, `source_file`, `condition`, `category`, `imported`, `source_note`, `redistribution_approved: true`, `personal_data_reviewed: true`, distinct `annotator` and `reviewer`, the OCR words/lines, quality class, and expected per-rule verdicts/evidence. Reject unknown IDs, product-ID mismatches against the PHO matrix, the same source file reused twice, missing approval/review flags, equal annotator/reviewer, malformed boxes, and image hashes already present in the dataset.
 

@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { chmod, copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,7 +31,11 @@ await mkdir(languageDestination, { recursive: true });
 await mkdir(licenseDestination, { recursive: true });
 await copyFile(join(packageRoot, 'dist', 'worker.min.js'), join(publicRoot, 'worker.min.js'));
 await Promise.all(
-  coreFiles.map((file) => copyFile(join(coreRoot, file), join(coreDestination, file)))
+  coreFiles.map(async (file) => {
+    const destination = join(coreDestination, file);
+    await copyFile(join(coreRoot, file), destination);
+    await chmod(destination, 0o644);
+  })
 );
 await copyFile(
   join(languageRoot, '4.0.0', 'eng.traineddata.gz'),

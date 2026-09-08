@@ -4,7 +4,7 @@ import os
 import sys
 import time
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from pathlib import Path
 
 if sys.platform == "win32":
@@ -92,10 +92,8 @@ def _database_lock(db_path: Path, timeout_seconds: float = LOCK_TIMEOUT_SECONDS)
         yield
     finally:
         if sys.platform == "win32":
-            try:
+            with suppress(OSError):
                 msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
-            except OSError:
-                pass
         else:
             fcntl.flock(descriptor, fcntl.LOCK_UN)
         os.close(descriptor)

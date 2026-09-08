@@ -68,7 +68,7 @@ docs/demo-runbook.md
 - Produces: `load_dataset(root: Path, split: str) -> EvalDataset` and `dataset_digest(dataset) -> str`.
 - Validates: paths, hashes, split isolation, statuses, rule IDs, boxes, and source/license metadata.
 
-- [ ] **Step 1: Write schema tests against temporary datasets**
+- [x] **Step 1: Write schema tests against temporary datasets**
 
 ```python
 def test_valid_dataset_loads_and_has_stable_digest(tmp_path):
@@ -95,13 +95,13 @@ def test_invalid_dataset_is_rejected(tmp_path, mutation, message):
         load_dataset(root, split="test")
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_eval_schema.py -q`.
 
 Expected: FAIL because `app.evaluation` does not exist.
 
-- [ ] **Step 3: Implement explicit schema models**
+- [x] **Step 3: Implement explicit schema models**
 
 Use these manifest columns:
 
@@ -131,11 +131,11 @@ Each JSONL record has:
 
 Pydantic validators enforce identifier patterns, known modes/categories/statuses, `imported` values `true|false|unknown`, a non-empty normalized condition slug, one ground-truth record per manifest row, exact file SHA, normalized boxes, allowed source classifications, distinct annotator/reviewer names, and product-level split isolation. Digest sorted canonical manifest rows, canonical ground truth, and image/OCR hashes with SHA-256.
 
-- [ ] **Step 4: Implement validation CLI**
+- [x] **Step 4: Implement validation CLI**
 
 `python -m scripts.validate_eval --dataset tests/eval` loads both splits, prints counts by mode/status/rule/source, prints the digest, and exits 2 for validation errors. It never writes the dataset.
 
-- [ ] **Step 5: Run tests and validate the initially empty skeleton**
+- [x] **Step 5: Run tests and validate the initially empty skeleton**
 
 Run:
 
@@ -146,7 +146,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS. Do not run the CLI against the repository dataset until Task 2 supplies all 30 records.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add backend/app/evaluation.py backend/scripts/validate_eval.py backend/tests/test_eval_schema.py backend/tests/eval/README.md

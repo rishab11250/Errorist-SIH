@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import {
@@ -8,6 +8,7 @@ import {
   type InspectionResultData,
 } from '@/components/inspection/InspectionResult';
 import { getScan } from '@/lib/api';
+import { safeNextPath } from '@/lib/api-client';
 
 function cachedResult(scanId: number): InspectionResultData | null {
   const cached = sessionStorage.getItem(`scan:${scanId}`);
@@ -35,7 +36,9 @@ function cachedResult(scanId: number): InspectionResultData | null {
 
 export default function ScanResultPage() {
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
   const scanId = Number.parseInt(params.id, 10);
+  const backHref = safeNextPath(searchParams.get('returnTo'), '/history');
   const [result, setResult] = useState<InspectionResultData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -85,5 +88,5 @@ export default function ScanResultPage() {
       </div>
     );
   }
-  return <InspectionResult result={result} />;
+  return <InspectionResult result={result} backHref={backHref} />;
 }

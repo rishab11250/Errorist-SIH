@@ -49,23 +49,25 @@ function Navigation({ user, onNavigate }: { user: AuthUser; onNavigate?: () => v
   );
 }
 
-function Account({ user }: { user: AuthUser }) {
-  const { logout } = useAuth();
-  const router = useRouter();
+function Account({ user, onSignOut }: { user: AuthUser; onSignOut?: () => Promise<void> }) {
   const [busy, setBusy] = useState(false);
 
   async function signOut() {
+    if (!onSignOut) return;
     setBusy(true);
-    await logout();
-    router.replace('/login');
-    router.refresh();
+    await onSignOut();
   }
 
   return (
     <div className="border-t pt-4">
       <p className="truncate text-sm font-semibold">{user.display_name}</p>
       <p className="mb-3 text-xs capitalize text-muted-foreground">{user.role}</p>
-      <Button variant="outline" className="w-full justify-start" onClick={signOut} disabled={busy}>
+      <Button
+        variant="outline"
+        className="w-full justify-start"
+        onClick={signOut}
+        disabled={busy || !onSignOut}
+      >
         <LogOut aria-hidden="true" />
         {busy ? 'Signing out…' : 'Sign out'}
       </Button>
@@ -73,11 +75,10 @@ function Account({ user }: { user: AuthUser }) {
   );
 }
 
-export function WorkspaceShell({ children }: { children: ReactNode }) {
-  const { user, loading } = useAuth();
+function ConnectedWorkspaceShell({ children }: { children: ReactNode }) {
+  const { user, loading, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -92,6 +93,31 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       </div>
     );
   }
+
+  return (
+    <WorkspaceFrame
+      user={user}
+      onSignOut={async () => {
+        await logout();
+        router.replace('/login');
+        router.refresh();
+      }}
+    >
+      {children}
+    </WorkspaceFrame>
+  );
+}
+
+function WorkspaceFrame({
+  children,
+  user,
+  onSignOut,
+}: {
+  children: ReactNode;
+  user: AuthUser;
+  onSignOut?: () => Promise<void>;
+}) {
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen md:grid md:grid-cols-[16rem_minmax(0,1fr)]">
@@ -113,7 +139,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
         </Link>
         <Navigation user={user} />
         <div className="mt-auto">
-          <Account user={user} />
+          <Account user={user} onSignOut={onSignOut} />
         </div>
       </aside>
 
@@ -136,7 +162,7 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
               </DialogTitle>
               <Navigation user={user} onNavigate={() => setMenuOpen(false)} />
               <div className="mt-auto pt-8">
-                <Account user={user} />
+                <Account user={user} onSignOut={onSignOut} />
               </div>
             </DialogContent>
           </Dialog>
@@ -148,4 +174,9 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       <Toaster position="top-right" richColors />
     </div>
   );
+}
+
+export function WorkspaceShell({ children, user }: { children: ReactNode; user?: AuthUser }) {
+  if (user) return <WorkspaceFrame user={user}>{children}</WorkspaceFrame>;
+  return <ConnectedWorkspaceShell>{children}</ConnectedWorkspaceShell>;
 }

@@ -1,6 +1,14 @@
 'use client';
 
-import { CheckCircle2, CircleHelp, Download, TriangleAlert, XCircle } from 'lucide-react';
+import {
+  ArrowLeft,
+  CheckCircle2,
+  CircleHelp,
+  Download,
+  TriangleAlert,
+  XCircle,
+} from 'lucide-react';
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -56,7 +64,13 @@ const overallPresentation: Record<
   },
 };
 
-export function InspectionResult({ result }: { result: InspectionResultData }) {
+export function InspectionResult({
+  result,
+  backHref = '/history',
+}: {
+  result: InspectionResultData;
+  backHref?: string;
+}) {
   const [activeRuleId, setActiveRuleId] = useState<string | null>(null);
   const [filter, setFilter] = useState<ResultFilter>('all');
   const [reviews, setReviews] = useState(result.reviewActions);
@@ -86,6 +100,11 @@ export function InspectionResult({ result }: { result: InspectionResultData }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link href={backHref}>
+              <ArrowLeft aria-hidden="true" /> Back to repository
+            </Link>
+          </Button>
           <Button asChild variant="outline">
             <a href={`/api/exports/scans/${result.scanId}.docx`}>
               <Download aria-hidden="true" /> DOCX

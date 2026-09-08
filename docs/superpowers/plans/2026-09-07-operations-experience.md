@@ -1002,7 +1002,7 @@ git commit -m "feat(frontend): add guided capture and evidence review"
 - Consumes: paginated history, filtered dashboard, users, and CSV export APIs.
 - Produces: URL-preserving operational screens with role-aware controls.
 
-- [ ] **Step 1: Write repository/dashboard/admin tests**
+- [x] **Step 1: Write repository/dashboard/admin tests**
 
 ```tsx
 it('serializes filters into the URL and API request', async () => {
@@ -1025,25 +1025,25 @@ it('does not expose user administration to inspectors', () => {
 });
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/frontend && pnpm test:run -- tests/operations-ui.test.tsx`.
 
 Expected: FAIL before these components exist.
 
-- [ ] **Step 3: Implement repository filters and responsive results**
+- [x] **Step 3: Implement repository filters and responsive results**
 
 Use immediate search and common filters plus an Advanced disclosure for rule, owner, and dates. Apply explicitly, reset explicitly, serialize all active filters and page in `URLSearchParams`, and restore from the URL. Desktop renders a semantic sortable table; small screens render the same records as cards. Link to detail with the repository query and scroll position in `history.state`; the detail back action restores both without issuing an unfiltered request. Preserve focus and announce result count after loading. CSV download uses the current query string.
 
-- [ ] **Step 4: Implement dashboard with accessible data alternatives**
+- [x] **Step 4: Implement dashboard with accessible data alternatives**
 
 Use filter semantics identical to repository. Render KPI values through the reduced-motion-aware NumberTicker, Recharts bars/lines with exact tooltips, and a visually available table beneath each chart. Status always includes text/icon, never only color. Empty/error states replace charts with a clear action.
 
-- [ ] **Step 5: Implement admin user management**
+- [x] **Step 5: Implement admin user management**
 
 List users and expose create, reset password, change role, and deactivate dialogs. Use visible labels and confirmation for role/deactivation changes. Display backend final-admin/duplicate conflicts inline. Never retain password fields after submit or log request bodies.
 
-- [ ] **Step 6: Run tests and production build**
+- [x] **Step 6: Run tests and production build**
 
 Run:
 
@@ -1057,7 +1057,7 @@ pnpm build
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add 'frontend/app/(workspace)/history/page.tsx' 'frontend/app/(workspace)/dashboard/page.tsx' 'frontend/app/(workspace)/admin/users/page.tsx' frontend/components/repository frontend/components/dashboard frontend/components/auth/UserTable.tsx frontend/tests/operations-ui.test.tsx

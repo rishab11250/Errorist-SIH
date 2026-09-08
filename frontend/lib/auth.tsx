@@ -99,3 +99,7 @@ export function useAuth() {
   if (!context) throw new Error('useAuth must be used inside AuthProvider.');
   return context;
 }
+
+export function useOptionalAuth() {
+  return useContext(AuthContext);
+}

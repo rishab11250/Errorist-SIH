@@ -6,10 +6,11 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import Depends, Request
+from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
 from app.auth.sessions import resolve_session
-from app.db import User, get_session
+from app.db import Scan, User, get_session
 from app.errors import AppError
 from app.settings import AuthSettings
 
@@ -40,3 +41,15 @@ def require_admin(user: Annotated[User, Depends(require_user)]) -> User:
     if user.role != "admin":
         raise AppError(403, "forbidden", "Administrator access is required.")
     return user
+
+
+def authorized_scan_query(user: User) -> Select[tuple[Scan]]:
+    """Return the complete scan scope visible to a user."""
+    query = select(Scan)
+    if user.role != "admin":
+        query = query.where(Scan.owner_user_id == user.id)
+    return query
+
+
+def authorized_scan(session: Session, user: User, scan_id: int) -> Scan | None:
+    return session.scalar(authorized_scan_query(user).where(Scan.id == scan_id))

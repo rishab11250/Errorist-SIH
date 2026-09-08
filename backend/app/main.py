@@ -14,6 +14,7 @@ from app.db import init_db
 from app.errors import install_error_handlers
 from app.models import HealthResponse
 from app.report_routes import router as report_router
+from app.reviews.routes import router as reviews_router
 from app.rules_loader import get_active_rules, load_rules, set_active_rules
 from app.scan_routes import router as scan_router
 from app.settings import AuthSettings
@@ -55,6 +56,7 @@ app.include_router(dashboard_router)
 app.include_router(report_router)
 app.include_router(auth_router)
 app.include_router(users_router)
+app.include_router(reviews_router)
 
 
 @app.get("/api/health", response_model=HealthResponse)

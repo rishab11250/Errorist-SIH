@@ -15,11 +15,12 @@ from app.main import app
 
 
 @pytest.fixture
-def client(tmp_path, monkeypatch):
+def client(tmp_path, monkeypatch, login_client):
     """Use a per-test SQLite file so tests do not share state."""
     db_file = tmp_path / "test.db"
     monkeypatch.setattr(main, "DB_PATH", db_file)
     with TestClient(app) as test_client:
+        login_client(test_client)
         yield test_client
 
 
@@ -145,6 +146,7 @@ def test_bad_image_has_error_envelope_and_failed_audit_row(client: TestClient) -
     assert db.SessionLocal is not None
     with db.SessionLocal() as session:
         failed = session.query(Scan).filter_by(request_id="bad-image-request").one()
+        assert failed.owner_user_id == 1
         assert failed.processing_status == "failed"
         assert failed.failure_stage == "decode_image"
         assert failed.processing_error_code == "image_decode_failed"

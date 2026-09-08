@@ -9,7 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.analysis_pipeline import PipelineError, analyze_scan
-from app.db import Scan, VerdictRow, get_session
+from app.auth.dependencies import authorized_scan, require_user
+from app.db import Scan, User, VerdictRow, get_session
 from app.domain import AnalysisResult, ExtractedField, QualitySummary, Verdict
 from app.errors import AppError
 from app.models import ScanAnalysisResponse, ScanRequest
@@ -124,6 +125,7 @@ def create_scan(
     req: ScanRequest,
     request: Request,
     session: Annotated[Session, Depends(get_session)],
+    current_user: Annotated[User, Depends(require_user)],
 ) -> ScanAnalysisResponse:
     rules = get_active_rules()
     request_id = request.state.request_id
@@ -140,6 +142,7 @@ def create_scan(
         request_id=request_id,
         quality_summary={},
         extracted_fields={},
+        owner_user_id=current_user.id,
     )
     session.add(scan)
     session.commit()
@@ -177,8 +180,12 @@ def create_scan(
 
 
 @router.get("/scan/{scan_id}")
-def get_scan(scan_id: int, session: Annotated[Session, Depends(get_session)]) -> dict:
-    scan = session.get(Scan, scan_id)
+def get_scan(
+    scan_id: int,
+    session: Annotated[Session, Depends(get_session)],
+    current_user: Annotated[User, Depends(require_user)],
+) -> dict:
+    scan = authorized_scan(session, current_user, scan_id)
     if scan is None:
         raise HTTPException(status_code=404, detail="scan_not_found")
     return {
@@ -217,5 +224,17 @@ def get_scan(scan_id: int, session: Annotated[Session, Depends(get_session)]) ->
                 "review_state": verdict.review_state,
             }
             for verdict in scan.verdicts
+        ],
+        "review_actions": [
+            {
+                "id": action.id,
+                "verdict_id": action.verdict_id,
+                "action": action.action,
+                "note": action.note,
+                "actor_user_id": action.actor_user_id,
+                "actor_display_name": action.actor.display_name,
+                "created_at": action.created_at.isoformat(),
+            }
+            for action in sorted(scan.review_actions, key=lambda item: (item.created_at, item.id))
         ],
     }

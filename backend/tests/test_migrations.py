@@ -103,7 +103,11 @@ def test_unversioned_legacy_database_is_adopted_without_data_loss(tmp_path) -> N
         )
 
 
-def test_upgraded_legacy_scan_keeps_id_and_downloads_report(tmp_path, monkeypatch) -> None:
+def test_upgraded_legacy_scan_keeps_id_and_downloads_report(
+    tmp_path,
+    monkeypatch,
+    login_client,
+) -> None:
     path = tmp_path / "legacy-report.db"
     with sqlite3.connect(path) as connection:
         _create_legacy_schema(connection)
@@ -120,6 +124,7 @@ def test_upgraded_legacy_scan_keeps_id_and_downloads_report(tmp_path, monkeypatc
     upgrade_database(path)
     monkeypatch.setattr(main, "DB_PATH", path)
     with TestClient(app) as client:
+        login_client(client, role="admin")
         stored = client.get("/api/scan/7")
         report = client.get("/api/report/7")
 

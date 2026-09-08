@@ -8,7 +8,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.db import Scan, VerdictRow, get_session
+from app.auth.dependencies import authorized_scan_query, require_user
+from app.db import Scan, User, VerdictRow, get_session
 
 router = APIRouter(prefix="/api", tags=["dashboard"])
 
@@ -16,11 +17,18 @@ router = APIRouter(prefix="/api", tags=["dashboard"])
 @router.get("/history")
 def list_history(
     session: Annotated[Session, Depends(get_session)],
+    current_user: Annotated[User, Depends(require_user)],
     limit: int = Query(default=20, ge=1, le=100),
 ) -> list[dict]:
     """Return recent scans, most-recent first."""
     scans = (
-        session.execute(select(Scan).order_by(Scan.created_at.desc()).limit(limit)).scalars().all()
+        session.execute(
+            authorized_scan_query(current_user)
+            .order_by(Scan.created_at.desc(), Scan.id.desc())
+            .limit(limit)
+        )
+        .scalars()
+        .all()
     )
     return [
         {
@@ -47,22 +55,35 @@ def list_history(
 
 
 @router.get("/dashboard")
-def dashboard_summary(session: Annotated[Session, Depends(get_session)]) -> dict:
+def dashboard_summary(
+    session: Annotated[Session, Depends(get_session)],
+    current_user: Annotated[User, Depends(require_user)],
+) -> dict:
     """Return aggregate scan statistics and recent activity."""
-    total = session.execute(select(func.count(Scan.id))).scalar_one()
+    scope = authorized_scan_query(current_user).subquery()
+    total = session.execute(select(func.count(scope.c.id))).scalar_one()
     if total == 0:
         return {"total_scans": 0, "pass_rate": 0.0, "top_failed_rule": None, "recent_activity": []}
     pass_count = session.execute(
-        select(func.count(Scan.id)).where(Scan.overall_status == "pass")
+        select(func.count(scope.c.id)).where(scope.c.overall_status == "pass")
     ).scalar_one()
     top_failed_row = session.execute(
         select(VerdictRow.rule_id, func.count(VerdictRow.id).label("count"))
+        .join(scope, VerdictRow.scan_id == scope.c.id)
         .where(VerdictRow.status == "fail")
         .group_by(VerdictRow.rule_id)
         .order_by(func.count(VerdictRow.id).desc(), VerdictRow.rule_id)
         .limit(1)
     ).first()
-    recent = session.execute(select(Scan).order_by(Scan.created_at.desc()).limit(5)).scalars().all()
+    recent = (
+        session.execute(
+            authorized_scan_query(current_user)
+            .order_by(Scan.created_at.desc(), Scan.id.desc())
+            .limit(5)
+        )
+        .scalars()
+        .all()
+    )
     return {
         "total_scans": total,
         "pass_rate": pass_count / total,

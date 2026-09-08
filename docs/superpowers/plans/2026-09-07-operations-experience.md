@@ -453,7 +453,7 @@ git commit -m "feat(backend): add admin user management"
 - Produces: `POST /api/scan/{id}/reviews`.
 - Changes: every scan/list/dashboard/report route requires an authenticated user and filters by authorization.
 
-- [ ] **Step 1: Add the permission matrix tests**
+- [x] **Step 1: Add the permission matrix tests**
 
 ```python
 @pytest.mark.parametrize("path", ["/api/scan/1", "/api/history", "/api/dashboard", "/api/report/1"])
@@ -478,13 +478,13 @@ def test_review_actions_are_append_only(inspector_client, owned_scan):
     assert [item["action"] for item in body["review_actions"]] == ["needs_follow_up", "resolved"]
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_review_routes.py tests/test_scan_routes.py -q`.
 
 Expected: FAIL because routes are public and review routes are absent.
 
-- [ ] **Step 3: Apply authorization consistently**
+- [x] **Step 3: Apply authorization consistently**
 
 Set `owner_user_id=current_user.id` on every new scan. Add one query helper:
 
@@ -498,11 +498,11 @@ def authorized_scan_query(user: User):
 
 Use the helper for scan detail, report, review, history, and dashboard. Return 404 rather than 403 for an inaccessible scan ID to avoid disclosing its existence. Anonymous POST `/api/scan` returns 401.
 
-- [ ] **Step 4: Implement append-only reviews**
+- [x] **Step 4: Implement append-only reviews**
 
 Validate action enum, note length at most 2000, optional verdict ID belonging to the same scan, and non-empty notes for `false_positive` and `needs_follow_up`. Insert a new row; do not expose update/delete endpoints. When a verdict ID is supplied, update its denormalized `review_state` to the new action in the same transaction while preserving every action row. Return actor display name and UTC timestamp.
 
-- [ ] **Step 5: Run all backend route tests**
+- [x] **Step 5: Run all backend route tests**
 
 Run:
 
@@ -514,7 +514,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add backend/app/reviews backend/app/scan_routes.py backend/app/dashboard_routes.py backend/app/report_routes.py backend/tests/test_scan_routes.py backend/tests/test_dashboard_routes.py backend/tests/test_report_routes.py backend/tests/test_review_routes.py

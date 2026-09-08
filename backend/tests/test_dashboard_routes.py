@@ -11,11 +11,12 @@ from scripts.seed_demo import main as seed_main
 
 
 @pytest.fixture
-def client(tmp_path, monkeypatch):
+def client(tmp_path, monkeypatch, login_client):
     db_file = tmp_path / "test.db"
     monkeypatch.setattr(main, "DB_PATH", db_file)
     seed_main(str(db_file))
     with TestClient(app) as test_client:
+        login_client(test_client, role="admin")
         yield test_client
 
 

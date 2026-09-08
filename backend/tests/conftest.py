@@ -2,10 +2,16 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
+from fastapi.testclient import TestClient
 
+from app import db
+from app.auth.sessions import issue_session
+from app.db import User
 from app.domain import RulesConfig
 from app.rules_loader import load_rules
 
@@ -15,6 +21,41 @@ RULES_PATH = Path(__file__).resolve().parent.parent / "app" / "rules.yaml"
 @pytest.fixture(scope="session")
 def rules() -> RulesConfig:
     return load_rules(RULES_PATH)
+
+
+@pytest.fixture
+def login_client() -> Callable[..., User]:
+    """Create a local user and attach a valid session cookie to a test client."""
+
+    def login(
+        client: TestClient,
+        *,
+        role: str = "inspector",
+        username: str | None = None,
+    ) -> User:
+        if db.SessionLocal is None:
+            raise RuntimeError("test database is not initialized")
+        normalized = username or role
+        with db.SessionLocal() as session:
+            user = User(
+                username_normalized=normalized,
+                display_name=normalized.title(),
+                password_hash="test-only-unused-hash",
+                role=role,
+            )
+            session.add(user)
+            session.flush()
+            issued = issue_session(
+                session,
+                user,
+                now=datetime.now(UTC),
+                ttl=timedelta(hours=8),
+            )
+            session.commit()
+        client.cookies.set("lmpc_session", issued.token)
+        return user
+
+    return login
 
 
 @pytest.fixture

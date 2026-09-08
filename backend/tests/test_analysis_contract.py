@@ -113,9 +113,10 @@ def test_task_one_columns_are_mapped_by_the_orm() -> None:
     )
 
 
-def test_http_errors_include_request_id(tmp_path, monkeypatch) -> None:
+def test_http_errors_include_request_id(tmp_path, monkeypatch, login_client) -> None:
     monkeypatch.setattr(main, "DB_PATH", tmp_path / "contract.db")
     with TestClient(app) as client:
+        login_client(client, role="admin")
         response = client.get("/api/scan/99999", headers={"X-Request-ID": "contract-test"})
     assert response.status_code == 404
     assert response.json() == {

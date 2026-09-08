@@ -8,15 +8,20 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
-from app.db import Scan, get_session
+from app.auth.dependencies import authorized_scan, require_user
+from app.db import User, get_session
 from app.reports import build_report
 
 router = APIRouter(prefix="/api", tags=["reports"])
 
 
 @router.get("/report/{scan_id}")
-def download_report(scan_id: int, session: Annotated[Session, Depends(get_session)]) -> Response:
-    scan = session.get(Scan, scan_id)
+def download_report(
+    scan_id: int,
+    session: Annotated[Session, Depends(get_session)],
+    current_user: Annotated[User, Depends(require_user)],
+) -> Response:
+    scan = authorized_scan(session, current_user, scan_id)
     if scan is None:
         raise HTTPException(status_code=404, detail="scan_not_found")
     return Response(

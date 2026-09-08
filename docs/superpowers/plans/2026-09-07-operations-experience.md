@@ -851,7 +851,7 @@ git commit -m "feat(frontend): establish accessible inspection design system"
 **Interfaces:**
 - Produces: typed `apiFetch<T>()`, `AuthProvider`, `useAuth`, protected route shell, and login UI.
 
-- [ ] **Step 1: Write client and login tests**
+- [x] **Step 1: Write client and login tests**
 
 ```tsx
 it('submits credentials with cookies and shows the returned user', async () => {
@@ -874,25 +874,25 @@ it('shows recovery guidance for an API error', async () => {
 });
 ```
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/frontend && pnpm test:run -- tests/auth-ui.test.tsx`.
 
 Expected: FAIL because the auth UI/client does not exist.
 
-- [ ] **Step 3: Proxy the API and implement one typed client**
+- [x] **Step 3: Proxy the API and implement one typed client**
 
 Replace public cross-origin URLs with a Next.js rewrite from `/api/:path*` to `${LMPC_BACKEND_URL:-http://127.0.0.1:8000}/api/:path*`. `apiFetch` uses relative URLs, `credentials: 'include'`, JSON content type for JSON bodies, parses the error envelope, and throws `ApiError` carrying status/code/detail/request ID. Update all old `lib/api.ts` consumers, then remove the old base URL constant.
 
-- [ ] **Step 4: Add auth provider and route protection**
+- [x] **Step 4: Add auth provider and route protection**
 
 `AuthProvider` loads `/api/auth/me`, exposes `user`, `loading`, `login`, `logout`, and `refresh`, and clears user state on 401. Middleware redirects protected paths to `/login?next=<encoded-local-path>` when the cookie is absent and redirects authenticated users away from `/login`. Validate `next` as a same-origin path beginning with one `/` before navigation.
 
-- [ ] **Step 5: Build responsive workspace shell and login**
+- [x] **Step 5: Build responsive workspace shell and login**
 
 Use one navigation hierarchy with icon plus label for New inspection, Repository, Dashboard, and—only for admins—Users. Desktop uses a sidebar; small screens use an accessible dialog/sheet. The login page uses visible labels, password reveal, inline errors, a loading button, and the token-normalized spotlight as a noninteractive background.
 
-- [ ] **Step 6: Run frontend tests and build**
+- [x] **Step 6: Run frontend tests and build**
 
 Run:
 
@@ -905,7 +905,7 @@ pnpm build
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add frontend/next.config.mjs frontend/lib/api-client.ts frontend/lib/auth.tsx frontend/middleware.ts 'frontend/app/(public)' 'frontend/app/(workspace)' frontend/components/auth/LoginForm.tsx frontend/components/WorkspaceShell.tsx frontend/tests/auth-ui.test.tsx

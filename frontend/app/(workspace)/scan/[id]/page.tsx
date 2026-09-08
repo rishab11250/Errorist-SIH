@@ -96,7 +96,7 @@ export default function ScanResultPage() {
 
   if (error) {
     return (
-      <main className="mx-auto max-w-2xl p-6">
+      <div className="mx-auto max-w-2xl p-6">
         <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-900">
           <h1 className="text-lg font-bold">Unable to load scan</h1>
           <p className="mt-2">{error}</p>
@@ -104,14 +104,14 @@ export default function ScanResultPage() {
             Start a new scan
           </a>
         </div>
-      </main>
+      </div>
     );
   }
 
   if (!scan) return <div className="p-6 text-slate-700" role="status">Loading scan results…</div>;
 
   return (
-    <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wider text-blue-700">Inspection result</p>
@@ -162,6 +162,6 @@ export default function ScanResultPage() {
           {scan.verdicts.map((verdict) => <VerdictCard key={verdict.rule_id} verdict={verdict} />)}
         </section>
       </div>
-    </main>
+    </div>
   );
 }

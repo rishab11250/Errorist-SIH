@@ -9,7 +9,7 @@ import type { ScanResponse } from '@/lib/types';
 export default function HomePage() {
   const router = useRouter();
   return (
-    <main>
+    <div>
       <UploadDropzone onComplete={(result: OCRRunResult & { response: ScanResponse }) => {
         sessionStorage.setItem(`scan:${result.response.scan_id}`, JSON.stringify({
           imageDataUrl: result.imageDataUrl,
@@ -23,6 +23,6 @@ export default function HomePage() {
         }));
         router.push(`/scan/${result.response.scan_id}`);
       }} />
-    </main>
+    </div>
   );
 }

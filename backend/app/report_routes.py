@@ -8,9 +8,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
-from app.auth.dependencies import authorized_scan, require_user
+from app.auth.dependencies import require_user
 from app.db import User, get_session
-from app.reports import build_report
+from app.exports.pdf import render_pdf
+from app.exports.view_model import load_report_model
 
 router = APIRouter(prefix="/api", tags=["reports"])
 
@@ -21,11 +22,11 @@ def download_report(
     session: Annotated[Session, Depends(get_session)],
     current_user: Annotated[User, Depends(require_user)],
 ) -> Response:
-    scan = authorized_scan(session, current_user, scan_id)
-    if scan is None:
+    report = load_report_model(session, current_user, scan_id)
+    if report is None:
         raise HTTPException(status_code=404, detail="scan_not_found")
     return Response(
-        content=build_report(scan),
+        content=render_pdf(report),
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="lmpc-scan-{scan_id}.pdf"'},
     )

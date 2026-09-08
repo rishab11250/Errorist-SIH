@@ -625,7 +625,7 @@ git commit -m "feat(backend): add searchable inspection repository"
 - Produces: `build_report_model(scan) -> InspectionReport`, plus PDF/DOCX/CSV bytes.
 - Produces: `/api/exports/scans/{id}.pdf`, `.docx`, and filtered `/api/exports/scans.csv`.
 
-- [ ] **Step 1: Write report parity and CSV safety tests**
+- [x] **Step 1: Write report parity and CSV safety tests**
 
 ```python
 def test_pdf_and_docx_contain_same_core_report_values(admin_client, reviewed_scan):
@@ -648,17 +648,17 @@ def test_csv_neutralizes_formula_cells(admin_client, scan_factory):
 
 Also test ownership, active-filter parity, content types, safe filenames, missing scans, image decode failure, Unicode, all status values, and review history.
 
-- [ ] **Step 2: Verify failure**
+- [x] **Step 2: Verify failure**
 
 Run `cd /home/wind/Projects/sih/backend && .venv/bin/python -m pytest tests/test_export_routes.py -q`.
 
 Expected: FAIL because export modules/routes do not exist.
 
-- [ ] **Step 3: Implement the immutable report view model**
+- [x] **Step 3: Implement the immutable report view model**
 
 `InspectionReport` contains scan identity/context, owner display name, timestamps, quality summary, source image, analysis version, ordered verdicts, review actions, and rules versions. Build it in one eager SQLAlchemy query. Renderers accept this value only and never receive a database session.
 
-- [ ] **Step 4: Implement three renderers**
+- [x] **Step 4: Implement three renderers**
 
 PDF preserves the existing annotated-image behavior and adds quality, reasoning, measurement method, confidence, and reviews. DOCX uses headings, a source image, and a table with the same fields. CSV writes one row per scan with aggregate counts and uses:
 
@@ -670,7 +670,7 @@ def safe_csv_cell(value: object) -> str:
 
 CSV export reuses `ScanFilters` and the authorized repository query. Set `Content-Disposition` with filenames `lmpc-scan-{id}.pdf`, `lmpc-scan-{id}.docx`, and `lmpc-scans-{UTC_DATE}.csv`. Add `X-LMPC-Filter-Digest` as SHA-256 over the canonical sorted active-filter JSON and `X-LMPC-Result-Count` so the exported scope is auditable without reflecting raw search text into a header.
 
-- [ ] **Step 5: Keep compatibility and run tests**
+- [x] **Step 5: Keep compatibility and run tests**
 
 Make `GET /api/report/{id}` call the same PDF service as the new route. Run:
 
@@ -682,7 +682,7 @@ cd /home/wind/Projects/sih/backend
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add backend/app/exports backend/app/report_routes.py backend/app/main.py backend/tests/test_export_routes.py backend/tests/test_report_routes.py

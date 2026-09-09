@@ -8,6 +8,9 @@ from typing import Annotated, Literal
 
 from pydantic import AfterValidator, BaseModel, Field, field_validator
 
+from app.errors import AppError
+from app.settings import DEFAULT_MAX_OCR_WORDS
+
 
 def _normalized_bbox(
     value: tuple[float, float, float, float],
@@ -93,6 +96,18 @@ class ScanRequest(BaseModel):
     scan_context: ScanContextIn = Field(default_factory=ScanContextIn)
     schema_version: Literal[1, 2] = 1
     ocr_lines: list[OCRLineIn] = Field(default_factory=list)
+
+    @field_validator("ocr_payload")
+    @classmethod
+    def validate_ocr_payload_length(cls, value: list[OCRWordIn]) -> list[OCRWordIn]:
+        if len(value) > DEFAULT_MAX_OCR_WORDS:
+            raise AppError(
+                422,
+                "ocr_payload_too_large",
+                f"OCR word count ({len(value)}) exceeds "
+                f"maximum allowed limit of {DEFAULT_MAX_OCR_WORDS}.",
+            )
+        return value
 
 
 class VisualMetricOut(BaseModel):

@@ -151,3 +151,58 @@ def test_bad_image_has_error_envelope_and_failed_audit_row(client: TestClient) -
         assert failed.failure_stage == "decode_image"
         assert failed.processing_error_code == "image_decode_failed"
         assert failed.verdicts == []
+
+
+def test_scan_rejects_oversized_ocr_payload(client: TestClient) -> None:
+    from app.settings import DEFAULT_MAX_OCR_WORDS
+
+    payload = _payload()
+    word = {"text": "word", "confidence": 0.9, "bbox": [0.01, 0.01, 0.05, 0.02]}
+    payload["ocr_payload"] = [word] * (DEFAULT_MAX_OCR_WORDS + 1)
+    response = client.post("/api/scan", json=payload)
+    assert response.status_code == 422
+    body = response.json()
+    assert body["error"] == "ocr_payload_too_large"
+
+
+def test_real_test_fixtures_fit_under_max_ocr_words() -> None:
+    import json
+    from pathlib import Path
+
+    from app.settings import DEFAULT_MAX_OCR_WORDS
+
+    fixtures_path = (
+        Path(__file__).resolve().parents[2]
+        / "real_test_labels"
+        / "e2e_real_test_results.json"
+    )
+    if not fixtures_path.exists():
+        pytest.skip("real_test_labels not found")
+    data = json.loads(fixtures_path.read_text(encoding="utf-8"))
+    word_counts = [item.get("ocr", {}).get("wordCount", 0) for item in data]
+    assert word_counts, "No test cases found in fixtures"
+    max_count = max(word_counts)
+    assert max_count <= 368
+    assert max_count < DEFAULT_MAX_OCR_WORDS
+    assert (DEFAULT_MAX_OCR_WORDS - max_count) / max_count >= 0.40
+
+
+def test_concurrent_scans_succeed_under_wal_mode(client: TestClient) -> None:
+    import concurrent.futures
+
+    payload = _payload()
+
+    def send_scan(req_id: int):
+        return client.post(
+            "/api/scan",
+            json=payload,
+            headers={"X-Request-ID": f"concurrent-{req_id}"},
+        )
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        futures = [executor.submit(send_scan, i) for i in range(4)]
+        results = [f.result() for f in futures]
+
+    assert all(r.status_code == 201 for r in results)
+
+

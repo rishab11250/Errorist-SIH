@@ -18,12 +18,14 @@ from app.errors import AppError
 from app.extractors.registry import extract_all
 from app.models import ScanRequest
 from app.placement import assess_placements
+from app.settings import DEFAULT_MAX_OCR_WORDS
 from app.visual_analysis import analyze_quality, assess_fields, decode_image, estimate_panel
 from app.visual_analysis.image_io import ImageDecodeError
 
 ANALYSIS_VERSION = "inspection-v2"
 MAX_IMAGE_BYTES = 10_000_000
 MAX_IMAGE_PIXELS = 24_000_000
+MAX_OCR_WORDS = DEFAULT_MAX_OCR_WORDS
 _LEGACY_RULE_IDS = {
     "r6_1_e_mrp",
     "r6_1_c_net_quantity",
@@ -106,6 +108,14 @@ def _reconstruct_lines(words: tuple[OCRWord, ...]) -> tuple[OCRLine, ...]:
 
 def normalize_ocr(request: ScanRequest) -> tuple[tuple[OCRWord, ...], tuple[OCRLine, ...]]:
     """Convert DTOs and validate or reconstruct deterministic line groups."""
+    if len(request.ocr_payload) > MAX_OCR_WORDS:
+        raise PipelineError(
+            422,
+            "ocr_payload_too_large",
+            f"OCR word count ({len(request.ocr_payload)}) exceeds "
+            f"maximum allowed limit of {MAX_OCR_WORDS}.",
+            "normalize_ocr",
+        )
 
     submitted_words = tuple(_word_from_dto(word) for word in request.ocr_payload)
     usable_indexes = {

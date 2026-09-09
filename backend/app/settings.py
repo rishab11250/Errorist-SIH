@@ -8,6 +8,8 @@ from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+DEFAULT_MAX_OCR_WORDS = 552
+
 
 class AuthSettings(BaseModel):
     """Authentication, storage, and bounded-upload settings."""
@@ -19,6 +21,7 @@ class AuthSettings(BaseModel):
     cookie_name: str = Field(default="lmpc_session", min_length=1, max_length=80)
     max_upload_bytes: int = Field(default=10_000_000, gt=0)
     max_image_pixels: int = Field(default=24_000_000, gt=0)
+    max_ocr_words: int = Field(default=DEFAULT_MAX_OCR_WORDS, gt=0)
     database_path: Path = Path("lmpc.db")
     backend_origin: str = "http://127.0.0.1:8000"
     allowed_browser_origins: tuple[str, ...] = (
@@ -90,6 +93,7 @@ class AuthSettings(BaseModel):
             "cookie_name": "LMPC_COOKIE_NAME",
             "max_upload_bytes": "LMPC_MAX_UPLOAD_BYTES",
             "max_image_pixels": "LMPC_MAX_IMAGE_PIXELS",
+            "max_ocr_words": "LMPC_MAX_OCR_WORDS",
             "database_path": "LMPC_DB_PATH",
             "backend_origin": "LMPC_BACKEND_ORIGIN",
             "allowed_browser_origins": "LMPC_ALLOWED_BROWSER_ORIGINS",

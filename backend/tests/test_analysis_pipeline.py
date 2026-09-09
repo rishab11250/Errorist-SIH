@@ -145,6 +145,16 @@ def test_oversized_image_maps_to_payload_too_large(monkeypatch) -> None:
     assert caught.value.error == "image_too_large"
 
 
+def test_oversized_ocr_payload_maps_to_ocr_payload_too_large(monkeypatch) -> None:
+    monkeypatch.setattr(analysis_pipeline, "MAX_OCR_WORDS", 10)
+    word = {"text": "word", "confidence": 0.9, "bbox": [0.01, 0.01, 0.05, 0.02]}
+    req = _request(ocr_payload=[word] * 15, ocr_lines=[])
+    with pytest.raises(AppError) as caught:
+        analyze_scan(req, load_rules("app/rules.yaml"))
+    assert caught.value.status_code == 422
+    assert caught.value.error == "ocr_payload_too_large"
+
+
 def test_low_quality_image_returns_guidance_without_false_failure() -> None:
     result = analyze_scan(
         _request(image_b64=_low_sharpness_image_b64()),

@@ -13,6 +13,8 @@ def _enable_foreign_keys(dbapi_connection, _connection_record) -> None:
     cursor = dbapi_connection.cursor()
     try:
         cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA synchronous=NORMAL")
     finally:
         cursor.close()
 

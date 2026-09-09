@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.auth.dependencies import get_auth_settings, require_user
 from app.auth.models import CurrentUser, normalize_username
 from app.auth.passwords import hash_password, verify_password
+from app.auth.rate_limit import check_login_rate_limit, record_login_failure, record_login_success
 from app.auth.sessions import issue_session, revoke_session
 from app.db import SessionRow, User, get_session
 from app.errors import AppError
@@ -54,11 +55,16 @@ def login(
 ) -> UserEnvelope:
     now = datetime.now(UTC)
     username = normalize_username(credentials.username)
+    check_login_rate_limit(username, now=now)
+
     user = session.scalar(select(User).where(User.username_normalized == username))
     encoded = user.password_hash if user is not None else _DUMMY_HASH
     password_valid = verify_password(encoded, credentials.password)
     if user is None or not password_valid or not user.is_active:
+        record_login_failure(username, now=now)
         raise AppError(401, "invalid_credentials", "Username or password is incorrect.")
+
+    record_login_success(username)
 
     session.execute(
         update(SessionRow)

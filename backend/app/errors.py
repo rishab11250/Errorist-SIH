@@ -24,8 +24,10 @@ _HTTP_DETAILS = {
     "forbidden": "You do not have permission to perform this action.",
     "invalid_credentials": "Username or password is incorrect.",
     "no_text_extracted": "No usable text was extracted from the evidence image.",
+    "ocr_payload_too_large": "The OCR payload contains too many words.",
     "scan_not_found": "Scan not found.",
     "session_expired": "Your session is no longer valid. Sign in again.",
+    "too_many_attempts": "Too many failed login attempts. Please try again later.",
 }
 
 

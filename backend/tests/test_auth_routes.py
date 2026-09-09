@@ -17,6 +17,15 @@ def inspector_credentials() -> dict[str, str]:
     return {"username": "Inspector.One", "password": "Correct Horse Battery Staple!"}
 
 
+@pytest.fixture(autouse=True)
+def _reset_limiter():
+    from app.auth.rate_limit import reset_login_attempts
+
+    reset_login_attempts()
+    yield
+    reset_login_attempts()
+
+
 @pytest.fixture
 def client(tmp_path, monkeypatch, inspector_credentials) -> Iterator[TestClient]:
     monkeypatch.setattr(main, "DB_PATH", tmp_path / "auth-routes.db")
@@ -129,3 +138,36 @@ def test_logout_revokes_cookie(
     assert response.status_code == 204
     assert client.get("/api/auth/me").status_code == 401
     assert "Max-Age=0" in response.headers["set-cookie"]
+
+
+def test_login_rate_limiting_throttles_after_n_failed_attempts(
+    client: TestClient,
+    inspector_credentials: dict[str, str],
+) -> None:
+    bad_creds = {"username": inspector_credentials["username"], "password": "WrongPassword123"}
+    for _ in range(5):
+        res = client.post("/api/auth/login", json=bad_creds)
+        assert res.status_code == 401
+        assert res.json()["error"] == "invalid_credentials"
+
+    res = client.post("/api/auth/login", json=inspector_credentials)
+    assert res.status_code == 429
+    assert res.json()["error"] == "too_many_attempts"
+
+
+def test_login_success_resets_rate_limit_counter(
+    client: TestClient,
+    inspector_credentials: dict[str, str],
+) -> None:
+    bad_creds = {"username": inspector_credentials["username"], "password": "WrongPassword123"}
+    for _ in range(4):
+        res = client.post("/api/auth/login", json=bad_creds)
+        assert res.status_code == 401
+
+    res = client.post("/api/auth/login", json=inspector_credentials)
+    assert res.status_code == 200
+
+    res = client.post("/api/auth/login", json=bad_creds)
+    assert res.status_code == 401
+    assert res.json()["error"] == "invalid_credentials"
+

@@ -111,3 +111,21 @@ def test_extracts_mrp_spaced_prefix_and_ocr_digit_noise():
     result = extract_mrp(words, _meta(), PHRASE)
     assert result.value == "50.00"
     assert result.confidence > 0.8
+
+
+def test_extracts_mrp_spaced_prefix_without_currency_symbol():
+    words = [
+        _w("M", 0.95, 10, 100),
+        _w("R", 0.95, 25, 100),
+        _w("P", 0.95, 40, 100),
+        _w(":", 0.95, 55, 100),
+        _w("50.00", 0.95, 75, 100),
+        _w("Incl.", 0.91, 140, 100),
+        _w("of", 0.95, 180, 100),
+        _w("all", 0.95, 205, 100),
+        _w("taxes", 0.92, 235, 100),
+    ]
+    result = extract_mrp(words, _meta(), PHRASE)
+    assert result.value == "50.00"
+    assert result.confidence > 0.8
+

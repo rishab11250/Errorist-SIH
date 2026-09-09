@@ -133,11 +133,16 @@ describe('inspection experience', () => {
     runOCRMock.mockImplementation(
       (_file: File, _onProgress: unknown, signal?: AbortSignal) =>
         new Promise((resolve, reject) => {
-          setTimeout(() => {
+          const timeoutId = setTimeout(() => {
             ocrStopped = signal?.aborted ?? false;
             if (ocrStopped) reject(new DOMException('Canceled', 'AbortError'));
             else resolve(OCR_RESULT);
-          }, 100);
+          }, 1000);
+          signal?.addEventListener('abort', () => {
+            clearTimeout(timeoutId);
+            ocrStopped = true;
+            reject(new DOMException('Canceled', 'AbortError'));
+          });
         })
     );
     const user = userEvent.setup();

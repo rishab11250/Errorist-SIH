@@ -70,22 +70,22 @@ function loadImage(file: File): Promise<HTMLImageElement> {
 async function createCompositeEvidenceFile(file1: File, file2: File): Promise<File> {
   try {
     const [img1, img2] = await Promise.all([loadImage(file1), loadImage(file2)]);
-    const targetH = Math.max(img1.naturalHeight, img2.naturalHeight, 800);
-    const w1 = Math.round(img1.naturalWidth * (targetH / img1.naturalHeight));
-    const w2 = Math.round(img2.naturalWidth * (targetH / img2.naturalHeight));
-    const gap = 20;
-    const totalW = w1 + w2 + gap;
+    const targetW = Math.max(img1.naturalWidth, img2.naturalWidth, 1000);
+    const h1 = Math.round(img1.naturalHeight * (targetW / img1.naturalWidth));
+    const h2 = Math.round(img2.naturalHeight * (targetW / img2.naturalWidth));
+    const gap = Math.max(650, Math.round((h1 + h2) * 0.25));
+    const totalH = h1 + gap + h2;
 
     const canvas = document.createElement('canvas');
-    canvas.width = totalW;
-    canvas.height = targetH;
+    canvas.width = targetW;
+    canvas.height = totalH;
     const ctx = canvas.getContext('2d');
     if (!ctx) return file1;
 
     ctx.fillStyle = '#1e1e1e';
-    ctx.fillRect(0, 0, totalW, targetH);
-    ctx.drawImage(img1, 0, 0, w1, targetH);
-    ctx.drawImage(img2, w1 + gap, 0, w2, targetH);
+    ctx.fillRect(0, 0, targetW, totalH);
+    ctx.drawImage(img1, 0, 0, targetW, h1);
+    ctx.drawImage(img2, 0, h1 + gap, targetW, h2);
 
     const blob = await new Promise<Blob | null>((resolve) =>
       canvas.toBlob(resolve, 'image/jpeg', 0.92)

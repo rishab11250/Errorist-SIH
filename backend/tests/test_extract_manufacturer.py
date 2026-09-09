@@ -138,3 +138,32 @@ def test_marks_pkd_by_and_district_keywords():
     assert result.value is not None
     assert "400601" in result.value
     assert "Delta" in result.value
+
+
+def test_vertical_composite_prevents_mrp_cross_panel_contamination():
+    h1 = 400
+    gap = 650
+    h2 = 400
+    total_height = h1 + gap + h2
+    meta = ImageMeta(width=1000, height=total_height)
+
+    words = [
+        _word("Mfg:", 0.95, 20, 50, 40),
+        _word("by:", 0.95, 65, 50, 25),
+        _word("ACME", 0.95, 95, 50, 50),
+        _word("Plot", 0.92, 20, 80, 40),
+        _word("12", 0.95, 65, 80, 20),
+        _word("Mumbai", 0.92, 90, 80, 60),
+        _word("400001", 0.95, 155, 80, 55),
+        _word("MRP", 0.95, 20, h1 + gap + 50, 40),
+        _word("Rs.", 0.95, 65, h1 + gap + 50, 30),
+        _word("99.00", 0.95, 100, h1 + gap + 50, 50),
+    ]
+
+    result = extract_manufacturer_address(words, meta, r"\b([1-9][0-9]{5})\b")
+    assert result.value is not None
+    assert "ACME" in result.value
+    assert "400001" in result.value
+    assert "99.00" not in result.value
+    assert "MRP" not in result.value
+

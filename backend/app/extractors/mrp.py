@@ -13,6 +13,10 @@ PRICE_PATTERN = re.compile(
     r"([0-9,oOlI]+(?:\.[0-9,oOlI]{1,2})?)",
     re.I,
 )
+MRP_PREFIX_BRANCH = re.compile(
+    r"^(?:M\.?\s*R\.?\s*P\.?|Max(?:imum)?\.?\s*Retail\s*Price)\s*[:\-]?",
+    re.I,
+)
 
 
 def extract_mrp(
@@ -27,6 +31,9 @@ def extract_mrp(
     for i in range(len(ocr_words)):
         sample_text = " ".join(w.text for w in ocr_words[i : min(i + 4, len(ocr_words))])
         m = PRICE_PATTERN.match(sample_text)
+        if not m and MRP_PREFIX_BRANCH.match(sample_text) and not re.search(r"\d", sample_text):
+            sample_text = " ".join(w.text for w in ocr_words[i : min(i + 8, len(ocr_words))])
+            m = PRICE_PATTERN.match(sample_text)
         if m:
             raw_val = m.group(1)
             cleaned = (

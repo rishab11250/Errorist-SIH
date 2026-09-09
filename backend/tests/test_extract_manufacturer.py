@@ -121,3 +121,20 @@ def test_manufacturer_below_other_declarations_excludes_prior_lines():
     assert "500g" not in result.value
     assert "99" not in result.value
 
+
+def test_marks_pkd_by_and_district_keywords():
+    words = [
+        _word("Pkd.", 0.92, 10, 10, 40),
+        _word("by:", 0.92, 55, 10, 25),
+        _word("Delta", 0.93, 85, 10, 45),
+        _word("Agro", 0.93, 135, 10, 40),
+        _word("Village", 0.91, 10, 35, 55),
+        _word("Rampur,", 0.91, 70, 35, 60),
+        _word("Dist", 0.90, 10, 60, 35),
+        _word("Thane", 0.90, 50, 60, 45),
+        _word("400601", 0.95, 100, 60, 55),
+    ]
+    result = extract_manufacturer_address(words, _meta(), r"\b([1-9][0-9]{5})\b")
+    assert result.value is not None
+    assert "400601" in result.value
+    assert "Delta" in result.value

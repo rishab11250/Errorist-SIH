@@ -18,8 +18,7 @@ from app.db import ReviewAction, Scan, User, VerdictRow
 from app.main import app
 
 _PNG = (
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUB"
-    "AScY42YAAAAASUVORK5CYII="
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
 )
 
 
@@ -171,9 +170,7 @@ def test_csv_neutralizes_formula_cells_and_preserves_unicode(export_context) -> 
     assert len(rows) == 6
     assert response.headers["x-lmpc-result-count"] == "6"
     assert response.headers["content-type"].startswith("text/csv")
-    assert response.headers["content-disposition"].startswith(
-        'attachment; filename="lmpc-scans-'
-    )
+    assert response.headers["content-disposition"].startswith('attachment; filename="lmpc-scans-')
 
 
 def test_csv_uses_authorized_active_filters_and_digest(export_context) -> None:

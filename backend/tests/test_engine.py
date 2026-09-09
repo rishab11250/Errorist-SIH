@@ -261,3 +261,36 @@ def test_ecommerce_aggregate_visibility_fails_when_core_declaration_missing(
     )["r6_10_ecommerce_declarations"]
     assert verdict.status == "fail"
     assert "missing: mrp" in (verdict.failure_message or "")
+
+
+def test_usp_mathematical_cross_validation_warns_on_mismatch(rules: RulesConfig) -> None:
+    extracted = _complete_extracted()
+    extracted["mrp"] = _ext("mrp", "Rs 100", conf=0.95)
+    extracted["net_quantity"] = _ext("net_quantity", "500 g", conf=0.95)
+    # Expected USP = 100 / 500 = 0.20/g. Declared = 0.50/g (mismatch)
+    extracted["unit_price"] = _ext("unit_price", "Rs 0.50/g", conf=0.95)
+    verdict = _by_id(
+        run_engine(
+            _analysis(extracted=extracted),
+            rules,
+            ScanContext(),
+        )
+    )["r6_11_unit_sale_price"]
+    assert verdict.status == "warn"
+    assert "mathematical discrepancy" in verdict.reasoning
+
+
+def test_usp_mathematical_cross_validation_passes_when_consistent(rules: RulesConfig) -> None:
+    extracted = _complete_extracted()
+    extracted["mrp"] = _ext("mrp", "Rs 100", conf=0.95)
+    extracted["net_quantity"] = _ext("net_quantity", "500 g", conf=0.95)
+    # Expected USP = 0.20/g. Declared = 0.20/g
+    extracted["unit_price"] = _ext("unit_price", "Rs 0.20/g", conf=0.95)
+    verdict = _by_id(
+        run_engine(
+            _analysis(extracted=extracted),
+            rules,
+            ScanContext(),
+        )
+    )["r6_11_unit_sale_price"]
+    assert verdict.status == "pass"

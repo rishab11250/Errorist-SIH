@@ -94,3 +94,20 @@ def test_mrp_evidence_bboxes_excludes_far_words():
     assert consumer_care_bbox not in result.evidence_spans
     assert len(result.evidence_spans) <= 6
 
+
+def test_extracts_mrp_spaced_prefix_and_ocr_digit_noise():
+    words = [
+        _w("M", 0.92, 10, 100),
+        _w("R", 0.93, 25, 100),
+        _w("P", 0.94, 40, 100),
+        _w(":", 0.90, 55, 100),
+        _w("Rs.", 0.92, 70, 100),
+        _w("5O.OO", 0.88, 100, 100),
+        _w("Incl.", 0.91, 150, 100),
+        _w("of", 0.95, 190, 100),
+        _w("all", 0.95, 215, 100),
+        _w("taxes", 0.92, 245, 100),
+    ]
+    result = extract_mrp(words, _meta(), PHRASE)
+    assert result.value == "50.00"
+    assert result.confidence > 0.8

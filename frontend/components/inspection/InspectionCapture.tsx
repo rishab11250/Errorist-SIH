@@ -53,15 +53,69 @@ export function buildScanRequest(ocr: OCRRunResult, scanContext: ScanContext): S
   };
 }
 
+function loadImage(file: File): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = reader.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function createCompositeEvidenceFile(file1: File, file2: File): Promise<File> {
+  try {
+    const [img1, img2] = await Promise.all([loadImage(file1), loadImage(file2)]);
+    const targetH = Math.max(img1.naturalHeight, img2.naturalHeight, 800);
+    const w1 = Math.round(img1.naturalWidth * (targetH / img1.naturalHeight));
+    const w2 = Math.round(img2.naturalWidth * (targetH / img2.naturalHeight));
+    const gap = 20;
+    const totalW = w1 + w2 + gap;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = totalW;
+    canvas.height = targetH;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return file1;
+
+    ctx.fillStyle = '#1e1e1e';
+    ctx.fillRect(0, 0, totalW, targetH);
+    ctx.drawImage(img1, 0, 0, w1, targetH);
+    ctx.drawImage(img2, w1 + gap, 0, w2, targetH);
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.92)
+    );
+    if (!blob) return file1;
+    return new File([blob], `composite-evidence-${Date.now()}.jpg`, {
+      type: 'image/jpeg',
+      lastModified: Date.now(),
+    });
+  } catch {
+    return file1;
+  }
+}
+
 function stageIndex(stage: CaptureStage) {
   return { ready: 0, reading: 0, ocr: 1, analyzing: 2, saving: 3, complete: 4, error: 0 }[stage];
 }
 
 export function InspectionCapture({ onComplete }: Props) {
   const fileInputId = useId();
+  const secondaryInputId = useId();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [secondaryFile, setSecondaryFile] = useState<File | null>(null);
+  const [secondaryPreview, setSecondaryPreview] = useState<string | null>(null);
+  const [secondaryDimensions, setSecondaryDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState<CaptureStage>('ready');
@@ -156,6 +210,22 @@ export function InspectionCapture({ onComplete }: Props) {
     reader.readAsDataURL(selected);
   }, []);
 
+  const handleSecondaryFile = useCallback((selected: File) => {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(selected.type)) {
+      setError('Choose a JPEG, PNG, or WebP evidence image.');
+      return;
+    }
+    if (selected.size > MAX_IMAGE_BYTES) {
+      setError('Choose an evidence image no larger than 10 MB.');
+      return;
+    }
+    setSecondaryFile(selected);
+    setSecondaryDimensions(null);
+    const reader = new FileReader();
+    reader.onload = () => setSecondaryPreview(reader.result as string);
+    reader.readAsDataURL(selected);
+  }, []);
+
   const onDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
@@ -185,8 +255,11 @@ export function InspectionCapture({ onComplete }: Props) {
     setError(null);
     setStage('reading');
     try {
+      const scanFile = secondaryFile
+        ? await createCompositeEvidenceFile(file, secondaryFile)
+        : file;
       setStage('ocr');
-      const ocr = await runOCR(file, setProgress, controller.signal);
+      const ocr = await runOCR(scanFile, setProgress, controller.signal);
       if (operation !== operationRef.current) return;
       if (ocr.words.length === 0 || !ocr.words.some((word) => word.text.trim())) {
         throw new Error('No readable text was found. Retake or upload a clearer label image.');
@@ -344,7 +417,54 @@ export function InspectionCapture({ onComplete }: Props) {
             onDrop={onDrop}
             className="surface-panel border-2 border-dashed p-5 text-center sm:p-8"
           >
-            {preview ? (
+            {preview && secondaryPreview ? (
+              <div className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2 rounded-lg border bg-background/50 p-3 text-left">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                        Panel 1 · Primary
+                      </span>
+                    </div>
+                    <img
+                      src={preview}
+                      alt="Primary evidence panel"
+                      className="mx-auto max-h-64 rounded object-contain"
+                    />
+                    <p className="truncate text-xs text-muted-foreground">{file?.name}</p>
+                  </div>
+                  <div className="space-y-2 rounded-lg border bg-background/50 p-3 text-left">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                        Panel 2 · Secondary / Sticker
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSecondaryFile(null);
+                          setSecondaryPreview(null);
+                          setSecondaryDimensions(null);
+                        }}
+                        className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                        title="Remove secondary panel"
+                      >
+                        <X className="size-4" />
+                      </button>
+                    </div>
+                    <img
+                      src={secondaryPreview}
+                      alt="Secondary evidence panel"
+                      className="mx-auto max-h-64 rounded object-contain"
+                    />
+                    <p className="truncate text-xs text-muted-foreground">{secondaryFile?.name}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Multi-panel mode active: Panels will be composited into a single evidence
+                  inspection.
+                </p>
+              </div>
+            ) : preview ? (
               <div className="space-y-3">
                 <img
                   src={preview}
@@ -395,17 +515,28 @@ export function InspectionCapture({ onComplete }: Props) {
             <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
               <label
                 htmlFor={fileInputId}
-                className="inline-flex min-h-11 cursor-pointer items-center rounded-md border bg-background px-5 py-2 font-semibold hover:bg-muted"
+                className="inline-flex min-h-11 cursor-pointer items-center rounded-md border bg-background px-4 py-2 text-sm font-semibold hover:bg-muted"
               >
-                {file ? 'Replace evidence image' : 'Choose evidence image'}
+                {file ? 'Replace primary image' : 'Choose evidence image'}
               </label>
+              {file && mode === 'retail_image' && !secondaryFile ? (
+                <label
+                  htmlFor={secondaryInputId}
+                  className="inline-flex min-h-11 cursor-pointer items-center rounded-md border border-primary/40 bg-primary/5 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10"
+                >
+                  + Add secondary panel (MRP sticker / back)
+                </label>
+              ) : null}
               {file && mode === 'retail_image' ? (
                 <Button
                   type="button"
                   variant="outline"
+                  size="sm"
                   onClick={() => {
                     setFile(null);
                     setPreview(null);
+                    setSecondaryFile(null);
+                    setSecondaryPreview(null);
                     setCaptureMethod('camera');
                   }}
                   className="gap-2"
@@ -414,7 +545,7 @@ export function InspectionCapture({ onComplete }: Props) {
                 </Button>
               ) : null}
             </div>
-            {file ? (
+            {file && !secondaryFile ? (
               <p className="mt-3 break-all text-sm text-muted-foreground">
                 {file.name}
                 {dimensions ? ` · ${dimensions.width} × ${dimensions.height}px` : ''}
@@ -436,6 +567,21 @@ export function InspectionCapture({ onComplete }: Props) {
           className="sr-only"
           disabled={busy}
         />
+
+        {mode === 'retail_image' ? (
+          <input
+            id={secondaryInputId}
+            aria-label="Secondary package panel"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(event) => {
+              const selected = event.target.files?.[0];
+              if (selected) handleSecondaryFile(selected);
+            }}
+            className="sr-only"
+            disabled={busy}
+          />
+        ) : null}
 
         {busy ? (
           <div className="surface-panel space-y-4 p-5" role="status" aria-live="polite">

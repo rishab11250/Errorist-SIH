@@ -8,11 +8,17 @@ from app.domain import ExtractedField, ImageMeta, OCRWord
 from app.extractors.base import avg_confidence, merge_bboxes
 
 ROLE_KEYWORDS = re.compile(
-    r"\b(?:mfg|mfd|mfd\.?|manufactured\s+by|packed\s+by|imported\s+by|marketed\s+by|manufactured\s+for|manufacturer|packer)\b",
+    r"\b(?:mfg|mfd|pkd|mktd|mfg\.?|mfd\.?|pkd\.?|mktd\.?|"
+    r"(?:mfg|mfd)\.?\s*(?:&|and)\s*pkd\.?\s*(?:by)?:?|"
+    r"manufactured\s+by:?|packed\s+by:?|pkd\.?\s*by:?|mktd\.?\s*by:?|"
+    r"imported\s+by:?|marketed\s+by:?|manufactured\s+for:?|"
+    r"imported\s+and\s+packed\s+by:?|manufacturer:?|packer:?)\b",
     re.IGNORECASE,
 )
 ADDRESS_HINT = re.compile(
-    r"\b(?:pvt|ltd|limited|private|company|co\.|india|industries|foods|plot|road|street|sector|phase|marg|nagar|colony|estate|complex|tel|phone|email|pin)\b",
+    r"\b(?:pvt|ltd|limited|private|company|co\.|india|industries|foods|plot|road|street|"
+    r"sector|phase|marg|nagar|colony|estate|complex|tel|phone|email|pin|"
+    r"taluk|dist|district|village|khasra|survey|post|state|regd|office)\b",
     re.IGNORECASE,
 )
 

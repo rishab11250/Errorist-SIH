@@ -111,6 +111,87 @@ def _subfield_present(check: CheckConfig, extracted: ExtractedField | None) -> d
     return {subfield: bool(text.strip()) for subfield in check.requires}
 
 
+UNIT_FACTORS: dict[str, tuple[str, float]] = {
+    "g": ("mass", 1.0),
+    "gm": ("mass", 1.0),
+    "gms": ("mass", 1.0),
+    "gram": ("mass", 1.0),
+    "grams": ("mass", 1.0),
+    "kg": ("mass", 1000.0),
+    "kgs": ("mass", 1000.0),
+    "kilogram": ("mass", 1000.0),
+    "kilograms": ("mass", 1000.0),
+    "ml": ("volume", 1.0),
+    "millilitre": ("volume", 1.0),
+    "milliliter": ("volume", 1.0),
+    "l": ("volume", 1000.0),
+    "lt": ("volume", 1000.0),
+    "ltr": ("volume", 1000.0),
+    "liter": ("volume", 1000.0),
+    "litre": ("volume", 1000.0),
+    "liters": ("volume", 1000.0),
+    "litres": ("volume", 1000.0),
+    "u": ("count", 1.0),
+    "unit": ("count", 1.0),
+    "units": ("count", 1.0),
+    "piece": ("count", 1.0),
+    "pieces": ("count", 1.0),
+    "pc": ("count", 1.0),
+    "pcs": ("count", 1.0),
+    "n": ("count", 1.0),
+}
+
+
+def _validate_unit_sale_price(
+    mrp_text: str | None,
+    net_qty_text: str | None,
+    usp_text: str | None,
+    tolerance: float = 0.12,
+) -> tuple[bool, str | None]:
+    """Compare MRP / Net Quantity against declared USP within a relative tolerance."""
+    if not mrp_text or not net_qty_text or not usp_text:
+        return True, None
+
+    m_mrp = re.search(r"(\d+(?:\.\d+)?)", mrp_text.replace(",", ""))
+    m_qty = re.search(r"(\d+(?:\.\d+)?)\s*([a-zA-Z]+)", net_qty_text)
+    m_usp = re.search(r"(\d+(?:\.\d+)?)\s*(?:/|per)\s*([a-zA-Z]+)", usp_text, re.I)
+    if not (m_mrp and m_qty and m_usp):
+        return True, None
+
+    try:
+        mrp_val = float(m_mrp.group(1))
+        qty_val = float(m_qty.group(1))
+        declared_usp = float(m_usp.group(1))
+    except ValueError:
+        return True, None
+
+    if mrp_val <= 0 or qty_val <= 0 or declared_usp <= 0:
+        return True, None
+
+    qty_unit_raw = m_qty.group(2).lower()
+    usp_unit_raw = m_usp.group(2).lower()
+    qty_info = UNIT_FACTORS.get(qty_unit_raw)
+    usp_info = UNIT_FACTORS.get(usp_unit_raw)
+    if not qty_info or not usp_info or qty_info[0] != usp_info[0]:
+        return True, None
+
+    qty_in_base = qty_val * qty_info[1]
+    expected_usp_in_base = mrp_val / qty_in_base
+    expected_declared_usp = expected_usp_in_base * usp_info[1]
+
+    denom = max(declared_usp, expected_declared_usp)
+    diff = abs(declared_usp - expected_declared_usp) / denom
+    if diff > tolerance:
+        return (
+            False,
+            (
+                f"Declared USP (Rs {declared_usp:.2f}/{usp_unit_raw}) differs from "
+                f"calculated MRP/Net Qty (Rs {expected_declared_usp:.2f}/{usp_unit_raw})."
+            ),
+        )
+    return True, None
+
+
 def _legacy_analysis(extracted: dict[str, ExtractedField | None]) -> AnalysisInput:
     return AnalysisInput(
         extracted=extracted,
@@ -258,7 +339,13 @@ def _aggregate_visibility_rule_verdict(
                 boxes.append(field.bbox)
             boxes.extend(field.evidence_spans)
 
-    for extra_field in ["consumer_care", "best_before", "common_name", "country_origin", "unit_price"]:
+    for extra_field in [
+        "consumer_care",
+        "best_before",
+        "common_name",
+        "country_origin",
+        "unit_price",
+    ]:
         field = extracted.get(extra_field)
         if field is not None and field.value:
             found_evidence.append(f"{extra_field}: {field.value}")
@@ -283,22 +370,26 @@ def _aggregate_visibility_rule_verdict(
         )
 
     if missing_fields:
+        missing_str = ", ".join(missing_fields)
         return _verdict(
             check,
             rules,
             status="fail",
-            reasoning=f"Listing evidence is missing mandatory declarations: {', '.join(missing_fields)}.",
+            reasoning=f"Listing evidence is missing mandatory declarations: {missing_str}.",
             confidence=confidence,
             evidence=evidence,
             evidence_bboxes=boxes,
-            failure_message=f"{check.failure_message} (missing: {', '.join(missing_fields)})",
+            failure_message=f"{check.failure_message} (missing: {missing_str})",
         )
 
     return _verdict(
         check,
         rules,
         status="pass",
-        reasoning="All mandatory e-commerce declarations are present and visible in the submitted listing.",
+        reasoning=(
+            "All mandatory e-commerce declarations are present and visible in the "
+            "submitted listing."
+        ),
         confidence=confidence,
         evidence=evidence,
         evidence_bboxes=boxes,
@@ -446,21 +537,35 @@ def _verdict_for_check(
             failure_message=check.failure_message,
         )
 
+    usp_mismatch_note: str | None = None
+    if check.rule_id == "r6_11_unit_sale_price" and has_value and extracted is not None:
+        mrp_field = analysis.extracted.get("mrp")
+        net_qty_field = analysis.extracted.get("net_quantity")
+        mrp_text = mrp_field.value if mrp_field else None
+        qty_text = net_qty_field.value if net_qty_field else None
+        valid, note = _validate_unit_sale_price(mrp_text, qty_text, extracted.value)
+        if not valid:
+            usp_mismatch_note = note
+
     warning_present = (
         analysis.quality.status == "usable_with_warnings"
         or (extracted is not None and extracted.confidence < rules.confidence_thresholds.pass_min)
         or (readability is not None and readability.status == "warn")
         or (placement is not None and placement.status == "warn")
+        or (usp_mismatch_note is not None)
     )
+    if usp_mismatch_note:
+        reasoning = f"Declaration present with mathematical discrepancy: {usp_mismatch_note}"
+    elif warning_present:
+        reasoning = "The declaration is present, but one or more evidence signals carry a warning."
+    else:
+        reasoning = "The declaration and its available supporting evidence satisfy this rule."
+
     return _verdict(
         check,
         rules,
         status="warn" if warning_present else "pass",
-        reasoning=(
-            "The declaration is present, but one or more evidence signals carry a warning."
-            if warning_present
-            else "The declaration and its available supporting evidence satisfy this rule."
-        ),
+        reasoning=reasoning,
         confidence=confidence,
         evidence=evidence,
         evidence_bboxes=boxes,

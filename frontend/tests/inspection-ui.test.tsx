@@ -262,4 +262,14 @@ describe('inspection experience', () => {
     expect(screen.getByRole('button', { name: /Rule 7/i })).toBeVisible();
     expect(screen.getByText(/Displaying unverified findings/i)).toBeVisible();
   });
+
+  it('allows adding a secondary panel in retail image mode', async () => {
+    render(<InspectionCapture onComplete={() => undefined} />);
+    const primaryFile = new File(['primary'], 'front-panel.jpg', { type: 'image/jpeg' });
+    const user = userEvent.setup();
+    await user.upload(screen.getByLabelText(/evidence image/i), primaryFile);
+    await waitFor(() => {
+      expect(screen.getByText(/Add secondary panel/i)).toBeVisible();
+    });
+  });
 });

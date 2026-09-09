@@ -8,7 +8,10 @@ from app.domain import ExtractedField, ImageMeta, OCRWord
 from app.extractors.base import avg_confidence, merge_bboxes
 
 PRICE_PATTERN = re.compile(
-    r"(?:MRP|Max\.?\s*Retail\s*Price|₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*([0-9,]+(?:\.\d{1,2})?)", re.I
+    r"(?:(?:M\.?\s*R\.?\s*P\.?|Max(?:imum)?\.?\s*Retail\s*Price)\s*[:\-]?[₹$X\.\s]*"
+    r"(?:(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)?|(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)"
+    r"([0-9,oOlI]+(?:\.[0-9,oOlI]{1,2})?)",
+    re.I,
 )
 
 
@@ -22,11 +25,17 @@ def extract_mrp(
     price_word = None
     value = None
     for i in range(len(ocr_words)):
-        m = PRICE_PATTERN.search(" ".join(w.text for w in ocr_words[i : i + 2]))
+        sample_text = " ".join(w.text for w in ocr_words[i : min(i + 4, len(ocr_words))])
+        m = PRICE_PATTERN.match(sample_text)
         if m:
-            price_word = ocr_words[i]
-            value = m.group(1)
-            break
+            raw_val = m.group(1)
+            cleaned = (
+                raw_val.replace("o", "0").replace("O", "0").replace("l", "1").replace("I", "1")
+            )
+            if re.search(r"\d", cleaned):
+                price_word = ocr_words[i]
+                value = cleaned
+                break
     if not price_word:
         return ExtractedField("mrp", None, None, 0.0, [])
     is_normalized = bool(

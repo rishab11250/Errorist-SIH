@@ -131,10 +131,6 @@ def load_report_model(
     scan_id: int,
 ) -> InspectionReport | None:
     """Load an authorized scan and all report relations in one eager query."""
-    query = (
-        authorized_scan_query(user)
-        .where(Scan.id == scan_id)
-        .options(*report_eager_options())
-    )
+    query = authorized_scan_query(user).where(Scan.id == scan_id).options(*report_eager_options())
     scan = session.execute(query).unique().scalar_one_or_none()
     return build_report_model(scan) if scan is not None else None

@@ -23,9 +23,14 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const handleCaptureRef = useRef<() => void>(() => undefined);
+  const isCapturingRef = useRef(false);
+  const readyStreakRef = useRef(0);
 
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [autoCapture, setAutoCapture] = useState(true);
+  const [readyStreak, setReadyStreak] = useState(0);
   const [quality, setQuality] = useState<FrameQuality>({
     brightness: 0,
     glareFraction: 0,
@@ -137,6 +142,24 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
       message = 'Hold steady / move closer';
     }
 
+    if (status === 'ready') {
+      readyStreakRef.current += 1;
+      const streak = readyStreakRef.current;
+      setReadyStreak(streak);
+      if (streak >= 3) {
+        message = autoCapture ? 'Auto-capturing steady frame…' : 'Steady — ready to snap';
+        if (autoCapture && !isCapturingRef.current) {
+          isCapturingRef.current = true;
+          handleCaptureRef.current();
+        }
+      } else {
+        message = autoCapture ? `Hold steady (${streak}/3)…` : 'Ready — hold steady';
+      }
+    } else {
+      readyStreakRef.current = 0;
+      setReadyStreak(0);
+    }
+
     setQuality({
       brightness: avgBrightness,
       glareFraction,
@@ -144,12 +167,15 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
       status,
       message,
     });
-  }, []);
+  }, [autoCapture]);
 
   const startCamera = useCallback(async () => {
     stopCamera();
     setCameraError(null);
     setCanOverride(false);
+    isCapturingRef.current = false;
+    readyStreakRef.current = 0;
+    setReadyStreak(0);
 
     if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
       setCameraError('Live camera not supported in this browser. Please use file upload.');
@@ -207,7 +233,8 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
 
   const handleCapture = useCallback(() => {
     const video = videoRef.current;
-    if (!video || disabled) return;
+    if (!video || disabled || isCapturingRef.current) return;
+    isCapturingRef.current = true;
 
     const vWidth = video.videoWidth || 1920;
     const vHeight = video.videoHeight || 1080;
@@ -241,6 +268,10 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
     );
   }, [disabled, onCapture, stopCamera]);
 
+  useEffect(() => {
+    handleCaptureRef.current = handleCapture;
+  }, [handleCapture]);
+
   const statusColor =
     quality.status === 'ready'
       ? 'border-emerald-500 text-emerald-400 bg-emerald-500/15'
@@ -250,7 +281,9 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
 
   const frameBorderColor =
     quality.status === 'ready'
-      ? 'border-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.4)]'
+      ? readyStreak >= 3
+        ? 'border-emerald-300 shadow-[0_0_25px_rgba(52,211,153,0.8)] ring-4 ring-emerald-400/50 scale-[1.01]'
+        : 'border-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.4)]'
       : quality.status === 'blurry'
         ? 'border-rose-400/80'
         : 'border-amber-400/80';
@@ -355,7 +388,21 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
           </Button>
         </div>
 
-        <div className="w-10" />
+        <button
+          type="button"
+          onClick={() => setAutoCapture((prev) => !prev)}
+          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${
+            autoCapture
+              ? 'border border-emerald-500/50 bg-emerald-500/20 text-emerald-300'
+              : 'border border-neutral-700 bg-neutral-800 text-neutral-400'
+          }`}
+          title="Auto-snap after 3 steady frames (~1.3s)"
+          aria-label={`Toggle auto-snap (currently ${autoCapture ? 'on' : 'off'})`}
+        >
+          <Zap className="size-3.5" />
+          <span className="hidden sm:inline">Auto-snap:</span>
+          <span>{autoCapture ? 'ON' : 'OFF'}</span>
+        </button>
       </div>
     </div>
   );

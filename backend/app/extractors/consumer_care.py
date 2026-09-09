@@ -55,11 +55,7 @@ def extract_consumer_care(
             for w in ocr_words
         )
     )
-    max_delta_y = (
-        200.0 / image_meta.height
-        if (is_normalized and image_meta.height > 0)
-        else 200.0
-    )
+    max_delta_y = 200.0 / image_meta.height if (is_normalized and image_meta.height > 0) else 200.0
     block = [word for word in ocr_words if 0 <= word.bbox[1] - section_y <= max_delta_y]
     block_text = " ".join(word.text for word in block)
     has_email = bool(email_re.search(block_text))

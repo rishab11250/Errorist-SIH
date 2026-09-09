@@ -16,6 +16,9 @@ QUALITY_THRESHOLDS = {
     "glare_retake_fraction": 0.18,
     "skew_warn_degrees": 8.0,
     "skew_retake_degrees": 18.0,
+    "ocr_confidence_median_retake": 60.0,
+    "ocr_confidence_median_warn": 70.0,
+    "ocr_confidence_lower_quartile_retake": 35.0,
 }
 
 _GUIDANCE = {
@@ -23,6 +26,7 @@ _GUIDANCE = {
     "contrast": "Use even lighting so the declaration text stands out from its background.",
     "glare": "Tilt the package or light source to remove reflections from the label.",
     "skew": "Position the camera parallel to the declaration panel.",
+    "ocr_confidence": "Hold the camera closer and steady so the printed text is sharp and legible.",
 }
 
 
@@ -185,6 +189,16 @@ def analyze_quality(
         retake_failures.append("skew")
     elif skew > QUALITY_THRESHOLDS["skew_warn_degrees"]:
         warning_failures.append("skew")
+
+    if words:
+        if (
+            confidence_median < QUALITY_THRESHOLDS["ocr_confidence_median_retake"]
+            or confidence_lower_quartile
+            < QUALITY_THRESHOLDS["ocr_confidence_lower_quartile_retake"]
+        ):
+            retake_failures.append("ocr_confidence")
+        elif confidence_median < QUALITY_THRESHOLDS["ocr_confidence_median_warn"]:
+            warning_failures.append("ocr_confidence")
 
     if {"sharpness", "contrast"}.issubset(retake_failures):
         status = "unreadable"

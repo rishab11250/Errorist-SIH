@@ -2,9 +2,12 @@
 
 import {
   ArrowLeft,
+  Camera,
   CheckCircle2,
   CircleHelp,
   Download,
+  RotateCcw,
+  ShieldAlert,
   TriangleAlert,
   XCircle,
 } from 'lucide-react';
@@ -74,6 +77,55 @@ export function InspectionResult({
   const [activeRuleId, setActiveRuleId] = useState<string | null>(null);
   const [filter, setFilter] = useState<ResultFilter>('all');
   const [reviews, setReviews] = useState(result.reviewActions);
+  const [showUnreliableReview, setShowUnreliableReview] = useState(false);
+
+  const isRetakeRecommended =
+    result.quality.status === 'retake_recommended' || result.quality.status === 'unreadable';
+
+  const failedMetrics = useMemo(() => {
+    const list: Array<{ label: string; current: string; expected: string }> = [];
+    for (const m of result.quality.metrics) {
+      if (m.name === 'ocr_confidence_distribution' && m.value < 60) {
+        list.push({
+          label: 'OCR Word Confidence (Median)',
+          current: `${Math.round(m.value)}%`,
+          expected: '≥ 60%',
+        });
+      } else if (m.name === 'ocr_confidence_lower_quartile' && m.value < 35) {
+        list.push({
+          label: 'OCR Word Confidence (Lower Quartile)',
+          current: `${Math.round(m.value)}%`,
+          expected: '≥ 35%',
+        });
+      } else if (m.name === 'sharpness' && m.value < 35) {
+        list.push({
+          label: 'Image Sharpness',
+          current: `${Math.round(m.value)} / 100`,
+          expected: '≥ 35',
+        });
+      } else if (m.name === 'contrast' && m.value < 15) {
+        list.push({
+          label: 'Grayscale Contrast',
+          current: `${Math.round(m.value)} / 100`,
+          expected: '≥ 15',
+        });
+      } else if (m.name === 'glare' && m.value > 18) {
+        list.push({
+          label: 'Specular Glare Area',
+          current: `${Math.round(m.value)}%`,
+          expected: '≤ 18%',
+        });
+      } else if (m.name === 'skew' && m.value > 18) {
+        list.push({
+          label: 'Package Skew Angle',
+          current: `${Math.round(m.value)}°`,
+          expected: '≤ 18°',
+        });
+      }
+    }
+    return list;
+  }, [result.quality.metrics]);
+
   const activeVerdict = result.verdicts.find((verdict) => verdict.rule_id === activeRuleId);
   const visibleVerdicts = useMemo(() => {
     if (filter === 'pass') return result.verdicts.filter((verdict) => verdict.status === 'pass');
@@ -118,6 +170,84 @@ export function InspectionResult({
         </div>
       </header>
 
+      {/* Quality Gate Intervention Card */}
+      {isRetakeRecommended ? (
+        <section
+          aria-label="Quality Gate Intervention"
+          className="rounded-xl border-2 border-amber-500/40 bg-amber-500/10 p-6 sm:p-8 space-y-5"
+        >
+          <div className="flex flex-col sm:flex-row items-start gap-4">
+            <div className="rounded-xl bg-amber-500/20 p-3 text-amber-600 dark:text-amber-400 shrink-0">
+              <Camera className="size-8" />
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold text-amber-900 dark:text-amber-200">
+                Photo quality insufficient for reliable inspection
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                The image quality or OCR readability is below the required threshold to evaluate
+                LMPC mandatory declarations reliably. Showing false non-compliance violations on
+                unreadable evidence is misleading. Please retake the photo using the guided camera
+                frame.
+              </p>
+            </div>
+          </div>
+
+          {result.quality.guidance.length ? (
+            <div className="rounded-lg border bg-background/80 p-4 space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Recommended Actions
+              </p>
+              <ul className="list-disc space-y-1 pl-5 text-sm">
+                {result.quality.guidance.map((g) => (
+                  <li key={g} className="font-medium text-foreground">
+                    {g}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {failedMetrics.length ? (
+            <div className="rounded-lg border bg-background/80 p-4 space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Failed Quality Checks
+              </p>
+              <div className="grid gap-2.5 sm:grid-cols-2">
+                {failedMetrics.map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center justify-between rounded-md border bg-muted/40 px-3.5 py-2.5 text-sm"
+                  >
+                    <div>
+                      <p className="font-medium">{item.label}</p>
+                      <p className="text-xs text-muted-foreground">Expected: {item.expected}</p>
+                    </div>
+                    <span className="font-mono font-bold text-fail">{item.current}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Button asChild size="lg" className="gap-2 font-semibold">
+              <Link href="/">
+                <RotateCcw className="size-4" /> Retake photo (Guided camera)
+              </Link>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={() => setShowUnreliableReview((prev) => !prev)}
+            >
+              {showUnreliableReview ? 'Hide raw results' : 'Review anyway (unreliable)'}
+            </Button>
+          </div>
+        </section>
+      ) : null}
+
       <QualityPanel quality={result.quality} />
 
       <section className={`rounded-lg border p-5 ${overall.className}`} aria-label="Overall status">
@@ -131,60 +261,105 @@ export function InspectionResult({
         <p className="mt-2 text-sm">{overall.detail}</p>
       </section>
 
-      <p role="status" aria-live="polite" className="sr-only">
-        {activeVerdict
-          ? `${activeVerdict.citation}. ${activeVerdict.reasoning}`
-          : 'No finding selected.'}
-      </p>
-
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(24rem,1fr)]">
-        <section
-          aria-label="Annotated inspection evidence"
-          className="surface-panel p-3 lg:sticky lg:top-6"
-        >
-          <AnnotatedEvidence
-            imageSrc={result.imageDataUrl}
-            imageWidth={result.imageWidth}
-            imageHeight={result.imageHeight}
-            verdicts={result.verdicts}
-            activeRuleId={activeRuleId}
-          />
-        </section>
-        <section aria-labelledby="findings-heading" className="space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 id="findings-heading" className="text-h2">
-              Declaration checks
-            </h2>
-            <label className="text-sm font-semibold">
-              <span className="sr-only">Filter findings</span>
-              <select
-                aria-label="Filter findings"
-                value={filter}
-                onChange={(event) => setFilter(event.target.value as ResultFilter)}
-                className="h-11 rounded-md border bg-background px-3"
-              >
-                <option value="all">All findings</option>
-                <option value="attention">Needs attention</option>
-                <option value="pass">Passing only</option>
-              </select>
-            </label>
-          </div>
-          {visibleVerdicts.length ? (
-            visibleVerdicts.map((verdict) => (
-              <VerdictCard
-                key={verdict.rule_id}
-                verdict={verdict}
-                active={activeRuleId === verdict.rule_id}
-                onSelect={() => setActiveRuleId(verdict.rule_id)}
-              />
-            ))
-          ) : (
-            <p className="surface-panel p-5 text-muted-foreground">
-              No findings match this filter.
+      {isRetakeRecommended && !showUnreliableReview ? (
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(24rem,1fr)]">
+          <section
+            aria-label="Annotated inspection evidence"
+            className="surface-panel p-3 lg:sticky lg:top-6"
+          >
+            <AnnotatedEvidence
+              imageSrc={result.imageDataUrl}
+              imageWidth={result.imageWidth}
+              imageHeight={result.imageHeight}
+              verdicts={[]}
+              activeRuleId={null}
+            />
+          </section>
+          <div className="surface-panel p-6 space-y-4">
+            <div className="flex items-center gap-3 text-amber-600 dark:text-amber-400">
+              <ShieldAlert className="size-6" />
+              <h3 className="font-heading text-lg font-semibold">Automated checks paused</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              To prevent false non-compliance verdicts caused by garbled OCR reading, detailed rule
+              verdicts are withheld. Click <strong>&quot;Retake photo&quot;</strong> to capture a
+              clearer image of the primary declaration panel, or toggle{' '}
+              <strong>&quot;Review anyway (unreliable)&quot;</strong> to inspect raw unverified
+              detections.
             </p>
-          )}
-        </section>
-      </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {isRetakeRecommended && showUnreliableReview ? (
+            <div
+              role="alert"
+              className="rounded-lg border border-warn/40 bg-warn/10 p-4 text-sm text-warn"
+            >
+              <p className="font-semibold">⚠️ Displaying unverified findings</p>
+              <p className="mt-1">
+                Image quality was marked retake recommended. Detections below may contain false
+                failures due to unreadable OCR.
+              </p>
+            </div>
+          ) : null}
+
+          <p role="status" aria-live="polite" className="sr-only">
+            {activeVerdict
+              ? `${activeVerdict.citation}. ${activeVerdict.reasoning}`
+              : 'No finding selected.'}
+          </p>
+
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(24rem,1fr)]">
+            <section
+              aria-label="Annotated inspection evidence"
+              className="surface-panel p-3 lg:sticky lg:top-6"
+            >
+              <AnnotatedEvidence
+                imageSrc={result.imageDataUrl}
+                imageWidth={result.imageWidth}
+                imageHeight={result.imageHeight}
+                verdicts={result.verdicts}
+                activeRuleId={activeRuleId}
+              />
+            </section>
+            <section aria-labelledby="findings-heading" className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 id="findings-heading" className="text-h2">
+                  Declaration checks
+                </h2>
+                <label className="text-sm font-semibold">
+                  <span className="sr-only">Filter findings</span>
+                  <select
+                    aria-label="Filter findings"
+                    value={filter}
+                    onChange={(event) => setFilter(event.target.value as ResultFilter)}
+                    className="h-11 rounded-md border bg-background px-3"
+                  >
+                    <option value="all">All findings</option>
+                    <option value="attention">Needs attention</option>
+                    <option value="pass">Passing only</option>
+                  </select>
+                </label>
+              </div>
+              {visibleVerdicts.length ? (
+                visibleVerdicts.map((verdict) => (
+                  <VerdictCard
+                    key={verdict.rule_id}
+                    verdict={verdict}
+                    active={activeRuleId === verdict.rule_id}
+                    onSelect={() => setActiveRuleId(verdict.rule_id)}
+                  />
+                ))
+              ) : (
+                <p className="surface-panel p-5 text-muted-foreground">
+                  No findings match this filter.
+                </p>
+              )}
+            </section>
+          </div>
+        </>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <ReviewForm

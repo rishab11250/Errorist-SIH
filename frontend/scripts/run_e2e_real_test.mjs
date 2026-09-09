@@ -14,7 +14,8 @@ const TEST_CASES = [
     mode: 'retail_image',
     category: 'food',
     imported: 'domestic',
-    description: 'Clean flat back panel: Net Qty 25g, MRP Rs 5.00 incl taxes, USP Rs 0.20/g, Rajkot PIN 360024',
+    description:
+      'Clean flat back panel: Net Qty 25g, MRP Rs 5.00 incl taxes, USP Rs 0.20/g, Rajkot PIN 360024',
     expected: {
       r6_1_e_mrp: 'pass',
       r6_1_c_net_quantity: 'pass',
@@ -28,8 +29,8 @@ const TEST_CASES = [
       r6_1_f_dimensions: 'na', // food
       r6_11_unit_sale_price: 'pass',
       r6_10_ecommerce_declarations: 'na', // retail mode
-      r7_font_size: 'manual_review/pass' // DPI fallback
-    }
+      r7_font_size: 'manual_review/pass', // DPI fallback
+    },
   },
   {
     id: 'case_2_clean_good_day',
@@ -38,7 +39,8 @@ const TEST_CASES = [
     mode: 'retail_image',
     category: 'food',
     imported: 'domestic',
-    description: 'Clean horizontal label strip: Britannia Industries Ltd, Kolkata 700 017, email, phone',
+    description:
+      'Clean horizontal label strip: Britannia Industries Ltd, Kolkata 700 017, email, phone',
     expected: {
       r6_1_a_address: 'pass',
       r6_2_consumer_care: 'pass',
@@ -46,8 +48,8 @@ const TEST_CASES = [
       r6_1_aa_country_origin: 'na',
       r6_1_a_importer_address: 'na',
       r6_1_f_dimensions: 'na',
-      r6_10_ecommerce_declarations: 'na'
-    }
+      r6_10_ecommerce_declarations: 'na',
+    },
   },
   {
     id: 'case_3_angle_good_day',
@@ -62,8 +64,8 @@ const TEST_CASES = [
       r6_1_aa_country_origin: 'na',
       r6_1_a_importer_address: 'na',
       r6_1_f_dimensions: 'na',
-      r6_10_ecommerce_declarations: 'na'
-    }
+      r6_10_ecommerce_declarations: 'na',
+    },
   },
   {
     id: 'case_4_wrinkle_parle_g',
@@ -78,8 +80,8 @@ const TEST_CASES = [
       r6_1_aa_country_origin: 'na',
       r6_1_a_importer_address: 'na',
       r6_1_f_dimensions: 'na',
-      r6_10_ecommerce_declarations: 'na'
-    }
+      r6_10_ecommerce_declarations: 'na',
+    },
   },
   {
     id: 'case_5_glare_bourbon',
@@ -94,8 +96,8 @@ const TEST_CASES = [
       r6_1_aa_country_origin: 'na',
       r6_1_a_importer_address: 'na',
       r6_1_f_dimensions: 'na',
-      r6_10_ecommerce_declarations: 'na'
-    }
+      r6_10_ecommerce_declarations: 'na',
+    },
   },
   {
     id: 'case_6_missing_maggi',
@@ -104,7 +106,8 @@ const TEST_CASES = [
     mode: 'retail_image',
     category: 'food',
     imported: 'domestic',
-    description: 'Panel with common name and FSSAI, but missing MRP, missing manufacturer address PIN code',
+    description:
+      'Panel with common name and FSSAI, but missing MRP, missing manufacturer address PIN code',
     expected: {
       r6_1_e_mrp: 'fail',
       r6_1_a_address: 'fail',
@@ -113,8 +116,8 @@ const TEST_CASES = [
       r6_1_aa_country_origin: 'na',
       r6_1_a_importer_address: 'na',
       r6_1_f_dimensions: 'na',
-      r6_10_ecommerce_declarations: 'na'
-    }
+      r6_10_ecommerce_declarations: 'na',
+    },
   },
   {
     id: 'case_7_ecom_haldiram',
@@ -136,9 +139,9 @@ const TEST_CASES = [
       r6_1_da_best_before: 'pass',
       r6_1_f_dimensions: 'na',
       r6_11_unit_sale_price: 'pass',
-      r7_font_size: 'na' // retail only
-    }
-  }
+      r7_font_size: 'na', // retail only
+    },
+  },
 ];
 
 async function run() {
@@ -151,9 +154,9 @@ async function run() {
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
-      '--window-size=1280,900'
+      '--window-size=1280,900',
     ],
-    defaultViewport: { width: 1280, height: 900 }
+    defaultViewport: { width: 1280, height: 900 },
   });
 
   const page = await browser.newPage();
@@ -162,7 +165,12 @@ async function run() {
   page.on('pageerror', (err) => console.log('Browser PageError:', err.message));
   page.on('console', (msg) => {
     const text = msg.text();
-    if (text.includes('Reading label text') || text.includes('Tesseract') || text.includes('error') || text.includes('Error')) {
+    if (
+      text.includes('Reading label text') ||
+      text.includes('Tesseract') ||
+      text.includes('error') ||
+      text.includes('Error')
+    ) {
       console.log('   [Browser]', text.slice(0, 100));
     }
   });
@@ -171,7 +179,7 @@ async function run() {
   const loginRes = await fetch(`${BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: 'admin', password: 'admin-password-123' })
+    body: JSON.stringify({ username: 'admin', password: 'admin-password-123' }),
   });
   const cookieHeader = loginRes.headers.get('set-cookie') || '';
   const sessionMatch = cookieHeader.match(/lmpc_session=([^;]+)/);
@@ -183,7 +191,7 @@ async function run() {
     name: 'lmpc_session',
     value: sessionVal,
     domain: '127.0.0.1',
-    path: '/'
+    path: '/',
   });
   console.log('   Authenticated. Session cookie set.');
 
@@ -195,7 +203,9 @@ async function run() {
     console.log(`\n------------------------------------------------------------`);
     console.log(`Test ${i + 1}/${TEST_CASES.length}: [${testCase.id}] ${testCase.name}`);
     console.log(`Image: ${testCase.file} (${(fs.statSync(imagePath).size / 1024).toFixed(1)} KB)`);
-    console.log(`Context: mode=${testCase.mode}, category=${testCase.category}, imported=${testCase.imported}`);
+    console.log(
+      `Context: mode=${testCase.mode}, category=${testCase.category}, imported=${testCase.imported}`
+    );
 
     // Navigate to fresh homepage
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
@@ -267,11 +277,19 @@ async function run() {
     await page.waitForSelector('img[alt="Selected evidence preview"]', { timeout: 10000 });
 
     // Wait for start button to be enabled
-    await page.waitForFunction(() => {
-      const btns = Array.from(document.querySelectorAll('button'));
-      const btn = btns.find(b => b.textContent && (b.textContent.includes('Start inspection') || b.textContent.includes('Retry inspection')));
-      return btn && !btn.disabled;
-    }, { timeout: 10000 });
+    await page.waitForFunction(
+      () => {
+        const btns = Array.from(document.querySelectorAll('button'));
+        const btn = btns.find(
+          (b) =>
+            b.textContent &&
+            (b.textContent.includes('Start inspection') ||
+              b.textContent.includes('Retry inspection'))
+        );
+        return btn && !btn.disabled;
+      },
+      { timeout: 10000 }
+    );
 
     const buttons = await page.$$('button');
     let startBtn = null;
@@ -302,7 +320,7 @@ async function run() {
         testCase,
         durationMs,
         error: scanError,
-        overallStatus: 'ui_error'
+        overallStatus: 'ui_error',
       });
       continue;
     }
@@ -310,7 +328,7 @@ async function run() {
     // Parse data
     const wordCount = interceptedRequest?.ocr_payload?.length || 0;
     const lineCount = interceptedRequest?.ocr_lines?.length || 0;
-    const rawText = (interceptedRequest?.ocr_payload || []).map(w => w.text).join(' ');
+    const rawText = (interceptedRequest?.ocr_payload || []).map((w) => w.text).join(' ');
     const quality = interceptedResponse?.quality || {};
     const overallStatus = interceptedResponse?.overall_status || 'unknown';
     const verdicts = interceptedResponse?.verdicts || [];
@@ -330,9 +348,11 @@ async function run() {
         bbox_count: (v.evidence_bboxes || []).length,
         evidence_bboxes: v.evidence_bboxes || [],
         reasoning: v.reasoning,
-        failure_message: v.failure_message
+        failure_message: v.failure_message,
       };
-      console.log(`     - [${v.status.toUpperCase()}] ${v.rule_id}: ${v.evidence ? `"${v.evidence.slice(0, 60)}..."` : v.reasoning.slice(0, 60)}`);
+      console.log(
+        `     - [${v.status.toUpperCase()}] ${v.rule_id}: ${v.evidence ? `"${v.evidence.slice(0, 60)}..."` : v.reasoning.slice(0, 60)}`
+      );
     }
 
     results.push({
@@ -342,12 +362,12 @@ async function run() {
         wordCount,
         lineCount,
         rawTextPreview: rawText.slice(0, 300),
-        rawTextFull: rawText
+        rawTextFull: rawText,
       },
       quality,
       overallStatus,
       verdictMap,
-      verdictsRaw: verdicts
+      verdictsRaw: verdicts,
     });
   }
 

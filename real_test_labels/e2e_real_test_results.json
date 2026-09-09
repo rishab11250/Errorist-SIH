@@ -24,7 +24,7 @@
         "r7_font_size": "manual_review/pass"
       }
     },
-    "durationMs": 4568,
+    "durationMs": 5907,
     "ocr": {
       "wordCount": 140,
       "lineCount": 29,
@@ -32,7 +32,7 @@
       "rawTextFull": "Hg “ Ney vE ™ d ; ah WY YEN ¢ £ NCREBIENTS. liana” 1 (ON MOLE, RE RENTS % aan 2 : Les Flow Er i Ay Gl EAE ENT (MS S51 NOUR I5AR, AIT cGUATO® WAT. AND NATURE IDENTICAL FLAVOURING LANCER (IN 627. dor) 1 PRIKA EXTRACT (INS 1600) oi OR AN | Pi IETARY an - NAMKEEN 3 po OCC ETNG SE cp YEE _ NUTRIriwiAL INFCRMATION* PER 109 | “Row PERT 1 3 Ek —— : 514 Keal 8% TOTAL SUGARS : 1% a —_ = % BE | 70 | 6 ‘APPROXIMATE VALUES | GUIDELINE DAILY AMOUNT T0 “RECOMMEE 8 fr AERAGE ADL PER DAY (2000 AL DET 15 545 2 SERVING PER PACKAGE®: | SERVING SEX NET WEIGHT 25 AS i pO OONLOFAL GS): 5.00 (| UNITSALE PRICE 00 PER 1 6.00. vp, Fo"
     },
     "quality": {
-      "status": "usable_with_warnings",
+      "status": "retake_recommended",
       "score": 67.87,
       "metrics": [
         {
@@ -101,13 +101,14 @@
         }
       ],
       "guidance": [
+        "Hold the camera closer and steady so the printed text is sharp and legible.",
         "Hold the camera steady and tap to focus on the declaration panel."
       ]
     },
-    "overallStatus": "fail",
+    "overallStatus": "manual_review",
     "verdictMap": {
       "r6_1_e_mrp": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6787,
         "evidence": "",
         "bbox_count": 1,
@@ -119,35 +120,35 @@
             0.03375
           ]
         ],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
-        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_c_net_quantity": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6787,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: net_quantity_value, net_quantity_unit.",
-        "failure_message": "Net quantity must be declared in metric units (g/kg/ml/l) (missing: net_quantity_value, net_quantity_unit)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_a_address": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6787,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
-        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_2_consumer_care": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6787,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
-        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_d_mfg_date": {
         "status": "na",
@@ -159,13 +160,13 @@
         "failure_message": null
       },
       "r6_1_b_common_name": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6787,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
-        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_aa_country_origin": {
         "status": "na",
@@ -186,13 +187,13 @@
         "failure_message": null
       },
       "r6_1_da_best_before": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6787,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
-        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_f_dimensions": {
         "status": "na",
@@ -209,7 +210,7 @@
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "failure_message": null
       },
       "r6_10_ecommerce_declarations": {
@@ -234,7 +235,7 @@
     "verdictsRaw": [
       {
         "rule_id": "r6_1_e_mrp",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(e) of LMPC Rules 2011",
         "evidence": "",
@@ -247,48 +248,48 @@
           ]
         ],
         "confidence": 0.6787,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
         "rule_id": "r6_1_c_net_quantity",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6787,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: net_quantity_value, net_quantity_unit.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Net quantity must be declared in metric units (g/kg/ml/l) (missing: net_quantity_value, net_quantity_unit)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
         "rule_id": "r6_1_a_address",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6787,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
         "rule_id": "r6_2_consumer_care",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(2) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6787,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
@@ -306,15 +307,15 @@
       },
       {
         "rule_id": "r6_1_b_common_name",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(b) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6787,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
@@ -345,15 +346,15 @@
       },
       {
         "rule_id": "r6_1_da_best_before",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "warning",
         "citation": "Rule 6(1)(da) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6787,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
@@ -377,7 +378,7 @@
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6787,
-        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
         "failure_message": null,
         "rule_version": "2026-09"
@@ -429,7 +430,7 @@
         "r6_10_ecommerce_declarations": "na"
       }
     },
-    "durationMs": 2960,
+    "durationMs": 3464,
     "ocr": {
       "wordCount": 174,
       "lineCount": 21,
@@ -506,7 +507,8 @@
         }
       ],
       "guidance": [
-        "Tilt the package or light source to remove reflections from the label."
+        "Tilt the package or light source to remove reflections from the label.",
+        "Hold the camera closer and steady so the printed text is sharp and legible."
       ]
     },
     "overallStatus": "manual_review",
@@ -832,7 +834,7 @@
         "r6_10_ecommerce_declarations": "na"
       }
     },
-    "durationMs": 4921,
+    "durationMs": 5895,
     "ocr": {
       "wordCount": 191,
       "lineCount": 35,
@@ -840,7 +842,7 @@
       "rawTextFull": "4 Co 9 3 hs i F ey aa g ! pr - o RR he we i & & ’ - . sre -r- YAbo.., Say : oo” 3 >. \\ » EL an, Po bo © Por So... Lo pH MALES: b E protein-6.69. Carbonydrate «¥.7g, ” ; Repos -21.90. Aden Slr TnI p— Ton WR F 4 IE\" z Rr — PE Eap— re r aT 3 on: 1 - ' y Salk — Eh Ve’ ] ' lt = 3 ’ oN p , CIHLAR MEAS HITS 5 : 1 ERT CI =i ¢ SY SSIRIWED WHEAT FLOUR (MAIDA), REFINED PALM 01 SUGAR, CASHEW NUTS (15%), INVERT SUGAR SY : & . “8 A113 FRS [2224i} 471 R 477] ANT AVOLIR ATR ABUSING AGENTS [503(i) & 5000, I0DISED © AS (32211), 471 & 47: AVIS NR pr ARMIKAND VANILLA) FLAVOURING SUBSTA! ON MSinckets as per International Numbe: { ASHER, NUTS MILK AND SO U STREF r KI} | WA : Mtl BRITANN IND e LOT N 4 3 addre TAS A : ip WE or xm: : oh MN LR ; oi] - ¢ = 0 ¥"
     },
     "quality": {
-      "status": "usable_with_warnings",
+      "status": "retake_recommended",
       "score": 61.27,
       "metrics": [
         {
@@ -909,19 +911,20 @@
         }
       ],
       "guidance": [
+        "Hold the camera closer and steady so the printed text is sharp and legible.",
         "Hold the camera steady and tap to focus on the declaration panel."
       ]
     },
-    "overallStatus": "fail",
+    "overallStatus": "manual_review",
     "verdictMap": {
       "r6_1_e_mrp": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6127,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
-        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_c_net_quantity": {
         "status": "manual_review",
@@ -948,26 +951,26 @@
             0.012566137566137559
           ]
         ],
-        "reasoning": "OCR confidence is below the automatic-decision threshold.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "failure_message": null
       },
       "r6_1_a_address": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6127,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
-        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_2_consumer_care": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6127,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
-        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_d_mfg_date": {
         "status": "na",
@@ -979,13 +982,13 @@
         "failure_message": null
       },
       "r6_1_b_common_name": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6127,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
-        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_aa_country_origin": {
         "status": "na",
@@ -1006,13 +1009,13 @@
         "failure_message": null
       },
       "r6_1_da_best_before": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.6127,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
-        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_f_dimensions": {
         "status": "na",
@@ -1029,7 +1032,7 @@
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "failure_message": null
       },
       "r6_10_ecommerce_declarations": {
@@ -1067,15 +1070,15 @@
     "verdictsRaw": [
       {
         "rule_id": "r6_1_e_mrp",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(e) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6127,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
@@ -1105,35 +1108,35 @@
           ]
         ],
         "confidence": 0,
-        "reasoning": "OCR confidence is below the automatic-decision threshold.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "relative_readability",
         "failure_message": null,
         "rule_version": "2026-09"
       },
       {
         "rule_id": "r6_1_a_address",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6127,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
         "rule_id": "r6_2_consumer_care",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(2) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6127,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
@@ -1151,15 +1154,15 @@
       },
       {
         "rule_id": "r6_1_b_common_name",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(b) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6127,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
@@ -1190,15 +1193,15 @@
       },
       {
         "rule_id": "r6_1_da_best_before",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "warning",
         "citation": "Rule 6(1)(da) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6127,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
@@ -1222,7 +1225,7 @@
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.6127,
-        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
         "failure_message": null,
         "rule_version": "2026-09"
@@ -1285,7 +1288,7 @@
         "r6_10_ecommerce_declarations": "na"
       }
     },
-    "durationMs": 3867,
+    "durationMs": 5775,
     "ocr": {
       "wordCount": 143,
       "lineCount": 35,
@@ -1293,7 +1296,7 @@
       "rawTextFull": "é ¢ _— . > \" he of; 5 oh A | ? ed —— - wb us OF WEGET ARLE Omri 12. / l va | mG : yr, A 1 ; 7.1 - Av UGE CONDITIONS STORE m A CODY WYGIEMIC AND DRY #4 ACE . i —— a 4 nmin | ——~ Ex NE Rr my J EET TERRE ET A . —_— I'L — =D © : $V | / - | NUTRITIONAL INFORMATION. | | | \\ ) at . 7% 2 : \\ é & nT CFRVE STZ a PER SERV] MOH NOBTRI 2d Ea =n ho ROU moma so GE | SOLAN o = IEE\" « % y vA ~~ 3 Pn + ‘ ITE. = isyIiuvasima 1 de Ea aad —_—— - a — = - hd Fe : \" 8 2 Wg g »"
     },
     "quality": {
-      "status": "acceptable",
+      "status": "retake_recommended",
       "score": 81.55,
       "metrics": [
         {
@@ -1361,45 +1364,47 @@
           "evidence_bboxes": []
         }
       ],
-      "guidance": []
+      "guidance": [
+        "Hold the camera closer and steady so the printed text is sharp and legible."
+      ]
     },
-    "overallStatus": "fail",
+    "overallStatus": "manual_review",
     "verdictMap": {
       "r6_1_e_mrp": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.8155,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
-        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_c_net_quantity": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.8155,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: net_quantity_value, net_quantity_unit.",
-        "failure_message": "Net quantity must be declared in metric units (g/kg/ml/l) (missing: net_quantity_value, net_quantity_unit)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_a_address": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.8155,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
-        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_2_consumer_care": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.8155,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
-        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_d_mfg_date": {
         "status": "na",
@@ -1411,13 +1416,13 @@
         "failure_message": null
       },
       "r6_1_b_common_name": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.8155,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
-        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_aa_country_origin": {
         "status": "na",
@@ -1438,13 +1443,13 @@
         "failure_message": null
       },
       "r6_1_da_best_before": {
-        "status": "fail",
+        "status": "manual_review",
         "confidence": 0.8155,
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
-        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)"
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+        "failure_message": null
       },
       "r6_1_f_dimensions": {
         "status": "na",
@@ -1461,7 +1466,7 @@
         "evidence": "",
         "bbox_count": 0,
         "evidence_bboxes": [],
-        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "failure_message": null
       },
       "r6_10_ecommerce_declarations": {
@@ -1486,54 +1491,54 @@
     "verdictsRaw": [
       {
         "rule_id": "r6_1_e_mrp",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(e) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.8155,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: mrp_value, tax_inclusive_phrase.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: mrp_value, tax_inclusive_phrase)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
         "rule_id": "r6_1_c_net_quantity",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.8155,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: net_quantity_value, net_quantity_unit.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Net quantity must be declared in metric units (g/kg/ml/l) (missing: net_quantity_value, net_quantity_unit)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
         "rule_id": "r6_1_a_address",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.8155,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: manufacturer_name, address, pin_code.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required (missing: manufacturer_name, address, pin_code)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
         "rule_id": "r6_2_consumer_care",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(2) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.8155,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2)) (missing: consumer_care_name, consumer_care_address, consumer_care_phone, consumer_care_email)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
@@ -1551,15 +1556,15 @@
       },
       {
         "rule_id": "r6_1_b_common_name",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "critical",
         "citation": "Rule 6(1)(b) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.8155,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
@@ -1590,15 +1595,15 @@
       },
       {
         "rule_id": "r6_1_da_best_before",
-        "status": "fail",
+        "status": "manual_review",
         "severity": "warning",
         "citation": "Rule 6(1)(da) of LMPC Rules 2011",
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.8155,
-        "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: best_before_value.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
-        "failure_message": "Best-before, use-by, or expiry declaration is required when applicable (missing: best_before_value)",
+        "failure_message": null,
         "rule_version": "2026-09"
       },
       {
@@ -1622,7 +1627,7 @@
         "evidence": "",
         "evidence_bboxes": [],
         "confidence": 0.8155,
-        "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+        "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
         "measurement_method": "not_measurable",
         "failure_message": null,
         "rule_version": "2026-09"
@@ -1672,7 +1677,7 @@
         "r6_10_ecommerce_declarations": "na"
       }
     },
-    "durationMs": 4811,
+    "durationMs": 6169,
     "ocr": {
       "wordCount": 368,
       "lineCount": 68,
@@ -1749,7 +1754,8 @@
         }
       ],
       "guidance": [
-        "Hold the camera steady and tap to focus on the declaration panel."
+        "Hold the camera steady and tap to focus on the declaration panel.",
+        "Hold the camera closer and steady so the printed text is sharp and legible."
       ]
     },
     "overallStatus": "manual_review",
@@ -2064,7 +2070,7 @@
         "r6_10_ecommerce_declarations": "na"
       }
     },
-    "durationMs": 1071,
+    "durationMs": 1409,
     "ocr": {
       "wordCount": 99,
       "lineCount": 25,
@@ -2072,7 +2078,7 @@
       "rawTextFull": "Rl, 4S KNOW YOUR PORTION Jj NUTRITIONAL INFORMATION  [Ifaserveis70g  INUTRITION® Per | Per | Xo b INFORMATION 100g fserve| Px ome A Energy (kcal) | 386 [269] 13%] : : Carbohydrate (g) 59.6 161.7] 16% ; PER) Total Sugars (g) 181.3] 1% iin -Added Sugars (g) 11 [08] - : Total Fat (g) 12.5[88] 13% INGREDIENTS -Saluraled Ft () mre | 8.25.8 234 ¢ RETINER WEAR TOUT. Trans Fat (g) (not more than) [0.13 10.10] - : 4 wo» [Sodium (mg) 1000.0(700.0] 29% ’ villi g CK {im A \\ i 2a, STORAGE ADVICE Lic.No. 1001201100016! RTT | »"
     },
     "quality": {
-      "status": "acceptable",
+      "status": "usable_with_warnings",
       "score": 80.69,
       "metrics": [
         {
@@ -2140,7 +2146,9 @@
           "evidence_bboxes": []
         }
       ],
-      "guidance": []
+      "guidance": [
+        "Hold the camera closer and steady so the printed text is sharp and legible."
+      ]
     },
     "overallStatus": "fail",
     "verdictMap": {
@@ -2522,7 +2530,7 @@
         "r7_font_size": "na"
       }
     },
-    "durationMs": 1084,
+    "durationMs": 1377,
     "ocr": {
       "wordCount": 109,
       "lineCount": 16,

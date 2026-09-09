@@ -149,3 +149,19 @@ def test_panel_falls_back_when_no_plausible_contour_exists() -> None:
     panel = estimate_panel(_decoded(image), ())
     assert panel.bbox == (0.0, 0.0, 1.0, 1.0)
     assert panel.confidence == 0.0
+
+
+def test_low_ocr_confidence_triggers_retake() -> None:
+    image = np.full((200, 300, 3), 30, dtype=np.uint8)
+    cv2.rectangle(image, (20, 20), (280, 180), (220, 220, 220), 4)
+    for y in range(45, 170, 25):
+        cv2.line(image, (45, y), (250, y), (30, 30, 30), 3)
+
+    # Sharp image with unreadable/low confidence OCR words
+    low_conf_words = (
+        OCRWord("garbled1", 0.25, (0.1, 0.1, 0.2, 0.05)),
+        OCRWord("garbled2", 0.30, (0.3, 0.1, 0.2, 0.05)),
+    )
+    result = analyze_quality(_decoded(image), low_conf_words)
+    assert result.status == "retake_recommended"
+    assert any("closer and steady" in g for g in result.guidance)

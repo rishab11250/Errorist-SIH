@@ -16,30 +16,56 @@ out/
 *.tsbuildinfo
 next-env.d.ts
 
-# Editors
+# Environment files (secrets / local overrides)
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+frontend/.env.local
+!*.env.example
+
+# Editors & OS
 .vscode/
 .idea/
 *.swp
-
-# OS
 .DS_Store
 Thumbs.db
 
-# Eval (images can be large)
+# Logs & temp
+*.log
+
+# Eval & training artifacts
 backend/tests/eval/images/*.jpg
 backend/tests/eval/images/*.jpeg
 backend/tests/eval/images/*.png
 !backend/tests/eval/images/.gitkeep
+*.traineddata
 
-# Local data
+# Local databases
 data/
 *.sqlite
 *.sqlite3
 *.db.lock
-*.traineddata
 
-# Test labels (binary photos)
+# Bulk packaging photos & stress datasets (do not commit binary photos)
+off_india_images/*.jpg
+off_india_images/*.jpeg
+off_india_images/*.png
+off_india_images/*.webp
 real_test_labels/*.jpg
 real_test_labels/*.jpeg
 real_test_labels/*.png
+real_test_labels/**/*.jpg
+real_test_labels/**/*.jpeg
+real_test_labels/**/*.png
+real_test_labels/**/*.webp
+real_test_labels/fresh_candidates/
+real_test_labels/fresh_validation/
+real_test_labels/off_stress_pairs/
+real_test_labels/temp_test/
+
+# Keep dataset manifests and test result reports
+!off_india_images/manifest.jsonl
+!off_india_images/selected_test_cases.json
 !real_test_labels/*.json

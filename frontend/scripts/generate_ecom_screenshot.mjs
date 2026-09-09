@@ -61,7 +61,7 @@ async function main() {
   const browser = await puppeteer.launch({
     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
     headless: true,
-    args: ['--no-sandbox', '--window-size=950,900']
+    args: ['--no-sandbox', '--window-size=950,900'],
   });
   const page = await browser.newPage();
   await page.setContent(html, { waitUntil: 'networkidle0' });

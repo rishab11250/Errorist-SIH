@@ -47,7 +47,8 @@ export function QualityPanel({ quality }: { quality: QualitySummary }) {
           </div>
         </div>
         <p className="rounded-full bg-background/80 px-3 py-1 text-sm font-semibold">
-          Quality score {Math.round(quality.score * 100)}%
+          Quality score{' '}
+          {quality.score > 1 ? Math.round(quality.score) : Math.round(quality.score * 100)}%
         </p>
       </div>
       {quality.guidance.length ? (

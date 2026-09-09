@@ -228,4 +228,38 @@ describe('inspection experience', () => {
     expect(screen.getByText('In progress')).toBeInTheDocument();
     expect(screen.getByText('Complete')).toBeInTheDocument();
   });
+
+  it('gates declaration checks and provides review override when quality is retake_recommended', async () => {
+    const RETAKE_RESULT: InspectionResultData = {
+      ...MANUAL_REVIEW_RESULT,
+      scanId: 15,
+      quality: {
+        status: 'retake_recommended',
+        score: 35.0,
+        metrics: [
+          {
+            name: 'ocr_confidence_distribution',
+            value: 28.5,
+            unit: 'percent',
+            confidence: 1,
+            method: 'median',
+            evidence_bboxes: [],
+          },
+        ],
+        guidance: ['Hold the camera closer and steady so the printed text is sharp and legible.'],
+      },
+    };
+    render(<InspectionResult result={RETAKE_RESULT} />);
+    expect(screen.getByText(/Photo quality insufficient for reliable inspection/i)).toBeVisible();
+    expect(screen.getByText(/OCR Word Confidence \(Median\)/i)).toBeVisible();
+    expect(screen.getByText('29%')).toBeVisible();
+    expect(screen.getByRole('link', { name: /Retake photo/i })).toBeVisible();
+    expect(screen.queryByRole('button', { name: /Rule 7/i })).not.toBeInTheDocument();
+    expect(screen.getByText(/Automated checks paused/i)).toBeVisible();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Review anyway/i }));
+    expect(screen.getByRole('button', { name: /Rule 7/i })).toBeVisible();
+    expect(screen.getByText(/Displaying unverified findings/i)).toBeVisible();
+  });
 });

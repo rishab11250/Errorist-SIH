@@ -8,7 +8,8 @@ from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-DEFAULT_MAX_OCR_WORDS = 552
+# 1.6x headroom over largest observed real photo (Marie Gold freeform: 1,315 words)
+DEFAULT_MAX_OCR_WORDS = 2104
 
 
 class AuthSettings(BaseModel):

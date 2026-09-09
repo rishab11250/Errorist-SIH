@@ -1,0 +1,614 @@
+[
+  {
+    "item": {
+      "id": "off_1_8902080000227",
+      "name": "Sting Energy",
+      "code": "8902080000227",
+      "category_note": "bottle / curved liquid",
+      "freeform_file": "off_1_8902080000227_freeform.jpg",
+      "guided_file": "off_1_8902080000227_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_1_8902080000227_freeform.jpg",
+      "durationMs": 4800,
+      "wordsCount": 90,
+      "linesCount": 17,
+      "confidence": {
+        "median": 0.4,
+        "p25": 0.2,
+        "mean": 0.4
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 74.65,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_1_8902080000227_guided.jpg",
+      "durationMs": 1600,
+      "wordsCount": 24,
+      "linesCount": 4,
+      "confidence": {
+        "median": 0.4,
+        "p25": 0.3,
+        "mean": 0.5
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 80.54,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": -66,
+      "confDelta": 0.0
+    },
+    "readabilityImproved": false
+  },
+  {
+    "item": {
+      "id": "off_2_8901262010016",
+      "name": "Amul Pasteurized Butter",
+      "code": "8901262010016",
+      "category_note": "paper carton / dense print",
+      "freeform_file": "off_2_8901262010016_freeform.jpg",
+      "guided_file": "off_2_8901262010016_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_2_8901262010016_freeform.jpg",
+      "durationMs": 8000,
+      "wordsCount": 435,
+      "linesCount": 53,
+      "confidence": {
+        "median": 0.4,
+        "p25": 0.2,
+        "mean": 0.4
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 63.41,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_2_8901262010016_guided.jpg",
+      "durationMs": 1600,
+      "wordsCount": 56,
+      "linesCount": 11,
+      "confidence": {
+        "median": 0.5,
+        "p25": 0.2,
+        "mean": 0.4
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 51.93,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": -379,
+      "confDelta": 0.1
+    },
+    "readabilityImproved": true
+  },
+  {
+    "item": {
+      "id": "off_3_8904043901015",
+      "name": "Tata Salt",
+      "code": "8904043901015",
+      "category_note": "poly pouch / salt",
+      "freeform_file": "off_3_8904043901015_freeform.jpg",
+      "guided_file": "off_3_8904043901015_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_3_8904043901015_freeform.jpg",
+      "durationMs": 1300,
+      "wordsCount": 67,
+      "linesCount": 24,
+      "confidence": {
+        "median": 0.3,
+        "p25": 0.1,
+        "mean": 0.4
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 61.29,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_3_8904043901015_guided.jpg",
+      "durationMs": 600,
+      "wordsCount": 9,
+      "linesCount": 4,
+      "confidence": {
+        "median": 0.4,
+        "p25": 0.2,
+        "mean": 0.4
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 61.25,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": -58,
+      "confDelta": 0.1
+    },
+    "readabilityImproved": true
+  },
+  {
+    "item": {
+      "id": "off_4_8901491100519",
+      "name": "Kurkure",
+      "code": "8901491100519",
+      "category_note": "wrinkled foil pouch",
+      "freeform_file": "off_4_8901491100519_freeform.jpg",
+      "guided_file": "off_4_8901491100519_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_4_8901491100519_freeform.jpg",
+      "durationMs": 1400,
+      "wordsCount": 69,
+      "linesCount": 8,
+      "confidence": {
+        "median": 0.8,
+        "p25": 0.6,
+        "mean": 0.7
+      },
+      "qualityStatus": "acceptable",
+      "qualityScore": 78.48,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "fail",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_4_8901491100519_guided.jpg",
+      "durationMs": 900,
+      "wordsCount": 39,
+      "linesCount": 5,
+      "confidence": {
+        "median": 0.9,
+        "p25": 0.7,
+        "mean": 0.8
+      },
+      "qualityStatus": "acceptable",
+      "qualityScore": 78.56,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "fail",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": -30,
+      "confDelta": 0.1
+    },
+    "readabilityImproved": true
+  },
+  {
+    "item": {
+      "id": "off_5_8901764082405",
+      "name": "Kinley Mineral Water 1ltr",
+      "code": "8901764082405",
+      "category_note": "transparent bottle label",
+      "freeform_file": "off_5_8901764082405_freeform.jpg",
+      "guided_file": "off_5_8901764082405_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_5_8901764082405_freeform.jpg",
+      "durationMs": 1000,
+      "wordsCount": 45,
+      "linesCount": 20,
+      "confidence": {
+        "median": 0.4,
+        "p25": 0.1,
+        "mean": 0.4
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 79.28,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_5_8901764082405_guided.jpg",
+      "durationMs": 1200,
+      "wordsCount": 64,
+      "linesCount": 15,
+      "confidence": {
+        "median": 0.3,
+        "p25": 0.2,
+        "mean": 0.3
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 74.62,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": 19,
+      "confDelta": -0.1
+    },
+    "readabilityImproved": false
+  },
+  {
+    "item": {
+      "id": "off_6_8901030897542",
+      "name": "kissan fresh tomato",
+      "code": "8901030897542",
+      "category_note": "sauce bottle / pouch",
+      "freeform_file": "off_6_8901030897542_freeform.jpg",
+      "guided_file": "off_6_8901030897542_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_6_8901030897542_freeform.jpg",
+      "durationMs": 900,
+      "wordsCount": 4,
+      "linesCount": 3,
+      "confidence": {
+        "median": 0.2,
+        "p25": 0.1,
+        "mean": 0.2
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 72.64,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_6_8901030897542_guided.jpg",
+      "durationMs": 6100,
+      "wordsCount": 328,
+      "linesCount": 38,
+      "confidence": {
+        "median": 0.2,
+        "p25": 0.1,
+        "mean": 0.3
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 62.45,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": 324,
+      "confDelta": 0.0
+    },
+    "readabilityImproved": false
+  },
+  {
+    "item": {
+      "id": "off_7_8901063029255",
+      "name": "Jimjam 57g (57)",
+      "code": "8901063029255",
+      "category_note": "foil biscuit wrapper",
+      "freeform_file": "off_7_8901063029255_freeform.jpg",
+      "guided_file": "off_7_8901063029255_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_7_8901063029255_freeform.jpg",
+      "durationMs": 3600,
+      "wordsCount": 206,
+      "linesCount": 34,
+      "confidence": {
+        "median": 0.3,
+        "p25": 0.1,
+        "mean": 0.3
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 80.41,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_7_8901063029255_guided.jpg",
+      "durationMs": 2200,
+      "wordsCount": 123,
+      "linesCount": 29,
+      "confidence": {
+        "median": 0.3,
+        "p25": 0.1,
+        "mean": 0.3
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 78.44,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": -83,
+      "confDelta": 0.0
+    },
+    "readabilityImproved": false
+  },
+  {
+    "item": {
+      "id": "off_8_7622202225512",
+      "name": "Original Oreo",
+      "code": "7622202225512",
+      "category_note": "metallic foil tube",
+      "freeform_file": "off_8_7622202225512_freeform.jpg",
+      "guided_file": "off_8_7622202225512_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_8_7622202225512_freeform.jpg",
+      "durationMs": 1600,
+      "wordsCount": 12,
+      "linesCount": 5,
+      "confidence": {
+        "median": 0.4,
+        "p25": 0.2,
+        "mean": 0.5
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 62.46,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_8_7622202225512_guided.jpg",
+      "durationMs": 1300,
+      "wordsCount": 31,
+      "linesCount": 10,
+      "confidence": {
+        "median": 0.3,
+        "p25": 0.1,
+        "mean": 0.4
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 70.47,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": 19,
+      "confDelta": -0.1
+    },
+    "readabilityImproved": false
+  },
+  {
+    "item": {
+      "id": "off_9_7622202334009",
+      "name": "dairy milk",
+      "code": "7622202334009",
+      "category_note": "chocolate foil wrap",
+      "freeform_file": "off_9_7622202334009_freeform.jpg",
+      "guided_file": "off_9_7622202334009_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_9_7622202334009_freeform.jpg",
+      "durationMs": 600,
+      "wordsCount": 5,
+      "linesCount": 4,
+      "confidence": {
+        "median": 0.4,
+        "p25": 0.3,
+        "mean": 0.4
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 77.27,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_9_7622202334009_guided.jpg",
+      "durationMs": 700,
+      "wordsCount": 2,
+      "linesCount": 1,
+      "confidence": {
+        "median": 0.5,
+        "p25": 0.3,
+        "mean": 0.5
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 80.6,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": -3,
+      "confDelta": 0.1
+    },
+    "readabilityImproved": true
+  },
+  {
+    "item": {
+      "id": "off_10_8906010500245",
+      "name": "Balaji Wafers Masala Sev Murmura",
+      "code": "8906010500245",
+      "category_note": "snack namkeen pouch",
+      "freeform_file": "off_10_8906010500245_freeform.jpg",
+      "guided_file": "off_10_8906010500245_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_10_8906010500245_freeform.jpg",
+      "durationMs": 2900,
+      "wordsCount": 373,
+      "linesCount": 41,
+      "confidence": {
+        "median": 0.5,
+        "p25": 0.2,
+        "mean": 0.5
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 77.84,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_10_8906010500245_guided.jpg",
+      "durationMs": 1600,
+      "wordsCount": 129,
+      "linesCount": 16,
+      "confidence": {
+        "median": 0.8,
+        "p25": 0.4,
+        "mean": 0.7
+      },
+      "qualityStatus": "acceptable",
+      "qualityScore": 76.99,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "fail",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": -244,
+      "confDelta": 0.3
+    },
+    "readabilityImproved": true
+  },
+  {
+    "item": {
+      "id": "off_11_8901030535895",
+      "name": "Bru Instant Coffee",
+      "code": "8901030535895",
+      "category_note": "glass jar label",
+      "freeform_file": "off_11_8901030535895_freeform.jpg",
+      "guided_file": "off_11_8901030535895_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_11_8901030535895_freeform.jpg",
+      "durationMs": 2700,
+      "wordsCount": 111,
+      "linesCount": 17,
+      "confidence": {
+        "median": 0.3,
+        "p25": 0.2,
+        "mean": 0.4
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 71.64,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_11_8901030535895_guided.jpg",
+      "durationMs": 1700,
+      "wordsCount": 81,
+      "linesCount": 13,
+      "confidence": {
+        "median": 0.4,
+        "p25": 0.2,
+        "mean": 0.4
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 65.48,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": -30,
+      "confDelta": 0.1
+    },
+    "readabilityImproved": true
+  },
+  {
+    "item": {
+      "id": "off_12_8901063162914",
+      "name": "Marie Gold Biscuit",
+      "code": "8901063162914",
+      "category_note": "cylindrical biscuit roll",
+      "freeform_file": "off_12_8901063162914_freeform.jpg",
+      "guided_file": "off_12_8901063162914_guided.jpg"
+    },
+    "freeform": {
+      "variantKey": "freeform",
+      "filename": "off_12_8901063162914_freeform.jpg",
+      "durationMs": 19900,
+      "wordsCount": 1315,
+      "linesCount": 173,
+      "confidence": {
+        "median": 0.2,
+        "p25": 0.1,
+        "mean": 0.2
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 81.48,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "guided": {
+      "variantKey": "guided",
+      "filename": "off_12_8901063162914_guided.jpg",
+      "durationMs": 8500,
+      "wordsCount": 641,
+      "linesCount": 87,
+      "confidence": {
+        "median": 0.2,
+        "p25": 0.1,
+        "mean": 0.3
+      },
+      "qualityStatus": "retake_recommended",
+      "qualityScore": 75.44,
+      "retakeFailures": [],
+      "warningFailures": [],
+      "overallStatus": "manual_review",
+      "rawTextSample": ""
+    },
+    "deltas": {
+      "wordDelta": -674,
+      "confDelta": 0.0
+    },
+    "readabilityImproved": false
+  }
+]

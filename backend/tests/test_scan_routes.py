@@ -171,20 +171,33 @@ def test_real_test_fixtures_fit_under_max_ocr_words() -> None:
 
     from app.settings import DEFAULT_MAX_OCR_WORDS
 
-    fixtures_path = (
-        Path(__file__).resolve().parents[2]
-        / "real_test_labels"
-        / "e2e_real_test_results.json"
-    )
-    if not fixtures_path.exists():
+    labels_dir = Path(__file__).resolve().parents[2] / "real_test_labels"
+    e2e_path = labels_dir / "e2e_real_test_results.json"
+    stress_path = labels_dir / "off_stress_test_results.json"
+
+    if not e2e_path.exists():
         pytest.skip("real_test_labels not found")
-    data = json.loads(fixtures_path.read_text(encoding="utf-8"))
-    word_counts = [item.get("ocr", {}).get("wordCount", 0) for item in data]
-    assert word_counts, "No test cases found in fixtures"
-    max_count = max(word_counts)
-    assert max_count <= 368
-    assert max_count < DEFAULT_MAX_OCR_WORDS
-    assert (DEFAULT_MAX_OCR_WORDS - max_count) / max_count >= 0.40
+
+    e2e_data = json.loads(e2e_path.read_text(encoding="utf-8"))
+    e2e_counts = [item.get("ocr", {}).get("wordCount", 0) for item in e2e_data]
+    assert e2e_counts, "No test cases found in e2e fixtures"
+    e2e_max = max(e2e_counts)
+    assert e2e_max <= 368
+    assert e2e_max < DEFAULT_MAX_OCR_WORDS
+
+    assert stress_path.exists(), "off_stress_test_results.json must exist"
+    stress_data = json.loads(stress_path.read_text(encoding="utf-8"))
+    stress_counts = []
+    for item in stress_data:
+        stress_counts.append(item.get("freeform", {}).get("wordsCount", 0))
+        stress_counts.append(item.get("guided", {}).get("wordsCount", 0))
+    assert stress_counts, "No test cases found in stress fixtures"
+    stress_max = max(stress_counts)
+    assert stress_max <= 1315
+    assert stress_max < DEFAULT_MAX_OCR_WORDS
+
+    overall_max = max(e2e_max, stress_max)
+    assert (DEFAULT_MAX_OCR_WORDS - overall_max) / overall_max >= 0.50
 
 
 def test_concurrent_scans_succeed_under_wal_mode(client: TestClient) -> None:

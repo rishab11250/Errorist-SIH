@@ -23,6 +23,7 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const overrideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleCaptureRef = useRef<() => void>(() => undefined);
   const isCapturingRef = useRef(false);
   const readyStreakRef = useRef(0);
@@ -45,6 +46,10 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
+    }
+    if (overrideTimeoutRef.current) {
+      clearTimeout(overrideTimeoutRef.current);
+      overrideTimeoutRef.current = null;
     }
     if (streamRef.current) {
       for (const track of streamRef.current.getTracks()) {
@@ -202,8 +207,9 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
       }
 
       // Allow override after 3 seconds
-      const overrideTimeout = setTimeout(() => {
+      overrideTimeoutRef.current = setTimeout(() => {
         setCanOverride(true);
+        overrideTimeoutRef.current = null;
       }, 3000);
 
       // Start quality check interval (~450ms)
@@ -212,8 +218,6 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
       }, 450);
 
       timerRef.current = interval;
-
-      return () => clearTimeout(overrideTimeout);
     } catch (err) {
       const msg =
         err instanceof DOMException && err.name === 'NotAllowedError'

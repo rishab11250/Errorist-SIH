@@ -92,6 +92,20 @@ describe('inspection experience', () => {
     );
   });
 
+  it('stops camera tracks when the guided capture unmounts', async () => {
+    const track = { stop: vi.fn() };
+    const stream = { getTracks: () => [track] } as unknown as MediaStream;
+    const getUserMedia = vi.fn().mockResolvedValue(stream);
+    vi.stubGlobal('navigator', { ...navigator, mediaDevices: { getUserMedia } });
+
+    const { unmount } = render(<CameraCaptureGuide onCapture={() => undefined} />);
+    await waitFor(() => expect(getUserMedia).toHaveBeenCalledTimes(1));
+
+    unmount();
+
+    expect(track.stop).toHaveBeenCalledTimes(1);
+  });
+
   it('changes capture guidance when screenshot mode is selected', async () => {
     render(<InspectionCapture onComplete={() => undefined} />);
     await userEvent.click(screen.getByRole('radio', { name: 'E-commerce screenshot' }));

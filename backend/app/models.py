@@ -55,6 +55,8 @@ class HealthResponse(BaseModel):
 
 
 class ScanContextIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     mode: ModeValue = "retail_image"
     category: CategoryValue = "unknown"
     imported: bool | None = None
@@ -62,6 +64,8 @@ class ScanContextIn(BaseModel):
 
 
 class ImageMetaIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     width: int = Field(gt=0)
     height: int = Field(gt=0)
     dpi: float | None = Field(default=None, gt=0)
@@ -69,12 +73,16 @@ class ImageMetaIn(BaseModel):
 
 
 class OCRWordIn(BaseModel):
-    text: str
+    model_config = ConfigDict(extra="forbid")
+
+    text: str = Field(min_length=1, max_length=1000)
     confidence: float = Field(ge=0.0, le=1.0)
     bbox: NormalizedBBox
 
 
 class OCRLineIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     word_indexes: list[int] = Field(min_length=1)
     bbox: NormalizedBBox
     median_character_height: float = Field(gt=0.0, le=1.0)
@@ -90,7 +98,9 @@ class OCRLineIn(BaseModel):
 
 
 class ScanRequest(BaseModel):
-    image_b64: str
+    model_config = ConfigDict(extra="forbid")
+
+    image_b64: str = Field(min_length=1, max_length=13_333_336)
     image_meta: ImageMetaIn
     ocr_payload: list[OCRWordIn]
     scan_context: ScanContextIn = Field(default_factory=ScanContextIn)
@@ -133,17 +143,19 @@ class ExtractedFieldOut(BaseModel):
 
 
 class VerdictOut(BaseModel):
-    rule_id: str
+    model_config = ConfigDict(extra="forbid")
+
+    rule_id: str = Field(min_length=1, max_length=128)
     status: VerdictStatusValue
     severity: Literal["critical", "warning", "info"]
-    citation: str
-    evidence: str
+    citation: str = Field(min_length=1, max_length=512)
+    evidence: str = Field(max_length=2000)
     evidence_bboxes: list[NormalizedBBox] = Field(default_factory=list)
     confidence: float = Field(ge=0.0, le=1.0)
-    reasoning: str = Field(min_length=1)
+    reasoning: str = Field(min_length=1, max_length=4000)
     measurement_method: MeasurementMethodValue
-    failure_message: str | None
-    rule_version: str
+    failure_message: str | None = Field(max_length=2000)
+    rule_version: str = Field(min_length=1, max_length=128)
 
 
 class OfflineScanSyncRequest(BaseModel):
@@ -159,7 +171,7 @@ class OfflineScanSyncRequest(BaseModel):
     local_id: UUID
     captured_at: datetime
     rule_version: str = Field(min_length=1, max_length=128)
-    image_b64: str = Field(min_length=1)
+    image_b64: str = Field(min_length=1, max_length=13_333_336)
     ocr_payload: list[OCRWordIn]
     scan_context: ScanContextIn = Field(default_factory=ScanContextIn)
     verdicts: list[VerdictOut] = Field(min_length=1)

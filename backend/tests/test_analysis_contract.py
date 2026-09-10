@@ -54,6 +54,24 @@ def test_v2_request_accepts_lines_and_applicability_context() -> None:
     assert request.ocr_lines[0].word_indexes == [0]
 
 
+def test_scan_input_rejects_unexpected_nested_fields() -> None:
+    with pytest.raises(ValidationError):
+        _request(scan_context={"unexpected": True})
+
+
+def test_scan_input_rejects_oversized_ocr_text() -> None:
+    with pytest.raises(ValidationError):
+        _request(
+            ocr_payload=[
+                {
+                    "text": "x" * 1001,
+                    "confidence": 0.9,
+                    "bbox": [0.1, 0.1, 0.2, 0.2],
+                }
+            ]
+        )
+
+
 @pytest.mark.parametrize(
     "bbox",
     [

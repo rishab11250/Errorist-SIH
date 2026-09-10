@@ -260,6 +260,17 @@ def test_scan_rejects_empty_ocr(client: TestClient) -> None:
     assert "no_text_extracted" in response.text
 
 
+def test_scan_rejects_unexpected_input_fields_with_error_envelope(client: TestClient) -> None:
+    payload = _payload()
+    payload["scan_context"]["unexpected"] = True
+
+    response = client.post("/api/scan", json=payload)
+
+    assert response.status_code == 422
+    assert set(response.json()) == {"error", "detail", "request_id"}
+    assert response.json()["error"] == "validation_error"
+
+
 def test_get_scan_returns_full_record(client: TestClient) -> None:
     create = client.post("/api/scan", json=_payload())
     assert create.status_code == 201

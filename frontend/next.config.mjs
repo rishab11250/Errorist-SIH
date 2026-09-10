@@ -11,7 +11,7 @@ const contentSecurityPolicy = [
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
-  "connect-src 'self'",
+  "connect-src 'self' blob: data:",
   "object-src 'none'",
   "base-uri 'self'",
   "frame-ancestors 'none'",

@@ -38,7 +38,7 @@ await Promise.all(
   })
 );
 await copyFile(
-  join(languageRoot, '4.0.0', 'eng.traineddata.gz'),
+  join(languageRoot, '4.0.0_best_int', 'eng.traineddata.gz'),
   join(languageDestination, 'eng.traineddata.gz')
 );
 const licenseFiles = [

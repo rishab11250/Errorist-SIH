@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import math
-from datetime import date
+from datetime import date, datetime
 from typing import Annotated, Literal
+from uuid import UUID
 
-from pydantic import AfterValidator, BaseModel, Field, field_validator
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.errors import AppError
 from app.settings import DEFAULT_MAX_OCR_WORDS
@@ -146,6 +147,69 @@ class VerdictOut(BaseModel):
     measurement_method: MeasurementMethodValue
     failure_message: str | None
     rule_version: str
+
+
+class OfflineScanSyncRequest(BaseModel):
+    """Wire representation of an immutable on-device scan snapshot.
+
+    IndexedDB keeps the image as a Blob. The sync client converts only that
+    field to base64 for this JSON API; the remaining fields keep their stored
+    shapes unchanged.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    local_id: UUID
+    captured_at: datetime
+    rule_version: str = Field(min_length=1, max_length=128)
+    image_b64: str = Field(min_length=1)
+    ocr_payload: list[OCRWordIn]
+    scan_context: ScanContextIn = Field(default_factory=ScanContextIn)
+    verdicts: list[VerdictOut] = Field(min_length=1)
+
+    @field_validator("captured_at")
+    @classmethod
+    def captured_at_must_include_timezone(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("captured_at must include a timezone offset")
+        return value
+
+    @field_validator("rule_version")
+    @classmethod
+    def normalize_rule_version(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("rule_version must not be blank")
+        return normalized
+
+    @field_validator("ocr_payload")
+    @classmethod
+    def validate_sync_ocr_payload_length(cls, value: list[OCRWordIn]) -> list[OCRWordIn]:
+        if len(value) > DEFAULT_MAX_OCR_WORDS:
+            raise AppError(
+                422,
+                "ocr_payload_too_large",
+                f"OCR word count ({len(value)}) exceeds "
+                f"maximum allowed limit of {DEFAULT_MAX_OCR_WORDS}.",
+            )
+        return value
+
+    @model_validator(mode="after")
+    def validate_snapshot(self) -> OfflineScanSyncRequest:
+        if any(verdict.rule_version != self.rule_version for verdict in self.verdicts):
+            raise ValueError("every verdict rule_version must match capture rule_version")
+        rule_ids = [verdict.rule_id for verdict in self.verdicts]
+        if len(set(rule_ids)) != len(rule_ids):
+            raise ValueError("verdict rule_id values must be unique")
+        return self
+
+
+class OfflineScanSyncResponse(BaseModel):
+    scan_id: int
+    local_id: UUID
+    processing_status: Literal["complete"] = "complete"
+    rule_version: str
+    created: bool
 
 
 class ScanAnalysisResponse(BaseModel):

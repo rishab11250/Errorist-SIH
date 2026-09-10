@@ -67,6 +67,7 @@ def test_fresh_database_reaches_inspection_head(tmp_path) -> None:
         "failure_stage",
         "request_id",
         "processing_error_code",
+        "client_local_id",
     } <= _columns(path, "scans")
     assert {"confidence", "reasoning", "measurement_method", "review_state"} <= _columns(
         path, "verdicts"
@@ -74,6 +75,9 @@ def test_fresh_database_reaches_inspection_head(tmp_path) -> None:
     with sqlite3.connect(path) as connection:
         revision = connection.execute("SELECT version_num FROM alembic_version").fetchone()[0]
     assert revision == HEAD_REVISION
+    with sqlite3.connect(path) as connection:
+        indexes = {row[1]: bool(row[2]) for row in connection.execute("PRAGMA index_list(scans)")}
+    assert indexes["ix_scans_owner_client_local_id"] is True
 
 
 def test_unversioned_legacy_database_is_adopted_without_data_loss(tmp_path) -> None:

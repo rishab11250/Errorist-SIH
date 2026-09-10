@@ -19,6 +19,13 @@ export interface AuthUser {
   role: 'inspector' | 'admin';
 }
 
+export const OFFLINE_INSPECTOR: AuthUser = {
+  id: 0,
+  username: 'offline',
+  display_name: 'Offline inspector',
+  role: 'inspector',
+};
+
 interface UserEnvelope {
   user: AuthUser;
 }
@@ -54,6 +61,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error instanceof ApiError && error.status === 401) {
         setUser(null);
         return null;
+      }
+      if (error instanceof TypeError) {
+        setUser(OFFLINE_INSPECTOR);
+        return OFFLINE_INSPECTOR;
       }
       throw error;
     }

@@ -32,6 +32,7 @@ export const emptyScanFilters: ScanFiltersValue = {
 
 export interface HistoryItem {
   scan_id: number;
+  local_id: string | null;
   thumbnail_b64: string;
   overall_status: OverallFilter;
   verdict_count: number;
@@ -40,6 +41,8 @@ export interface HistoryItem {
   category: ScanCategory;
   owner_user_id: number | null;
   verdict_summary: Record<VerdictFilter, number>;
+  rule_version: string | null;
+  rule_versions: string[];
   created_at: string;
 }
 

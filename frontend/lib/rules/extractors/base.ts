@@ -1,4 +1,4 @@
-import type { BoundingBox, ExtractedField, OCRWord } from './domain';
+import type { BoundingBox, ExtractedField, OCRWord } from '../domain';
 
 export function wordsToText(words: OCRWord[]): string {
   return words.map((w) => w.text).join(' ');

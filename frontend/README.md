@@ -32,6 +32,14 @@ Production deployments should put Next.js behind HTTPS, set the backend's `LMPC_
 
 The production Content Security Policy keeps `connect-src` at `'self'`; label OCR must not depend on a CDN or other runtime internet service. Re-run `pnpm ocr:assets` after changing a pinned Tesseract package.
 
+## Installable offline shell
+
+`pnpm build` generates `public/sw.js` from the production build output. The service worker precaches every hashed Next.js static asset, the web app manifest and icons, and every file under `public/tesseract/`. It also keeps the last successful capture-page HTML response as the navigation fallback. The generated worker is build-specific and intentionally ignored by Git.
+
+The service worker is registered only in production. Verify it with `pnpm build && pnpm start`, visit the capture page once while online, then use the browser's offline network mode and reload. A transport failure during `/api/auth/me` uses a non-privileged offline inspector shell.
+
+Pending on-device results use the fixed `lmpc-offline` IndexedDB database and `pending_scans` store. The service worker registers the `lmpc-sync-pending-scans` Background Sync task; browsers without that API retry while the installed app is open when connectivity returns. Sync requests go to the idempotent `/api/scan/sync` endpoint, which stores the pre-computed verdict snapshot with its capture-time `rule_version` instead of re-running the backend's current rules. The workspace indicator counts pending, syncing, and failed records. Safari and iOS cannot retry after the app has been fully closed, so reopen the app after connectivity returns.
+
 ## LMPC Rules Pipeline and Synchronization
 
 The client-side rules engine reads precompiled rules from `frontend/lib/rules/rules.json`, which is derived from the single source of truth in `backend/app/rules.yaml`.

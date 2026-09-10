@@ -12,6 +12,8 @@ __pycache__/
 node_modules/
 .next/
 out/
+frontend/public/sw.js
+frontend/public/offline/idb.js
 .pnpm-store/
 *.tsbuildinfo
 next-env.d.ts

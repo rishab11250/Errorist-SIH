@@ -112,6 +112,7 @@ export type ScanResponse = ScanAnalysisResponse;
 export interface StoredScanResponse {
   scan: {
     id: number;
+    local_id: string | null;
     mode: ScanContext['mode'];
     category: ScanContext['category'];
     overall_status: OverallStatus;

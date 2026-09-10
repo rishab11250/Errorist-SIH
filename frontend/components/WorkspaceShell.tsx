@@ -8,6 +8,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Toaster } from '@/components/ui/toaster';
+import { SyncStatusIndicator } from '@/components/pwa/SyncStatusIndicator';
 import { cn } from '@/lib/cn';
 import { useAuth, type AuthUser } from '@/lib/auth';
 
@@ -139,6 +140,7 @@ function WorkspaceFrame({
         </Link>
         <Navigation user={user} />
         <div className="mt-auto">
+          <SyncStatusIndicator className="mb-4 w-full justify-center" />
           <Account user={user} onSignOut={onSignOut} />
         </div>
       </aside>
@@ -149,23 +151,26 @@ function WorkspaceFrame({
             <ShieldCheck aria-hidden="true" className="size-5 text-primary" />
             LMPC Inspector
           </Link>
-          <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon" aria-label="Open navigation">
-                <Menu aria-hidden="true" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="left-auto right-0 top-0 h-dvh max-w-xs translate-x-0 translate-y-0 rounded-none p-5">
-              <DialogTitle className="mb-6 flex items-center gap-2">
-                <ShieldCheck aria-hidden="true" className="size-5 text-primary" />
-                Inspection workspace
-              </DialogTitle>
-              <Navigation user={user} onNavigate={() => setMenuOpen(false)} />
-              <div className="mt-auto pt-8">
-                <Account user={user} onSignOut={onSignOut} />
-              </div>
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center gap-2">
+            <SyncStatusIndicator className="max-w-44" />
+            <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="Open navigation">
+                  <Menu aria-hidden="true" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="left-auto right-0 top-0 h-dvh max-w-xs translate-x-0 translate-y-0 rounded-none p-5">
+                <DialogTitle className="mb-6 flex items-center gap-2">
+                  <ShieldCheck aria-hidden="true" className="size-5 text-primary" />
+                  Inspection workspace
+                </DialogTitle>
+                <Navigation user={user} onNavigate={() => setMenuOpen(false)} />
+                <div className="mt-auto pt-8">
+                  <Account user={user} onSignOut={onSignOut} />
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </header>
         <main id="main-content" tabIndex={-1} className="min-w-0">
           {children}

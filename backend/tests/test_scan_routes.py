@@ -4,13 +4,16 @@ from __future__ import annotations
 
 import base64
 import io
+from datetime import datetime
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw
 
 from app import db, main
-from app.db import Scan
+from app.db import Scan, VerdictRow
+from app.exports.view_model import load_report_model
 from app.main import app
 
 
@@ -67,6 +70,174 @@ def _payload() -> dict:
         "ocr_payload": words,
         "scan_context": {"mode": "retail_image", "category": "non_food"},
     }
+
+
+def _offline_sync_payload(*, local_id: str | None = None) -> dict:
+    payload = _payload()
+    rule_version = "device-rules-2026-08"
+    return {
+        "local_id": local_id or str(uuid4()),
+        "captured_at": "2026-08-31T18:45:00+05:30",
+        "rule_version": rule_version,
+        "image_b64": payload["image_b64"],
+        "ocr_payload": payload["ocr_payload"],
+        "scan_context": payload["scan_context"],
+        "verdicts": [
+            {
+                "rule_id": "r6_1_e_mrp",
+                "status": "fail",
+                "severity": "critical",
+                "citation": "Rule 6(1)(e)",
+                "evidence": "MRP missing",
+                "evidence_bboxes": [[0.10, 0.32, 0.20, 0.07]],
+                "confidence": 0.91,
+                "reasoning": "The on-device snapshot found no valid declaration.",
+                "measurement_method": "direct_metadata",
+                "failure_message": "MRP is required.",
+                "rule_version": rule_version,
+            },
+            {
+                "rule_id": "r6_1_c_net_quantity",
+                "status": "pass",
+                "severity": "critical",
+                "citation": "Rule 6(1)(c)",
+                "evidence": "500 g",
+                "evidence_bboxes": [[0.16, 0.24, 0.10, 0.06]],
+                "confidence": 0.96,
+                "reasoning": "The quantity and unit are present.",
+                "measurement_method": "direct_metadata",
+                "failure_message": None,
+                "rule_version": rule_version,
+            },
+        ],
+    }
+
+
+def test_offline_sync_persists_capture_time_snapshot_without_reanalysis(
+    client: TestClient,
+    monkeypatch,
+) -> None:
+    def fail_if_reanalyzed(*args, **kwargs):
+        raise AssertionError("offline verdict snapshots must not be recomputed")
+
+    monkeypatch.setattr("app.scan_routes.analyze_scan", fail_if_reanalyzed)
+    payload = _offline_sync_payload()
+    assert client.get("/api/health").json()["rules_version"] != payload["rule_version"]
+
+    response = client.post("/api/scan/sync", json=payload)
+
+    assert response.status_code == 201, response.text
+    body = response.json()
+    assert body == {
+        "scan_id": body["scan_id"],
+        "local_id": payload["local_id"],
+        "processing_status": "complete",
+        "rule_version": payload["rule_version"],
+        "created": True,
+    }
+    assert UUID(body["local_id"]) == UUID(payload["local_id"])
+
+    stored = client.get(f"/api/scan/{body['scan_id']}")
+    assert stored.status_code == 200
+    stored_body = stored.json()
+    assert stored_body["scan"]["local_id"] == payload["local_id"]
+    assert stored_body["scan"]["created_at"] == "2026-08-31T13:15:00"
+    assert stored_body["scan"]["overall_status"] == "fail"
+    assert {item["rule_version"] for item in stored_body["verdicts"]} == {
+        payload["rule_version"]
+    }
+    assert {item["rule_id"] for item in stored_body["verdicts"]} == {
+        "r6_1_e_mrp",
+        "r6_1_c_net_quantity",
+    }
+
+    history = client.get("/api/history").json()["items"]
+    synced_item = next(item for item in history if item["scan_id"] == body["scan_id"])
+    assert synced_item["local_id"] == payload["local_id"]
+    assert synced_item["rule_version"] == payload["rule_version"]
+    assert synced_item["rule_versions"] == [payload["rule_version"]]
+
+    assert db.SessionLocal is not None
+    with db.SessionLocal() as session:
+        scan = session.get(Scan, body["scan_id"])
+        assert scan is not None
+        assert scan.created_at == datetime(2026, 8, 31, 13, 15)
+        assert scan.analysis_version == "offline-ts-engine"
+        assert scan.image_meta["width"] == 400
+        assert scan.image_meta["height"] == 600
+        rows = session.query(VerdictRow).filter_by(scan_id=scan.id).all()
+        assert {row.rule_version for row in rows} == {payload["rule_version"]}
+        report = load_report_model(session, scan.owner, scan.id)
+        assert report is not None
+        assert report.rules_versions == (payload["rule_version"],)
+
+
+def test_offline_sync_retry_is_idempotent(client: TestClient) -> None:
+    payload = _offline_sync_payload()
+
+    first = client.post("/api/scan/sync", json=payload)
+    retry = client.post("/api/scan/sync", json=payload)
+
+    assert first.status_code == 201
+    assert retry.status_code == 200
+    assert retry.json() == {
+        "scan_id": first.json()["scan_id"],
+        "local_id": payload["local_id"],
+        "processing_status": "complete",
+        "rule_version": payload["rule_version"],
+        "created": False,
+    }
+    assert db.SessionLocal is not None
+    with db.SessionLocal() as session:
+        assert session.query(Scan).filter_by(client_local_id=payload["local_id"]).count() == 1
+
+
+def test_offline_sync_rejects_reused_local_id_for_changed_snapshot(client: TestClient) -> None:
+    payload = _offline_sync_payload()
+    assert client.post("/api/scan/sync", json=payload).status_code == 201
+    payload["verdicts"][0]["status"] = "pass"
+
+    response = client.post("/api/scan/sync", json=payload)
+
+    assert response.status_code == 409
+    assert response.json()["error"] == "sync_conflict"
+
+
+@pytest.mark.parametrize(
+    ("mutate", "message"),
+    [
+        (
+            lambda payload: payload["verdicts"][0].update(rule_version="server-current"),
+            "must match capture rule_version",
+        ),
+        (
+            lambda payload: payload["verdicts"].append(dict(payload["verdicts"][0])),
+            "rule_id values must be unique",
+        ),
+    ],
+)
+def test_offline_sync_rejects_ambiguous_verdict_snapshots(
+    client: TestClient,
+    mutate,
+    message: str,
+) -> None:
+    payload = _offline_sync_payload()
+    mutate(payload)
+
+    response = client.post("/api/scan/sync", json=payload)
+
+    assert response.status_code == 422
+    assert message in response.json()["detail"]
+
+
+def test_offline_sync_requires_uuid_and_timezone_aware_capture_time(client: TestClient) -> None:
+    payload = _offline_sync_payload(local_id="not-a-uuid")
+    payload["captured_at"] = "2026-08-31T13:15:00"
+
+    response = client.post("/api/scan/sync", json=payload)
+
+    assert response.status_code == 422
+    assert response.json()["error"] == "validation_error"
 
 
 def test_scan_endpoint_returns_201_and_verdicts(client: TestClient) -> None:
@@ -217,5 +388,3 @@ def test_concurrent_scans_succeed_under_wal_mode(client: TestClient) -> None:
         results = [f.result() for f in futures]
 
     assert all(r.status_code == 201 for r in results)
-
-

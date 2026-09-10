@@ -5,7 +5,9 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.analysis_pipeline import PipelineError, analyze_scan
@@ -13,9 +15,15 @@ from app.auth.dependencies import authorized_scan, get_auth_settings, require_us
 from app.db import Scan, User, VerdictRow, get_session
 from app.domain import AnalysisResult, ExtractedField, QualitySummary, Verdict
 from app.errors import AppError
-from app.models import ScanAnalysisResponse, ScanRequest
+from app.models import (
+    OfflineScanSyncRequest,
+    OfflineScanSyncResponse,
+    ScanAnalysisResponse,
+    ScanRequest,
+)
 from app.rules_loader import get_active_rules
 from app.settings import AuthSettings
+from app.visual_analysis.image_io import ImageDecodeError, decode_image
 
 router = APIRouter(prefix="/api", tags=["scan"])
 
@@ -83,6 +91,141 @@ def _verdict_row(verdict: Verdict) -> VerdictRow:
     )
 
 
+def _snapshot_overall_status(req: OfflineScanSyncRequest) -> str:
+    statuses = {verdict.status for verdict in req.verdicts}
+    if "fail" in statuses:
+        return "fail"
+    if "manual_review" in statuses:
+        return "manual_review"
+    if "warn" in statuses:
+        return "mixed"
+    return "pass"
+
+
+def _decode_sync_image(image_b64: str, settings: AuthSettings):
+    try:
+        return decode_image(
+            image_b64,
+            max_bytes=settings.max_upload_bytes,
+            max_pixels=settings.max_image_pixels,
+        )
+    except ImageDecodeError as exc:
+        status, error, detail = {
+            "invalid_image": (400, "invalid_image", "The supplied file is not a supported image."),
+            "image_too_large": (
+                413,
+                "image_too_large",
+                "The image exceeds the allowed byte or pixel limit.",
+            ),
+            "image_decode_failed": (
+                422,
+                "image_decode_failed",
+                "The image payload could not be decoded.",
+            ),
+        }.get(
+            exc.code,
+            (422, "image_decode_failed", "The image payload could not be decoded."),
+        )
+        raise AppError(status, error, detail) from exc
+
+
+def _sync_verdict_row(verdict, captured_at: datetime, rule_version: str) -> VerdictRow:
+    return VerdictRow(
+        rule_id=verdict.rule_id,
+        status=verdict.status,
+        severity=verdict.severity,
+        citation=verdict.citation,
+        evidence=verdict.evidence,
+        evidence_bboxes=[list(box) for box in verdict.evidence_bboxes],
+        confidence=verdict.confidence,
+        reasoning=verdict.reasoning,
+        measurement_method=verdict.measurement_method,
+        failure_message=verdict.failure_message,
+        rule_version=rule_version,
+        created_at=captured_at,
+    )
+
+
+def _find_synced_scan(session: Session, owner_user_id: int, local_id: str) -> Scan | None:
+    return session.scalar(
+        select(Scan).where(
+            Scan.owner_user_id == owner_user_id,
+            Scan.client_local_id == local_id,
+        )
+    )
+
+
+def _stored_rule_version(session: Session, scan: Scan) -> str:
+    session.refresh(scan, attribute_names=["verdicts"])
+    versions = {verdict.rule_version for verdict in scan.verdicts}
+    if len(versions) != 1:
+        raise AppError(
+            409,
+            "sync_conflict",
+            "The local scan identifier already refers to an incompatible snapshot.",
+        )
+    return versions.pop()
+
+
+def _submitted_verdicts(req: OfflineScanSyncRequest) -> list[dict]:
+    return sorted(
+        [verdict.model_dump(mode="json") for verdict in req.verdicts],
+        key=lambda verdict: verdict["rule_id"],
+    )
+
+
+def _stored_verdicts(scan: Scan) -> list[dict]:
+    return sorted(
+        [
+            {
+                "rule_id": verdict.rule_id,
+                "status": verdict.status,
+                "severity": verdict.severity,
+                "citation": verdict.citation,
+                "evidence": verdict.evidence,
+                "evidence_bboxes": verdict.evidence_bboxes,
+                "confidence": verdict.confidence,
+                "reasoning": verdict.reasoning,
+                "measurement_method": verdict.measurement_method,
+                "failure_message": verdict.failure_message,
+                "rule_version": verdict.rule_version,
+            }
+            for verdict in scan.verdicts
+        ],
+        key=lambda verdict: verdict["rule_id"],
+    )
+
+
+def _existing_sync_response(
+    session: Session,
+    scan: Scan,
+    req: OfflineScanSyncRequest,
+    captured_at: datetime,
+) -> OfflineScanSyncResponse:
+    stored_version = _stored_rule_version(session, scan)
+    submitted_ocr = [word.model_dump(mode="json") for word in req.ocr_payload]
+    if (
+        stored_version != req.rule_version
+        or scan.created_at != captured_at
+        or scan.mode != req.scan_context.mode
+        or scan.category != req.scan_context.category
+        or scan.image_b64 != req.image_b64
+        or scan.ocr_payload != submitted_ocr
+        or _stored_verdicts(scan) != _submitted_verdicts(req)
+    ):
+        raise AppError(
+            409,
+            "sync_conflict",
+            "The local scan identifier already refers to an incompatible snapshot.",
+        )
+    return OfflineScanSyncResponse(
+        scan_id=scan.id,
+        local_id=req.local_id,
+        rule_version=stored_version,
+        created=False,
+    )
+
+
 def _mark_failed(
     session: Session,
     scan_id: int,
@@ -119,6 +262,67 @@ def _store_complete(scan: Scan, result: AnalysisResult) -> None:
     scan.failure_stage = None
     scan.processing_error_code = None
     scan.verdicts = [_verdict_row(verdict) for verdict in result.verdicts]
+
+
+@router.post("/scan/sync", response_model=OfflineScanSyncResponse, status_code=201)
+def sync_offline_scan(
+    req: OfflineScanSyncRequest,
+    request: Request,
+    response: Response,
+    session: Annotated[Session, Depends(get_session)],
+    current_user: Annotated[User, Depends(require_user)],
+    settings: Annotated[AuthSettings, Depends(get_auth_settings)],
+) -> OfflineScanSyncResponse:
+    """Persist an on-device verdict snapshot without running active backend rules."""
+    local_id = str(req.local_id)
+    captured_at = req.captured_at.astimezone(UTC).replace(tzinfo=None)
+    existing = _find_synced_scan(session, current_user.id, local_id)
+    if existing is not None:
+        response.status_code = 200
+        return _existing_sync_response(session, existing, req, captured_at)
+
+    decoded = _decode_sync_image(req.image_b64, settings)
+    image_meta = dict(decoded.metadata)
+    image_meta.update({"width": decoded.width, "height": decoded.height})
+    scan = Scan(
+        created_at=captured_at,
+        mode=req.scan_context.mode,
+        category=req.scan_context.category,
+        image_b64=req.image_b64,
+        image_meta=image_meta,
+        ocr_payload=[word.model_dump(mode="json") for word in req.ocr_payload],
+        overall_status=_snapshot_overall_status(req),
+        schema_version=2,
+        processing_status="complete",
+        analysis_version="offline-ts-engine",
+        updated_at=datetime.now(UTC),
+        request_id=request.state.request_id,
+        quality_summary={},
+        extracted_fields={},
+        owner_user_id=current_user.id,
+        client_local_id=local_id,
+        verdicts=[
+            _sync_verdict_row(verdict, captured_at, req.rule_version)
+            for verdict in req.verdicts
+        ],
+    )
+    session.add(scan)
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        existing = _find_synced_scan(session, current_user.id, local_id)
+        if existing is None:
+            raise
+        response.status_code = 200
+        return _existing_sync_response(session, existing, req, captured_at)
+    session.refresh(scan)
+    return OfflineScanSyncResponse(
+        scan_id=scan.id,
+        local_id=req.local_id,
+        rule_version=req.rule_version,
+        created=True,
+    )
 
 
 @router.post("/scan", response_model=ScanAnalysisResponse, status_code=201)
@@ -203,6 +407,7 @@ def get_scan(
     return {
         "scan": {
             "id": scan.id,
+            "local_id": scan.client_local_id,
             "created_at": scan.created_at.isoformat(),
             "updated_at": scan.updated_at.isoformat() if scan.updated_at else None,
             "mode": scan.mode,

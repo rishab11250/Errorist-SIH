@@ -81,7 +81,15 @@ class SessionRow(Base):
 
 class Scan(Base):
     __tablename__ = "scans"
-    __table_args__ = (Index("ix_scans_owner_created_at", "owner_user_id", "created_at"),)
+    __table_args__ = (
+        Index("ix_scans_owner_created_at", "owner_user_id", "created_at"),
+        Index(
+            "ix_scans_owner_client_local_id",
+            "owner_user_id",
+            "client_local_id",
+            unique=True,
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
@@ -102,6 +110,7 @@ class Scan(Base):
     request_id: Mapped[str | None] = mapped_column(String, nullable=True)
     processing_error_code: Mapped[str | None] = mapped_column(String, nullable=True)
     owner_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    client_local_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     owner: Mapped[User | None] = relationship(back_populates="scans")
     verdicts: Mapped[list[VerdictRow]] = relationship(
         back_populates="scan", cascade="all, delete-orphan"

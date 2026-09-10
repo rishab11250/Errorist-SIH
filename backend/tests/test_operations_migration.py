@@ -7,7 +7,7 @@ from alembic import command
 from alembic.config import Config
 from sqlalchemy import create_engine, inspect
 
-from app.migrations import upgrade_database
+from app.migrations import HEAD_REVISION, upgrade_database
 
 
 def _inspection_v2_database(path: Path) -> Path:
@@ -66,5 +66,5 @@ def test_existing_inspection_scan_remains_unowned_after_operations_migration(tmp
             "SELECT id, owner_user_id FROM scans WHERE id = 7"
         ).fetchone() == (7, None)
         assert connection.execute("SELECT version_num FROM alembic_version").fetchone() == (
-            "0003_operations",
+            HEAD_REVISION,
         )

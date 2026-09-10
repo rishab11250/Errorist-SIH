@@ -135,8 +135,10 @@ def _history_item(scan: Scan) -> dict:
         status: sum(verdict.status == status for verdict in scan.verdicts)
         for status in _VERDICT_STATUSES
     }
+    rule_versions = sorted({verdict.rule_version for verdict in scan.verdicts})
     return {
         "scan_id": scan.id,
+        "local_id": scan.client_local_id,
         "thumbnail_b64": scan.image_b64,
         "thumbnail": scan.image_b64,
         "overall_status": scan.overall_status,
@@ -146,6 +148,8 @@ def _history_item(scan: Scan) -> dict:
         "category": scan.category,
         "owner_user_id": scan.owner_user_id,
         "verdict_summary": summary,
+        "rule_version": rule_versions[0] if len(rule_versions) == 1 else None,
+        "rule_versions": rule_versions,
         "created_at": scan.created_at.isoformat(),
     }
 

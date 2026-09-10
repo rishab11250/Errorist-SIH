@@ -80,11 +80,3 @@ pnpm build
 ```
 
 See [backend/README.md](backend/README.md) for deployment, security, migration, backup, and role details; see [frontend/README.md](frontend/README.md) for the same-origin proxy, local OCR assets, and frontend commands.
-
-## Design and implementation records
-
-- Core design: `docs/superpowers/specs/2026-09-06-lmpc-compliance-checker-design.md`
-- Operations design: `docs/superpowers/specs/2026-09-07-operations-experience-design.md`
-- Inspection intelligence plan: `docs/superpowers/plans/2026-09-07-inspection-intelligence.md`
-- Operations plan: `docs/superpowers/plans/2026-09-07-operations-experience.md`
-- Validation plan: `docs/superpowers/plans/2026-09-07-validation-demo-readiness.md`

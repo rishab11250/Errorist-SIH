@@ -75,7 +75,7 @@ class ImageMetaIn(BaseModel):
 class OCRWordIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    text: str = Field(min_length=1, max_length=1000)
+    text: str = Field(max_length=1000)
     confidence: float = Field(ge=0.0, le=1.0)
     bbox: NormalizedBBox
 

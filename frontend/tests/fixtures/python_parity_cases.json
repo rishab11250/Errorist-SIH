@@ -1,0 +1,4249 @@
+{
+  "mrp": [
+    {
+      "name": "with_inclusive_phrase",
+      "words": [
+        {
+          "text": "MRP",
+          "confidence": 0.95,
+          "bbox": [
+            10,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "Rs.99.00",
+          "confidence": 0.93,
+          "bbox": [
+            50,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "(Incl.",
+          "confidence": 0.91,
+          "bbox": [
+            135,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.95,
+          "bbox": [
+            185,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "all",
+          "confidence": 0.95,
+          "bbox": [
+            210,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "taxes)",
+          "confidence": 0.92,
+          "bbox": [
+            240,
+            100,
+            60,
+            22
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "phrase": "(?i)\\b(?:incl\\.?|inclusive)\\s*(?:of\\s+)?all\\s+taxes?\\b",
+      "expected": {
+        "name": "mrp",
+        "value": "99.00",
+        "bbox": [
+          10,
+          100,
+          290,
+          22
+        ],
+        "confidence": 0.936,
+        "evidence_spans": [
+          [
+            10,
+            100,
+            60,
+            22
+          ],
+          [
+            135,
+            100,
+            60,
+            22
+          ],
+          [
+            185,
+            100,
+            60,
+            22
+          ],
+          [
+            210,
+            100,
+            60,
+            22
+          ],
+          [
+            240,
+            100,
+            60,
+            22
+          ]
+        ]
+      }
+    },
+    {
+      "name": "without_phrase",
+      "words": [
+        {
+          "text": "MRP",
+          "confidence": 0.95,
+          "bbox": [
+            10,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "Rs.99",
+          "confidence": 0.93,
+          "bbox": [
+            50,
+            100,
+            60,
+            22
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "phrase": "(?i)\\b(?:incl\\.?|inclusive)\\s*(?:of\\s+)?all\\s+taxes?\\b",
+      "expected": {
+        "name": "mrp",
+        "value": null,
+        "bbox": [
+          10,
+          100,
+          60,
+          22
+        ],
+        "confidence": 0.95,
+        "evidence_spans": [
+          [
+            10,
+            100,
+            60,
+            22
+          ]
+        ]
+      }
+    },
+    {
+      "name": "rupee_symbol",
+      "words": [
+        {
+          "text": "\u20b999.00",
+          "confidence": 0.95,
+          "bbox": [
+            10,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "Inclusive",
+          "confidence": 0.92,
+          "bbox": [
+            80,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.95,
+          "bbox": [
+            145,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "all",
+          "confidence": 0.95,
+          "bbox": [
+            170,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "taxes",
+          "confidence": 0.92,
+          "bbox": [
+            200,
+            100,
+            60,
+            22
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "phrase": "(?i)\\b(?:incl\\.?|inclusive)\\s*(?:of\\s+)?all\\s+taxes?\\b",
+      "expected": {
+        "name": "mrp",
+        "value": "99.00",
+        "bbox": [
+          10,
+          100,
+          250,
+          22
+        ],
+        "confidence": 0.938,
+        "evidence_spans": [
+          [
+            10,
+            100,
+            60,
+            22
+          ],
+          [
+            80,
+            100,
+            60,
+            22
+          ],
+          [
+            145,
+            100,
+            60,
+            22
+          ],
+          [
+            170,
+            100,
+            60,
+            22
+          ],
+          [
+            200,
+            100,
+            60,
+            22
+          ]
+        ]
+      }
+    },
+    {
+      "name": "spaced_prefix_ocr_noise",
+      "words": [
+        {
+          "text": "M",
+          "confidence": 0.92,
+          "bbox": [
+            10,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "R",
+          "confidence": 0.93,
+          "bbox": [
+            25,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "P",
+          "confidence": 0.94,
+          "bbox": [
+            40,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": ":",
+          "confidence": 0.9,
+          "bbox": [
+            55,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "Rs.",
+          "confidence": 0.92,
+          "bbox": [
+            70,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "5O.OO",
+          "confidence": 0.88,
+          "bbox": [
+            100,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "Incl.",
+          "confidence": 0.91,
+          "bbox": [
+            150,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.95,
+          "bbox": [
+            190,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "all",
+          "confidence": 0.95,
+          "bbox": [
+            215,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "taxes",
+          "confidence": 0.92,
+          "bbox": [
+            245,
+            100,
+            60,
+            22
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "phrase": "(?i)\\b(?:incl\\.?|inclusive)\\s*(?:of\\s+)?all\\s+taxes?\\b",
+      "expected": {
+        "name": "mrp",
+        "value": "50.00",
+        "bbox": [
+          10,
+          100,
+          295,
+          22
+        ],
+        "confidence": 0.93,
+        "evidence_spans": [
+          [
+            10,
+            100,
+            60,
+            22
+          ],
+          [
+            150,
+            100,
+            60,
+            22
+          ],
+          [
+            190,
+            100,
+            60,
+            22
+          ],
+          [
+            215,
+            100,
+            60,
+            22
+          ],
+          [
+            245,
+            100,
+            60,
+            22
+          ]
+        ]
+      }
+    },
+    {
+      "name": "spaced_prefix_no_currency",
+      "words": [
+        {
+          "text": "M",
+          "confidence": 0.95,
+          "bbox": [
+            10,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "R",
+          "confidence": 0.95,
+          "bbox": [
+            25,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "P",
+          "confidence": 0.95,
+          "bbox": [
+            40,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": ":",
+          "confidence": 0.95,
+          "bbox": [
+            55,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "50.00",
+          "confidence": 0.95,
+          "bbox": [
+            75,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "Incl.",
+          "confidence": 0.91,
+          "bbox": [
+            140,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.95,
+          "bbox": [
+            180,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "all",
+          "confidence": 0.95,
+          "bbox": [
+            205,
+            100,
+            60,
+            22
+          ]
+        },
+        {
+          "text": "taxes",
+          "confidence": 0.92,
+          "bbox": [
+            235,
+            100,
+            60,
+            22
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "phrase": "(?i)\\b(?:incl\\.?|inclusive)\\s*(?:of\\s+)?all\\s+taxes?\\b",
+      "expected": {
+        "name": "mrp",
+        "value": "50.00",
+        "bbox": [
+          10,
+          100,
+          285,
+          22
+        ],
+        "confidence": 0.936,
+        "evidence_spans": [
+          [
+            10,
+            100,
+            60,
+            22
+          ],
+          [
+            140,
+            100,
+            60,
+            22
+          ],
+          [
+            180,
+            100,
+            60,
+            22
+          ],
+          [
+            205,
+            100,
+            60,
+            22
+          ],
+          [
+            235,
+            100,
+            60,
+            22
+          ]
+        ]
+      }
+    },
+    {
+      "name": "normalized_coords_evidence_spans",
+      "words": [
+        {
+          "text": "MRP",
+          "confidence": 0.95,
+          "bbox": [
+            0.02,
+            0.3,
+            0.08,
+            0.04
+          ]
+        },
+        {
+          "text": "Rs.199",
+          "confidence": 0.94,
+          "bbox": [
+            0.11,
+            0.3,
+            0.12,
+            0.04
+          ]
+        },
+        {
+          "text": "Inclusive",
+          "confidence": 0.92,
+          "bbox": [
+            0.24,
+            0.3,
+            0.14,
+            0.04
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.95,
+          "bbox": [
+            0.39,
+            0.3,
+            0.04,
+            0.04
+          ]
+        },
+        {
+          "text": "all",
+          "confidence": 0.95,
+          "bbox": [
+            0.44,
+            0.3,
+            0.05,
+            0.04
+          ]
+        },
+        {
+          "text": "taxes",
+          "confidence": 0.93,
+          "bbox": [
+            0.5,
+            0.3,
+            0.08,
+            0.04
+          ]
+        },
+        {
+          "text": "Customer",
+          "confidence": 0.9,
+          "bbox": [
+            0.02,
+            0.8,
+            0.15,
+            0.04
+          ]
+        },
+        {
+          "text": "care@acme.com",
+          "confidence": 0.92,
+          "bbox": [
+            0.02,
+            0.85,
+            0.2,
+            0.05
+          ]
+        }
+      ],
+      "meta": {
+        "width": 1000,
+        "height": 1000
+      },
+      "phrase": "(?i)\\b(?:incl\\.?|inclusive)\\s*(?:of\\s+)?all\\s+taxes?\\b",
+      "expected": {
+        "name": "mrp",
+        "value": "199",
+        "bbox": [
+          0.02,
+          0.3,
+          0.5599999999999999,
+          0.03999999999999998
+        ],
+        "confidence": 0.94,
+        "evidence_spans": [
+          [
+            0.02,
+            0.3,
+            0.08,
+            0.04
+          ],
+          [
+            0.24,
+            0.3,
+            0.14,
+            0.04
+          ],
+          [
+            0.39,
+            0.3,
+            0.04,
+            0.04
+          ],
+          [
+            0.44,
+            0.3,
+            0.05,
+            0.04
+          ],
+          [
+            0.5,
+            0.3,
+            0.08,
+            0.04
+          ]
+        ]
+      }
+    }
+  ],
+  "manufacturer": [
+    {
+      "name": "mfg_with_pin",
+      "words": [
+        {
+          "text": "Mfg:",
+          "confidence": 0.9,
+          "bbox": [
+            10,
+            10,
+            40,
+            18
+          ]
+        },
+        {
+          "text": "by:",
+          "confidence": 0.9,
+          "bbox": [
+            55,
+            10,
+            25,
+            18
+          ]
+        },
+        {
+          "text": "ACME",
+          "confidence": 0.95,
+          "bbox": [
+            85,
+            10,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "FOODS",
+          "confidence": 0.94,
+          "bbox": [
+            140,
+            10,
+            60,
+            18
+          ]
+        },
+        {
+          "text": "PVT",
+          "confidence": 0.92,
+          "bbox": [
+            10,
+            35,
+            40,
+            18
+          ]
+        },
+        {
+          "text": "LTD",
+          "confidence": 0.93,
+          "bbox": [
+            55,
+            35,
+            35,
+            18
+          ]
+        },
+        {
+          "text": "Plot",
+          "confidence": 0.91,
+          "bbox": [
+            10,
+            60,
+            35,
+            18
+          ]
+        },
+        {
+          "text": "12",
+          "confidence": 0.95,
+          "bbox": [
+            50,
+            60,
+            20,
+            18
+          ]
+        },
+        {
+          "text": "Mumbai",
+          "confidence": 0.9,
+          "bbox": [
+            75,
+            60,
+            60,
+            18
+          ]
+        },
+        {
+          "text": "400001",
+          "confidence": 0.95,
+          "bbox": [
+            140,
+            60,
+            55,
+            18
+          ]
+        },
+        {
+          "text": "India",
+          "confidence": 0.9,
+          "bbox": [
+            200,
+            60,
+            45,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "pin": "\\b([1-9][0-9]{5})\\b",
+      "expected": {
+        "name": "manufacturer_address",
+        "value": "Mfg: by: ACME FOODS PVT LTD Plot 12 Mumbai 400001 India",
+        "bbox": [
+          10,
+          10,
+          235,
+          68
+        ],
+        "confidence": 0.9227,
+        "evidence_spans": [
+          [
+            140,
+            60,
+            55,
+            18
+          ]
+        ]
+      }
+    },
+    {
+      "name": "packed_by_keyword",
+      "words": [
+        {
+          "text": "Packed",
+          "confidence": 0.92,
+          "bbox": [
+            10,
+            10,
+            55,
+            18
+          ]
+        },
+        {
+          "text": "by:",
+          "confidence": 0.92,
+          "bbox": [
+            70,
+            10,
+            25,
+            18
+          ]
+        },
+        {
+          "text": "Beta",
+          "confidence": 0.92,
+          "bbox": [
+            10,
+            35,
+            40,
+            18
+          ]
+        },
+        {
+          "text": "Co",
+          "confidence": 0.92,
+          "bbox": [
+            55,
+            35,
+            25,
+            18
+          ]
+        },
+        {
+          "text": "110001",
+          "confidence": 0.95,
+          "bbox": [
+            85,
+            35,
+            55,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "pin": "\\b([1-9][0-9]{5})\\b",
+      "expected": {
+        "name": "manufacturer_address",
+        "value": "Packed by: Beta Co 110001",
+        "bbox": [
+          10,
+          10,
+          130,
+          43
+        ],
+        "confidence": 0.926,
+        "evidence_spans": [
+          [
+            85,
+            35,
+            55,
+            18
+          ]
+        ]
+      }
+    },
+    {
+      "name": "imported_by_keyword",
+      "words": [
+        {
+          "text": "Imported",
+          "confidence": 0.92,
+          "bbox": [
+            10,
+            10,
+            70,
+            18
+          ]
+        },
+        {
+          "text": "by:",
+          "confidence": 0.92,
+          "bbox": [
+            85,
+            10,
+            25,
+            18
+          ]
+        },
+        {
+          "text": "Gamma",
+          "confidence": 0.92,
+          "bbox": [
+            10,
+            35,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "Imports",
+          "confidence": 0.92,
+          "bbox": [
+            65,
+            35,
+            60,
+            18
+          ]
+        },
+        {
+          "text": "Delhi",
+          "confidence": 0.9,
+          "bbox": [
+            130,
+            35,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "110002",
+          "confidence": 0.95,
+          "bbox": [
+            10,
+            60,
+            55,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "pin": "\\b([1-9][0-9]{5})\\b",
+      "expected": {
+        "name": "manufacturer_address",
+        "value": "Imported by: 110002",
+        "bbox": [
+          10,
+          10,
+          100,
+          68
+        ],
+        "confidence": 0.93,
+        "evidence_spans": [
+          [
+            10,
+            60,
+            55,
+            18
+          ]
+        ]
+      }
+    },
+    {
+      "name": "multi_panel_vertical_composite",
+      "words": [
+        {
+          "text": "Mfg:",
+          "confidence": 0.95,
+          "bbox": [
+            20,
+            50,
+            40,
+            18
+          ]
+        },
+        {
+          "text": "by:",
+          "confidence": 0.95,
+          "bbox": [
+            65,
+            50,
+            25,
+            18
+          ]
+        },
+        {
+          "text": "ACME",
+          "confidence": 0.95,
+          "bbox": [
+            95,
+            50,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "Plot",
+          "confidence": 0.92,
+          "bbox": [
+            20,
+            80,
+            40,
+            18
+          ]
+        },
+        {
+          "text": "12",
+          "confidence": 0.95,
+          "bbox": [
+            65,
+            80,
+            20,
+            18
+          ]
+        },
+        {
+          "text": "Mumbai",
+          "confidence": 0.92,
+          "bbox": [
+            90,
+            80,
+            60,
+            18
+          ]
+        },
+        {
+          "text": "400001",
+          "confidence": 0.95,
+          "bbox": [
+            155,
+            80,
+            55,
+            18
+          ]
+        },
+        {
+          "text": "MRP",
+          "confidence": 0.95,
+          "bbox": [
+            20,
+            1100,
+            40,
+            18
+          ]
+        },
+        {
+          "text": "Rs.",
+          "confidence": 0.95,
+          "bbox": [
+            65,
+            1100,
+            30,
+            18
+          ]
+        },
+        {
+          "text": "99.00",
+          "confidence": 0.95,
+          "bbox": [
+            100,
+            1100,
+            50,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 1000,
+        "height": 1450
+      },
+      "pin": "\\b([1-9][0-9]{5})\\b",
+      "expected": {
+        "name": "manufacturer_address",
+        "value": "Mfg: by: ACME Plot 12 Mumbai 400001",
+        "bbox": [
+          20,
+          50,
+          190,
+          48
+        ],
+        "confidence": 0.9414,
+        "evidence_spans": [
+          [
+            155,
+            80,
+            55,
+            18
+          ]
+        ]
+      }
+    },
+    {
+      "name": "no_pin_returns_none",
+      "words": [
+        {
+          "text": "ACME",
+          "confidence": 0.95,
+          "bbox": [
+            10,
+            10,
+            40,
+            18
+          ]
+        },
+        {
+          "text": "FOODS",
+          "confidence": 0.94,
+          "bbox": [
+            65,
+            10,
+            40,
+            18
+          ]
+        },
+        {
+          "text": "Mfg:",
+          "confidence": 0.9,
+          "bbox": [
+            10,
+            35,
+            40,
+            18
+          ]
+        },
+        {
+          "text": "Somewhere",
+          "confidence": 0.9,
+          "bbox": [
+            50,
+            35,
+            40,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "pin": "\\b([1-9][0-9]{5})\\b",
+      "expected": {
+        "name": "manufacturer_address",
+        "value": null,
+        "bbox": [
+          10,
+          35,
+          80,
+          18
+        ],
+        "confidence": 0.0,
+        "evidence_spans": []
+      }
+    }
+  ],
+  "consumer_care": [
+    {
+      "name": "complete_consumer_care",
+      "words": [
+        {
+          "text": "Customer",
+          "confidence": 0.92,
+          "bbox": [
+            10,
+            150,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "Care:",
+          "confidence": 0.93,
+          "bbox": [
+            85,
+            150,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "ACME",
+          "confidence": 0.93,
+          "bbox": [
+            10,
+            175,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "Foods",
+          "confidence": 0.93,
+          "bbox": [
+            65,
+            175,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "care@acme.com",
+          "confidence": 0.95,
+          "bbox": [
+            10,
+            200,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "Ph:",
+          "confidence": 0.9,
+          "bbox": [
+            125,
+            200,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "+91",
+          "confidence": 0.91,
+          "bbox": [
+            155,
+            200,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "9876543210",
+          "confidence": 0.93,
+          "bbox": [
+            190,
+            200,
+            50,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 400
+      },
+      "email": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "phone": "(?:\\+91[\\s-]?)?[6-9]\\d{9}",
+      "expected": {
+        "name": "consumer_care",
+        "value": "care@acme.com Ph: +91 9876543210",
+        "bbox": [
+          10,
+          200,
+          230,
+          18
+        ],
+        "confidence": 0.9225,
+        "evidence_spans": [
+          [
+            10,
+            200,
+            50,
+            18
+          ],
+          [
+            10,
+            200,
+            50,
+            18
+          ]
+        ]
+      }
+    },
+    {
+      "name": "missing_email",
+      "words": [
+        {
+          "text": "Customer",
+          "confidence": 0.92,
+          "bbox": [
+            10,
+            150,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "Care:",
+          "confidence": 0.93,
+          "bbox": [
+            85,
+            150,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "Ph:",
+          "confidence": 0.9,
+          "bbox": [
+            10,
+            200,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "+91",
+          "confidence": 0.91,
+          "bbox": [
+            40,
+            200,
+            50,
+            18
+          ]
+        },
+        {
+          "text": "9876543210",
+          "confidence": 0.93,
+          "bbox": [
+            80,
+            200,
+            50,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 400
+      },
+      "email": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "phone": "(?:\\+91[\\s-]?)?[6-9]\\d{9}",
+      "expected": {
+        "name": "consumer_care",
+        "value": null,
+        "bbox": null,
+        "confidence": 0.0,
+        "evidence_spans": []
+      }
+    }
+  ],
+  "net_quantity": [
+    {
+      "name": "grams",
+      "words": [
+        {
+          "text": "Net",
+          "confidence": 0.95,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        },
+        {
+          "text": "Wt:",
+          "confidence": 0.95,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        },
+        {
+          "text": "500",
+          "confidence": 0.96,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        },
+        {
+          "text": "g",
+          "confidence": 0.94,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "units": [
+        "g",
+        "kg",
+        "ml",
+        "l"
+      ],
+      "expected": {
+        "name": "net_quantity",
+        "value": "500 g",
+        "bbox": [
+          0,
+          0,
+          30,
+          18
+        ],
+        "confidence": 0.95,
+        "evidence_spans": [
+          [
+            0,
+            0,
+            30,
+            18
+          ],
+          [
+            0,
+            0,
+            30,
+            18
+          ]
+        ]
+      }
+    },
+    {
+      "name": "kilograms",
+      "words": [
+        {
+          "text": "Net",
+          "confidence": 0.9,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        },
+        {
+          "text": "Wt:",
+          "confidence": 0.9,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        },
+        {
+          "text": "2.5",
+          "confidence": 0.92,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        },
+        {
+          "text": "kg",
+          "confidence": 0.93,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "units": [
+        "g",
+        "kg"
+      ],
+      "expected": {
+        "name": "net_quantity",
+        "value": "2.5 kg",
+        "bbox": [
+          0,
+          0,
+          30,
+          18
+        ],
+        "confidence": 0.925,
+        "evidence_spans": [
+          [
+            0,
+            0,
+            30,
+            18
+          ],
+          [
+            0,
+            0,
+            30,
+            18
+          ]
+        ]
+      }
+    },
+    {
+      "name": "millilitres",
+      "words": [
+        {
+          "text": "Net",
+          "confidence": 0.9,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        },
+        {
+          "text": "Qty:",
+          "confidence": 0.9,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        },
+        {
+          "text": "750",
+          "confidence": 0.95,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        },
+        {
+          "text": "ml",
+          "confidence": 0.93,
+          "bbox": [
+            0,
+            0,
+            30,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "units": [
+        "ml",
+        "l"
+      ],
+      "expected": {
+        "name": "net_quantity",
+        "value": "750 ml",
+        "bbox": [
+          0,
+          0,
+          30,
+          18
+        ],
+        "confidence": 0.94,
+        "evidence_spans": [
+          [
+            0,
+            0,
+            30,
+            18
+          ],
+          [
+            0,
+            0,
+            30,
+            18
+          ]
+        ]
+      }
+    }
+  ],
+  "mfg_date": [
+    {
+      "name": "numeric_mmyyyy",
+      "words": [
+        {
+          "text": "Mfg:",
+          "confidence": 0.93,
+          "bbox": [
+            10,
+            100,
+            60,
+            18
+          ]
+        },
+        {
+          "text": "03/2026",
+          "confidence": 0.94,
+          "bbox": [
+            55,
+            100,
+            60,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "pattern": "(?i)\\b(?:mfg|mfd|manufactured|packed|pkd)[:\\s,.]*((?:0?[1-9]|1[0-2])[\\/\\-\\s]\\d{2,4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\\s+\\d{4})",
+      "expected": {
+        "name": "mfg_date",
+        "value": "03/2026",
+        "bbox": [
+          10,
+          100,
+          105,
+          18
+        ],
+        "confidence": 0.935,
+        "evidence_spans": [
+          [
+            10,
+            100,
+            60,
+            18
+          ],
+          [
+            55,
+            100,
+            60,
+            18
+          ]
+        ]
+      }
+    },
+    {
+      "name": "word_month",
+      "words": [
+        {
+          "text": "Manufactured:January 2026",
+          "confidence": 0.94,
+          "bbox": [
+            10,
+            100,
+            60,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "pattern": "(?i)\\b(?:mfg|mfd|manufactured|packed|pkd)[:\\s,.]*((?:0?[1-9]|1[0-2])[\\/\\-\\s]\\d{2,4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\\s+\\d{4})",
+      "expected": {
+        "name": "mfg_date",
+        "value": "January 2026",
+        "bbox": [
+          10,
+          100,
+          60,
+          18
+        ],
+        "confidence": 0.94,
+        "evidence_spans": [
+          [
+            10,
+            100,
+            60,
+            18
+          ]
+        ]
+      }
+    },
+    {
+      "name": "pkd_prefix",
+      "words": [
+        {
+          "text": "PKD",
+          "confidence": 0.93,
+          "bbox": [
+            10,
+            100,
+            60,
+            18
+          ]
+        },
+        {
+          "text": "12/25",
+          "confidence": 0.94,
+          "bbox": [
+            55,
+            100,
+            60,
+            18
+          ]
+        }
+      ],
+      "meta": {
+        "width": 400,
+        "height": 300
+      },
+      "pattern": "(?i)\\b(?:mfg|mfd|manufactured|packed|pkd)[:\\s,.]*((?:0?[1-9]|1[0-2])[\\/\\-\\s]\\d{2,4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\\s+\\d{4})",
+      "expected": {
+        "name": "mfg_date",
+        "value": "12/25",
+        "bbox": [
+          10,
+          100,
+          105,
+          18
+        ],
+        "confidence": 0.935,
+        "evidence_spans": [
+          [
+            10,
+            100,
+            60,
+            18
+          ],
+          [
+            55,
+            100,
+            60,
+            18
+          ]
+        ]
+      }
+    }
+  ],
+  "extended": [
+    {
+      "text": "Common name: Roasted Peanuts",
+      "field": "common_name",
+      "words": [
+        {
+          "text": "Common",
+          "confidence": 0.95,
+          "bbox": [
+            0.1,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ]
+        },
+        {
+          "text": "name:",
+          "confidence": 0.95,
+          "bbox": [
+            0.30000000000000004,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ]
+        },
+        {
+          "text": "Roasted",
+          "confidence": 0.95,
+          "bbox": [
+            0.5,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ]
+        },
+        {
+          "text": "Peanuts",
+          "confidence": 0.95,
+          "bbox": [
+            0.7000000000000001,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ]
+        }
+      ],
+      "meta": {
+        "width": 1000,
+        "height": 1000
+      },
+      "expected": {
+        "name": "common_name",
+        "value": "Roasted Peanuts",
+        "bbox": [
+          0.1,
+          0.1,
+          0.7800000000000001,
+          0.04000000000000001
+        ],
+        "confidence": 0.95,
+        "evidence_spans": [
+          [
+            0.1,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ],
+          [
+            0.30000000000000004,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ],
+          [
+            0.5,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ],
+          [
+            0.7000000000000001,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ]
+        ]
+      }
+    },
+    {
+      "text": "Country of Origin: India",
+      "field": "country_origin",
+      "words": [
+        {
+          "text": "Country",
+          "confidence": 0.95,
+          "bbox": [
+            0.1,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ]
+        },
+        {
+          "text": "of",
+          "confidence": 0.95,
+          "bbox": [
+            0.30000000000000004,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ]
+        },
+        {
+          "text": "Origin:",
+          "confidence": 0.95,
+          "bbox": [
+            0.5,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ]
+        },
+        {
+          "text": "India",
+          "confidence": 0.95,
+          "bbox": [
+            0.7000000000000001,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ]
+        }
+      ],
+      "meta": {
+        "width": 1000,
+        "height": 1000
+      },
+      "expected": {
+        "name": "country_origin",
+        "value": "India",
+        "bbox": [
+          0.1,
+          0.1,
+          0.7800000000000001,
+          0.04000000000000001
+        ],
+        "confidence": 0.95,
+        "evidence_spans": [
+          [
+            0.1,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ],
+          [
+            0.30000000000000004,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ],
+          [
+            0.5,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ],
+          [
+            0.7000000000000001,
+            0.1,
+            0.18000000000000002,
+            0.04
+          ]
+        ]
+      }
+    },
+    {
+      "text": "Best Before 9 Months from Packing",
+      "field": "best_before",
+      "words": [
+        {
+          "text": "Best",
+          "confidence": 0.95,
+          "bbox": [
+            0.1,
+            0.1,
+            0.12,
+            0.04
+          ]
+        },
+        {
+          "text": "Before",
+          "confidence": 0.95,
+          "bbox": [
+            0.23333333333333334,
+            0.1,
+            0.12,
+            0.04
+          ]
+        },
+        {
+          "text": "9",
+          "confidence": 0.95,
+          "bbox": [
+            0.3666666666666667,
+            0.1,
+            0.12,
+            0.04
+          ]
+        },
+        {
+          "text": "Months",
+          "confidence": 0.95,
+          "bbox": [
+            0.5,
+            0.1,
+            0.12,
+            0.04
+          ]
+        },
+        {
+          "text": "from",
+          "confidence": 0.95,
+          "bbox": [
+            0.6333333333333333,
+            0.1,
+            0.12,
+            0.04
+          ]
+        },
+        {
+          "text": "Packing",
+          "confidence": 0.95,
+          "bbox": [
+            0.7666666666666666,
+            0.1,
+            0.12,
+            0.04
+          ]
+        }
+      ],
+      "meta": {
+        "width": 1000,
+        "height": 1000
+      },
+      "expected": {
+        "name": "best_before",
+        "value": "9 Months from Packing",
+        "bbox": [
+          0.1,
+          0.1,
+          0.7866666666666666,
+          0.04000000000000001
+        ],
+        "confidence": 0.95,
+        "evidence_spans": [
+          [
+            0.1,
+            0.1,
+            0.12,
+            0.04
+          ],
+          [
+            0.23333333333333334,
+            0.1,
+            0.12,
+            0.04
+          ],
+          [
+            0.3666666666666667,
+            0.1,
+            0.12,
+            0.04
+          ],
+          [
+            0.5,
+            0.1,
+            0.12,
+            0.04
+          ],
+          [
+            0.6333333333333333,
+            0.1,
+            0.12,
+            0.04
+          ],
+          [
+            0.7666666666666666,
+            0.1,
+            0.12,
+            0.04
+          ]
+        ]
+      }
+    },
+    {
+      "text": "Dimensions 20 cm x 10 cm x 5 cm",
+      "field": "dimensions",
+      "words": [
+        {
+          "text": "Dimensions",
+          "confidence": 0.95,
+          "bbox": [
+            0.1,
+            0.1,
+            0.08,
+            0.04
+          ]
+        },
+        {
+          "text": "20",
+          "confidence": 0.95,
+          "bbox": [
+            0.18888888888888888,
+            0.1,
+            0.08,
+            0.04
+          ]
+        },
+        {
+          "text": "cm",
+          "confidence": 0.95,
+          "bbox": [
+            0.2777777777777778,
+            0.1,
+            0.08,
+            0.04
+          ]
+        },
+        {
+          "text": "x",
+          "confidence": 0.95,
+          "bbox": [
+            0.3666666666666667,
+            0.1,
+            0.08,
+            0.04
+          ]
+        },
+        {
+          "text": "10",
+          "confidence": 0.95,
+          "bbox": [
+            0.4555555555555556,
+            0.1,
+            0.08,
+            0.04
+          ]
+        },
+        {
+          "text": "cm",
+          "confidence": 0.95,
+          "bbox": [
+            0.5444444444444445,
+            0.1,
+            0.08,
+            0.04
+          ]
+        },
+        {
+          "text": "x",
+          "confidence": 0.95,
+          "bbox": [
+            0.6333333333333333,
+            0.1,
+            0.08,
+            0.04
+          ]
+        },
+        {
+          "text": "5",
+          "confidence": 0.95,
+          "bbox": [
+            0.7222222222222222,
+            0.1,
+            0.08,
+            0.04
+          ]
+        },
+        {
+          "text": "cm",
+          "confidence": 0.95,
+          "bbox": [
+            0.8111111111111111,
+            0.1,
+            0.08,
+            0.04
+          ]
+        }
+      ],
+      "meta": {
+        "width": 1000,
+        "height": 1000
+      },
+      "expected": {
+        "name": "dimensions",
+        "value": "20 cm x 10 cm x 5 cm",
+        "bbox": [
+          0.1,
+          0.1,
+          0.7911111111111111,
+          0.04000000000000001
+        ],
+        "confidence": 0.95,
+        "evidence_spans": [
+          [
+            0.1,
+            0.1,
+            0.08,
+            0.04
+          ],
+          [
+            0.18888888888888888,
+            0.1,
+            0.08,
+            0.04
+          ],
+          [
+            0.2777777777777778,
+            0.1,
+            0.08,
+            0.04
+          ],
+          [
+            0.3666666666666667,
+            0.1,
+            0.08,
+            0.04
+          ],
+          [
+            0.4555555555555556,
+            0.1,
+            0.08,
+            0.04
+          ],
+          [
+            0.5444444444444445,
+            0.1,
+            0.08,
+            0.04
+          ],
+          [
+            0.6333333333333333,
+            0.1,
+            0.08,
+            0.04
+          ],
+          [
+            0.7222222222222222,
+            0.1,
+            0.08,
+            0.04
+          ],
+          [
+            0.8111111111111111,
+            0.1,
+            0.08,
+            0.04
+          ]
+        ]
+      }
+    },
+    {
+      "text": "Unit Sale Price \u20b9 0.50/g",
+      "field": "unit_price",
+      "words": [
+        {
+          "text": "Unit",
+          "confidence": 0.95,
+          "bbox": [
+            0.1,
+            0.1,
+            0.14400000000000002,
+            0.04
+          ]
+        },
+        {
+          "text": "Sale",
+          "confidence": 0.95,
+          "bbox": [
+            0.26,
+            0.1,
+            0.14400000000000002,
+            0.04
+          ]
+        },
+        {
+          "text": "Price",
+          "confidence": 0.95,
+          "bbox": [
+            0.42000000000000004,
+            0.1,
+            0.14400000000000002,
+            0.04
+          ]
+        },
+        {
+          "text": "\u20b9",
+          "confidence": 0.95,
+          "bbox": [
+            0.58,
+            0.1,
+            0.14400000000000002,
+            0.04
+          ]
+        },
+        {
+          "text": "0.50/g",
+          "confidence": 0.95,
+          "bbox": [
+            0.74,
+            0.1,
+            0.14400000000000002,
+            0.04
+          ]
+        }
+      ],
+      "meta": {
+        "width": 1000,
+        "height": 1000
+      },
+      "expected": {
+        "name": "unit_price",
+        "value": "\u20b9 0.50/g",
+        "bbox": [
+          0.1,
+          0.1,
+          0.784,
+          0.04000000000000001
+        ],
+        "confidence": 0.95,
+        "evidence_spans": [
+          [
+            0.1,
+            0.1,
+            0.14400000000000002,
+            0.04
+          ],
+          [
+            0.26,
+            0.1,
+            0.14400000000000002,
+            0.04
+          ],
+          [
+            0.42000000000000004,
+            0.1,
+            0.14400000000000002,
+            0.04
+          ],
+          [
+            0.58,
+            0.1,
+            0.14400000000000002,
+            0.04
+          ],
+          [
+            0.74,
+            0.1,
+            0.14400000000000002,
+            0.04
+          ]
+        ]
+      }
+    },
+    {
+      "text": "Imported by Acme India Pvt Ltd Mumbai 400001",
+      "field": "importer_address",
+      "words": [
+        {
+          "text": "Imported",
+          "confidence": 0.95,
+          "bbox": [
+            0.1,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ]
+        },
+        {
+          "text": "by",
+          "confidence": 0.95,
+          "bbox": [
+            0.2,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ]
+        },
+        {
+          "text": "Acme",
+          "confidence": 0.95,
+          "bbox": [
+            0.30000000000000004,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ]
+        },
+        {
+          "text": "India",
+          "confidence": 0.95,
+          "bbox": [
+            0.4,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ]
+        },
+        {
+          "text": "Pvt",
+          "confidence": 0.95,
+          "bbox": [
+            0.5,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ]
+        },
+        {
+          "text": "Ltd",
+          "confidence": 0.95,
+          "bbox": [
+            0.6,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ]
+        },
+        {
+          "text": "Mumbai",
+          "confidence": 0.95,
+          "bbox": [
+            0.7000000000000001,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ]
+        },
+        {
+          "text": "400001",
+          "confidence": 0.95,
+          "bbox": [
+            0.8,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ]
+        }
+      ],
+      "meta": {
+        "width": 1000,
+        "height": 1000
+      },
+      "expected": {
+        "name": "importer_address",
+        "value": "Acme India Pvt Ltd Mumbai 400001",
+        "bbox": [
+          0.1,
+          0.1,
+          0.79,
+          0.04000000000000001
+        ],
+        "confidence": 0.95,
+        "evidence_spans": [
+          [
+            0.1,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ],
+          [
+            0.2,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ],
+          [
+            0.30000000000000004,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ],
+          [
+            0.4,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ],
+          [
+            0.5,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ],
+          [
+            0.6,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ],
+          [
+            0.7000000000000001,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ],
+          [
+            0.8,
+            0.1,
+            0.09000000000000001,
+            0.04
+          ]
+        ]
+      }
+    }
+  ],
+  "engine": [
+    {
+      "name": "all_pass_retail",
+      "extracted": {
+        "mrp": {
+          "name": "mrp",
+          "value": "MRP Rs.99.00 (Inclusive of all taxes)",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "net_quantity": {
+          "name": "net_quantity",
+          "value": "500 g",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "manufacturer_address": {
+          "name": "manufacturer_address",
+          "value": "ACME Plot 12 Mumbai 400001",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "consumer_care": {
+          "name": "consumer_care",
+          "value": "ACME care@acme.com +91 9876543210",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "mfg_date": {
+          "name": "mfg_date",
+          "value": "Mfg: 03/2026",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        }
+      },
+      "context": {
+        "mode": "retail_image",
+        "category": "non_food",
+        "imported": null
+      },
+      "quality": {
+        "status": "acceptable",
+        "score": 90.0
+      },
+      "expected_verdicts": [
+        {
+          "rule_id": "r6_1_e_mrp",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+          "evidence": "MRP Rs.99.00 (Inclusive of all taxes)",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_c_net_quantity",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+          "evidence": "500 g",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_a_address",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+          "evidence": "ACME Plot 12 Mumbai 400001",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_2_consumer_care",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(2) of LMPC Rules 2011",
+          "evidence": "ACME care@acme.com +91 9876543210",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_d_mfg_date",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+          "evidence": "Mfg: 03/2026",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_b_common_name",
+          "status": "fail",
+          "severity": "critical",
+          "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)",
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_aa_country_origin",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.0,
+          "reasoning": "Required applicability context is unknown: imported.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_a_importer_address",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.0,
+          "reasoning": "Required applicability context is unknown: imported.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_da_best_before",
+          "status": "na",
+          "severity": "warning",
+          "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this product category.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_f_dimensions",
+          "status": "fail",
+          "severity": "warning",
+          "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": "Metric dimensional declaration is required when applicable (missing: dimensions_value)",
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: dimensions_value.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_11_unit_sale_price",
+          "status": "manual_review",
+          "severity": "warning",
+          "citation": "Rule 6(11) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_10_ecommerce_declarations",
+          "status": "na",
+          "severity": "critical",
+          "citation": "Rule 6(10) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this evidence mode.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r7_font_size",
+          "status": "manual_review",
+          "severity": "warning",
+          "citation": "Rule 7 of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "No declaration readability measurements are available.",
+          "measurement_method": "not_measurable"
+        }
+      ],
+      "expected_overall_status": "fail"
+    },
+    {
+      "name": "mrp_missing_tax_phrase",
+      "extracted": {
+        "mrp": {
+          "name": "mrp",
+          "value": "MRP Rs.99",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.95,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "net_quantity": {
+          "name": "net_quantity",
+          "value": "500 g",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "manufacturer_address": {
+          "name": "manufacturer_address",
+          "value": "ACME Plot 12 Mumbai 400001",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "consumer_care": {
+          "name": "consumer_care",
+          "value": "ACME care@acme.com +91 9876543210",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "mfg_date": {
+          "name": "mfg_date",
+          "value": "Mfg: 03/2026",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        }
+      },
+      "context": {
+        "mode": "retail_image",
+        "category": "non_food",
+        "imported": null
+      },
+      "quality": {
+        "status": "acceptable",
+        "score": 90.0
+      },
+      "expected_verdicts": [
+        {
+          "rule_id": "r6_1_e_mrp",
+          "status": "fail",
+          "severity": "critical",
+          "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+          "evidence": "MRP Rs.99",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes' (missing: tax_inclusive_phrase)",
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: tax_inclusive_phrase.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_c_net_quantity",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+          "evidence": "500 g",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_a_address",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+          "evidence": "ACME Plot 12 Mumbai 400001",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_2_consumer_care",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(2) of LMPC Rules 2011",
+          "evidence": "ACME care@acme.com +91 9876543210",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_d_mfg_date",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+          "evidence": "Mfg: 03/2026",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_b_common_name",
+          "status": "fail",
+          "severity": "critical",
+          "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)",
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_aa_country_origin",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.0,
+          "reasoning": "Required applicability context is unknown: imported.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_a_importer_address",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.0,
+          "reasoning": "Required applicability context is unknown: imported.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_da_best_before",
+          "status": "na",
+          "severity": "warning",
+          "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this product category.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_f_dimensions",
+          "status": "fail",
+          "severity": "warning",
+          "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": "Metric dimensional declaration is required when applicable (missing: dimensions_value)",
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: dimensions_value.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_11_unit_sale_price",
+          "status": "manual_review",
+          "severity": "warning",
+          "citation": "Rule 6(11) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_10_ecommerce_declarations",
+          "status": "na",
+          "severity": "critical",
+          "citation": "Rule 6(10) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this evidence mode.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r7_font_size",
+          "status": "manual_review",
+          "severity": "warning",
+          "citation": "Rule 7 of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "No declaration readability measurements are available.",
+          "measurement_method": "not_measurable"
+        }
+      ],
+      "expected_overall_status": "fail"
+    },
+    {
+      "name": "low_confidence_malformed_requires_review",
+      "extracted": {
+        "mrp": {
+          "name": "mrp",
+          "value": "MRP Rs.99",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.65,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "net_quantity": {
+          "name": "net_quantity",
+          "value": "500 g",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "manufacturer_address": {
+          "name": "manufacturer_address",
+          "value": "ACME Plot 12 Mumbai 400001",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "consumer_care": {
+          "name": "consumer_care",
+          "value": "ACME care@acme.com +91 9876543210",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "mfg_date": {
+          "name": "mfg_date",
+          "value": "Mfg: 03/2026",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        }
+      },
+      "context": {
+        "mode": "retail_image",
+        "category": "non_food",
+        "imported": null
+      },
+      "quality": {
+        "status": "acceptable",
+        "score": 90.0
+      },
+      "expected_verdicts": [
+        {
+          "rule_id": "r6_1_e_mrp",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+          "evidence": "MRP Rs.99",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.65,
+          "reasoning": "OCR confidence is too low to prove that the declaration is malformed.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_c_net_quantity",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+          "evidence": "500 g",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_a_address",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+          "evidence": "ACME Plot 12 Mumbai 400001",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_2_consumer_care",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(2) of LMPC Rules 2011",
+          "evidence": "ACME care@acme.com +91 9876543210",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_d_mfg_date",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+          "evidence": "Mfg: 03/2026",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_b_common_name",
+          "status": "fail",
+          "severity": "critical",
+          "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": "Common or generic name of the commodity is required (missing: common_name_value)",
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: common_name_value.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_aa_country_origin",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.0,
+          "reasoning": "Required applicability context is unknown: imported.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_a_importer_address",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.0,
+          "reasoning": "Required applicability context is unknown: imported.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_da_best_before",
+          "status": "na",
+          "severity": "warning",
+          "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this product category.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_f_dimensions",
+          "status": "fail",
+          "severity": "warning",
+          "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": "Metric dimensional declaration is required when applicable (missing: dimensions_value)",
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "Sufficient image evidence does not show a compliant declaration. Missing or malformed: dimensions_value.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_11_unit_sale_price",
+          "status": "manual_review",
+          "severity": "warning",
+          "citation": "Rule 6(11) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "Configured exemption facts are not established by the submitted evidence.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_10_ecommerce_declarations",
+          "status": "na",
+          "severity": "critical",
+          "citation": "Rule 6(10) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this evidence mode.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r7_font_size",
+          "status": "manual_review",
+          "severity": "warning",
+          "citation": "Rule 7 of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "No declaration readability measurements are available.",
+          "measurement_method": "not_measurable"
+        }
+      ],
+      "expected_overall_status": "fail"
+    },
+    {
+      "name": "retake_recommended_quality_triggers_review",
+      "extracted": {
+        "mrp": {
+          "name": "mrp",
+          "value": "MRP Rs.99.00 (Inclusive of all taxes)",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "net_quantity": {
+          "name": "net_quantity",
+          "value": "500 g",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "manufacturer_address": {
+          "name": "manufacturer_address",
+          "value": "ACME Plot 12 Mumbai 400001",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "consumer_care": {
+          "name": "consumer_care",
+          "value": "ACME care@acme.com +91 9876543210",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "mfg_date": {
+          "name": "mfg_date",
+          "value": "Mfg: 03/2026",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        }
+      },
+      "context": {
+        "mode": "retail_image",
+        "category": "non_food",
+        "imported": null
+      },
+      "quality": {
+        "status": "retake_recommended",
+        "score": 45.0
+      },
+      "expected_verdicts": [
+        {
+          "rule_id": "r6_1_e_mrp",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+          "evidence": "MRP Rs.99.00 (Inclusive of all taxes)",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.45,
+          "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_c_net_quantity",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+          "evidence": "500 g",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.45,
+          "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_a_address",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+          "evidence": "ACME Plot 12 Mumbai 400001",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.45,
+          "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_2_consumer_care",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(2) of LMPC Rules 2011",
+          "evidence": "ACME care@acme.com +91 9876543210",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.45,
+          "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_d_mfg_date",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+          "evidence": "Mfg: 03/2026",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.45,
+          "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_b_common_name",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.45,
+          "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_aa_country_origin",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.0,
+          "reasoning": "Required applicability context is unknown: imported.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_a_importer_address",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.0,
+          "reasoning": "Required applicability context is unknown: imported.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_da_best_before",
+          "status": "na",
+          "severity": "warning",
+          "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this product category.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_f_dimensions",
+          "status": "manual_review",
+          "severity": "warning",
+          "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.45,
+          "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_11_unit_sale_price",
+          "status": "manual_review",
+          "severity": "warning",
+          "citation": "Rule 6(11) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.45,
+          "reasoning": "Image quality is insufficient to support an automatic compliance decision.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_10_ecommerce_declarations",
+          "status": "na",
+          "severity": "critical",
+          "citation": "Rule 6(10) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this evidence mode.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r7_font_size",
+          "status": "manual_review",
+          "severity": "warning",
+          "citation": "Rule 7 of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.45,
+          "reasoning": "No declaration readability measurements are available.",
+          "measurement_method": "not_measurable"
+        }
+      ],
+      "expected_overall_status": "manual_review"
+    },
+    {
+      "name": "ecommerce_listing_mode_with_all_declarations",
+      "extracted": {
+        "mrp": {
+          "name": "mrp",
+          "value": "MRP Rs.99.00 (Inclusive of all taxes)",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "net_quantity": {
+          "name": "net_quantity",
+          "value": "500 g",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "manufacturer_address": {
+          "name": "manufacturer_address",
+          "value": "ACME Plot 12 Mumbai 400001",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "consumer_care": {
+          "name": "consumer_care",
+          "value": "ACME care@acme.com +91 9876543210",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "mfg_date": {
+          "name": "mfg_date",
+          "value": "Mfg: 03/2026",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "common_name": {
+          "name": "common_name",
+          "value": "Biscuits",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "country_origin": {
+          "name": "country_origin",
+          "value": "India",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "best_before": {
+          "name": "best_before",
+          "value": "6 months",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        },
+        "unit_price": {
+          "name": "unit_price",
+          "value": "\u20b9 0.20/g",
+          "bbox": [
+            0.1,
+            0.1,
+            0.3,
+            0.05
+          ],
+          "confidence": 0.9,
+          "evidence_spans": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ]
+        }
+      },
+      "context": {
+        "mode": "ecommerce_listing",
+        "category": "non_food",
+        "imported": null
+      },
+      "quality": {
+        "status": "acceptable",
+        "score": 90.0
+      },
+      "expected_verdicts": [
+        {
+          "rule_id": "r6_1_e_mrp",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+          "evidence": "MRP Rs.99.00 (Inclusive of all taxes)",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_c_net_quantity",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+          "evidence": "500 g",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_a_address",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+          "evidence": "ACME Plot 12 Mumbai 400001",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_2_consumer_care",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(2) of LMPC Rules 2011",
+          "evidence": "ACME care@acme.com +91 9876543210",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_d_mfg_date",
+          "status": "na",
+          "severity": "critical",
+          "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this evidence mode.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_b_common_name",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+          "evidence": "Biscuits",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_aa_country_origin",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.0,
+          "reasoning": "Required applicability context is unknown: imported.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_a_importer_address",
+          "status": "manual_review",
+          "severity": "critical",
+          "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+          "evidence": "",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.0,
+          "reasoning": "Required applicability context is unknown: imported.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_da_best_before",
+          "status": "na",
+          "severity": "warning",
+          "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this product category.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_1_f_dimensions",
+          "status": "na",
+          "severity": "warning",
+          "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this evidence mode.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_11_unit_sale_price",
+          "status": "pass",
+          "severity": "warning",
+          "citation": "Rule 6(11) of LMPC Rules 2011",
+          "evidence": "\u20b9 0.20/g",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "The declaration and its available supporting evidence satisfy this rule.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r6_10_ecommerce_declarations",
+          "status": "pass",
+          "severity": "critical",
+          "citation": "Rule 6(10) of LMPC Rules 2011",
+          "evidence": "mrp: MRP Rs.99.00 (Inclusive of all taxes); net_quantity: 500 g; manufacturer_address: ACME Plot 12 Mumbai 400001; consumer_care: ACME care@acme.com +91 9876543210; best_before: 6 months; common_name: Biscuits; country_origin: India; unit_price: \u20b9 0.20/g",
+          "evidence_bboxes": [
+            [
+              0.1,
+              0.1,
+              0.3,
+              0.05
+            ]
+          ],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 0.9,
+          "reasoning": "All mandatory e-commerce declarations are present and visible in the submitted listing.",
+          "measurement_method": "not_measurable"
+        },
+        {
+          "rule_id": "r7_font_size",
+          "status": "na",
+          "severity": "warning",
+          "citation": "Rule 7 of LMPC Rules 2011",
+          "evidence": "Rule not applicable to supplied context",
+          "evidence_bboxes": [],
+          "failure_message": null,
+          "rule_version": "2026-09",
+          "confidence": 1.0,
+          "reasoning": "Rule is not applicable to this evidence mode.",
+          "measurement_method": "not_measurable"
+        }
+      ],
+      "expected_overall_status": "manual_review"
+    }
+  ],
+  "quality": [
+    {
+      "name": "two_words_distribution",
+      "words": [
+        {
+          "text": "A",
+          "confidence": 0.9,
+          "bbox": [
+            0.1,
+            0.1,
+            0.2,
+            0.2
+          ]
+        },
+        {
+          "text": "B",
+          "confidence": 0.5,
+          "bbox": [
+            0.2,
+            0.2,
+            0.2,
+            0.2
+          ]
+        }
+      ],
+      "expected_median": 70.0,
+      "expected_lower_quartile": 50.0,
+      "expected_coverage": 7.0
+    },
+    {
+      "name": "low_confidence_retake",
+      "words": [
+        {
+          "text": "garbled1",
+          "confidence": 0.25,
+          "bbox": [
+            0.1,
+            0.1,
+            0.2,
+            0.05
+          ]
+        },
+        {
+          "text": "garbled2",
+          "confidence": 0.3,
+          "bbox": [
+            0.3,
+            0.1,
+            0.2,
+            0.05
+          ]
+        }
+      ],
+      "expected_median": 27.5,
+      "expected_lower_quartile": 25.0,
+      "expected_coverage": 2.0
+    }
+  ],
+  "unit_sale_price": [
+    {
+      "mrp": "MRP 100",
+      "qty": "100 g",
+      "usp": "\u20b9 1.00/g",
+      "expected_valid": true,
+      "has_note": false
+    },
+    {
+      "mrp": "MRP 100",
+      "qty": "200 g",
+      "usp": "\u20b9 1.00/g",
+      "expected_valid": false,
+      "has_note": true
+    },
+    {
+      "mrp": "MRP 50",
+      "qty": "1 kg",
+      "usp": "\u20b9 50.00/kg",
+      "expected_valid": true,
+      "has_note": false
+    },
+    {
+      "mrp": "MRP 50",
+      "qty": "500 ml",
+      "usp": "\u20b9 100.00/l",
+      "expected_valid": true,
+      "has_note": false
+    }
+  ]
+}

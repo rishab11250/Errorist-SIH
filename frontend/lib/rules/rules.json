@@ -1,0 +1,383 @@
+{
+  "version": "2026-09",
+  "schema_version": 1,
+  "font_size_rules": {
+    "enforcement_scale_confidence": 0.8,
+    "boundary_error_policy": "manual_review",
+    "original_2011": {
+      "citation": "Rule 7(2), GSR 202(E), 7 March 2011",
+      "effective_from": "2011-04-01",
+      "superseded_date": "2022-04-01",
+      "table_I_weight_volume": {
+        "brackets": [
+          {
+            "max_g_or_ml": 200,
+            "normal_mm": 1,
+            "blown_mm": 2
+          },
+          {
+            "max_g_or_ml": 500,
+            "normal_mm": 2,
+            "blown_mm": 4
+          },
+          {
+            "max_g_or_ml": null,
+            "normal_mm": 4,
+            "blown_mm": 6
+          }
+        ]
+      },
+      "table_II_length_area_number": {
+        "brackets": [
+          {
+            "max_cm2": 100,
+            "normal_mm": 1,
+            "blown_mm": 2
+          },
+          {
+            "max_cm2": 500,
+            "normal_mm": 2,
+            "blown_mm": 4
+          },
+          {
+            "max_cm2": 2500,
+            "normal_mm": 4,
+            "blown_mm": 6
+          },
+          {
+            "max_cm2": null,
+            "normal_mm": 6,
+            "blown_mm": 6
+          }
+        ]
+      },
+      "letter_min_mm": 1,
+      "letter_blown_min_mm": 2
+    },
+    "consolidated_post_2021": {
+      "citation": "Rule 7(2) consolidated up to GSR 31.10.2021 (w.e.f. 1.4.2022)",
+      "effective_from": "2022-04-01",
+      "superseded_date": null,
+      "table_I": {
+        "brackets": [
+          {
+            "max_cm2": 50,
+            "normal_mm": 1,
+            "blown_mm": 1.5
+          },
+          {
+            "max_cm2": 100,
+            "normal_mm": 1.5,
+            "blown_mm": 3
+          },
+          {
+            "max_cm2": 500,
+            "normal_mm": 2.5,
+            "blown_mm": 4
+          },
+          {
+            "max_cm2": 2500,
+            "normal_mm": 4,
+            "blown_mm": 6
+          },
+          {
+            "max_cm2": null,
+            "normal_mm": 6,
+            "blown_mm": 6
+          }
+        ]
+      }
+    },
+    "default_version": "consolidated_post_2021",
+    "exemption": {
+      "applies_when_another_law_governs": true,
+      "exempted_declarations": [
+        "net_weight",
+        "retail_sale_price",
+        "expiry_date",
+        "consumer_care"
+      ],
+      "exempted_categories": [
+        "food",
+        "cosmetics",
+        "seeds"
+      ]
+    }
+  },
+  "confidence_thresholds": {
+    "pass_min": 0.7,
+    "warn_min": 0.6
+  },
+  "checks": [
+    {
+      "rule_id": "r6_1_e_mrp",
+      "citation": "Rule 6(1)(e) of LMPC Rules 2011",
+      "field": "mrp",
+      "check_type": "presence_and_format",
+      "severity": "critical",
+      "requires": [
+        "mrp_value",
+        "tax_inclusive_phrase"
+      ],
+      "tax_inclusive_phrase_regex": "(?i)\\b(?:incl\\.?|inclusive|nciusive)\\s*(?:of\\s+)?(?:all|ail)?\\s*taxes?\\b",
+      "failure_message": "MRP must be declared and accompanied by 'Inclusive of all taxes'"
+    },
+    {
+      "rule_id": "r6_1_c_net_quantity",
+      "citation": "Rule 6(1)(c) read with Rule 13 of LMPC Rules 2011",
+      "field": "net_quantity",
+      "check_type": "presence_and_format",
+      "severity": "critical",
+      "requires": [
+        "net_quantity_value",
+        "net_quantity_unit"
+      ],
+      "requires_unit_in": [
+        "g",
+        "kg",
+        "ml",
+        "l",
+        "gm",
+        "GM",
+        "Kg",
+        "Litre",
+        "Liter",
+        "mL"
+      ],
+      "failure_message": "Net quantity must be declared in metric units (g/kg/ml/l)"
+    },
+    {
+      "rule_id": "r6_1_a_address",
+      "citation": "Rule 6(1)(a) read with Rule 10 of LMPC Rules 2011",
+      "field": "manufacturer_address",
+      "check_type": "presence_and_format",
+      "severity": "critical",
+      "requires": [
+        "manufacturer_name",
+        "address",
+        "pin_code"
+      ],
+      "pin_code_regex": "\\b([1-9][0-9]{5})\\b",
+      "failure_message": "Manufacturer/packer/importer name, complete address, and 6-digit PIN required"
+    },
+    {
+      "rule_id": "r6_2_consumer_care",
+      "citation": "Rule 6(2) of LMPC Rules 2011",
+      "field": "consumer_care",
+      "check_type": "presence_and_format",
+      "severity": "critical",
+      "requires": [
+        "consumer_care_name",
+        "consumer_care_address",
+        "consumer_care_phone",
+        "consumer_care_email"
+      ],
+      "email_regex": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "phone_regex": "(?:\\+91[\\s-]?)?[6-9]\\d{9}",
+      "failure_message": "Consumer care must include name, address, phone, and email (Rule 6(2))"
+    },
+    {
+      "rule_id": "r6_1_d_mfg_date",
+      "citation": "Rule 6(1)(d) of LMPC Rules 2011",
+      "field": "mfg_date",
+      "check_type": "presence_and_format",
+      "severity": "critical",
+      "requires": [
+        "mfg_date_value"
+      ],
+      "skipped_when_category_in": [
+        "food",
+        "cosmetics",
+        "seeds"
+      ],
+      "skipped_when_mode": "ecommerce_listing",
+      "date_format_regex": "(?i)\\b(?:mfg|mfd|manufactured|packed|pkd)[:\\s,.]*((0?[1-9]|1[0-2])[\\/\\-\\s]\\d{2,4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\s+\\d{4})",
+      "failure_message": "Month and year of manufacture required (skip if food/cosmetics/seeds or ecommerce mode)"
+    },
+    {
+      "rule_id": "r6_1_b_common_name",
+      "citation": "Rule 6(1)(b) of LMPC Rules 2011",
+      "field": "common_name",
+      "check_type": "presence_and_format",
+      "severity": "critical",
+      "requires": [
+        "common_name_value"
+      ],
+      "failure_message": "Common or generic name of the commodity is required",
+      "placement": {
+        "relationship": "inside_visible_panel"
+      },
+      "readability": {
+        "required": true
+      }
+    },
+    {
+      "rule_id": "r6_1_aa_country_origin",
+      "citation": "Rule 6(1)(aa) of LMPC Rules 2011",
+      "field": "country_origin",
+      "check_type": "presence_and_format",
+      "severity": "critical",
+      "requires": [
+        "country_origin_value"
+      ],
+      "failure_message": "Country of origin is required for imported products",
+      "applies_when": {
+        "imported": true,
+        "context_required": [
+          "imported"
+        ]
+      },
+      "placement": {
+        "relationship": "inside_visible_panel"
+      },
+      "readability": {
+        "required": true
+      }
+    },
+    {
+      "rule_id": "r6_1_a_importer_address",
+      "citation": "Rule 6(1)(a) of LMPC Rules 2011",
+      "field": "importer_address",
+      "check_type": "presence_and_format",
+      "severity": "critical",
+      "requires": [
+        "importer_address_value"
+      ],
+      "failure_message": "Importer name and complete address are required for imported products",
+      "applies_when": {
+        "imported": true,
+        "context_required": [
+          "imported"
+        ]
+      },
+      "placement": {
+        "relationship": "inside_visible_panel"
+      },
+      "readability": {
+        "required": true
+      }
+    },
+    {
+      "rule_id": "r6_1_da_best_before",
+      "citation": "Rule 6(1)(da) of LMPC Rules 2011",
+      "field": "best_before",
+      "check_type": "presence_and_format",
+      "severity": "warning",
+      "requires": [
+        "best_before_value"
+      ],
+      "failure_message": "Best-before, use-by, or expiry declaration is required when applicable",
+      "applies_when": {
+        "category_in": [
+          "food"
+        ],
+        "context_required": [
+          "category"
+        ]
+      },
+      "placement": {
+        "relationship": "inside_visible_panel"
+      },
+      "readability": {
+        "required": true
+      }
+    },
+    {
+      "rule_id": "r6_1_f_dimensions",
+      "citation": "Rule 6(1)(f) of LMPC Rules 2011",
+      "field": "dimensions",
+      "check_type": "presence_and_format",
+      "severity": "warning",
+      "requires": [
+        "dimensions_value"
+      ],
+      "failure_message": "Metric dimensional declaration is required when applicable",
+      "applies_when": {
+        "mode_in": [
+          "retail_image"
+        ],
+        "category_in": [
+          "non_food"
+        ],
+        "context_required": [
+          "category"
+        ]
+      },
+      "placement": {
+        "relationship": "inside_visible_panel"
+      },
+      "readability": {
+        "required": true
+      }
+    },
+    {
+      "rule_id": "r6_11_unit_sale_price",
+      "citation": "Rule 6(11) of LMPC Rules 2011",
+      "field": "unit_price",
+      "check_type": "presence_and_format",
+      "severity": "warning",
+      "requires": [
+        "unit_price_value"
+      ],
+      "failure_message": "Unit sale price in rupees per applicable unit is required",
+      "effective_from": "2023-06-01",
+      "exemption": {
+        "retail_sale_price_equals_unit_sale_price": true,
+        "package_types": [
+          "combination",
+          "group",
+          "multi_piece"
+        ],
+        "state_excise_governs_alcoholic_beverages": true
+      },
+      "placement": {
+        "relationship": "associated_with_related_declaration",
+        "related_fields": [
+          "mrp"
+        ]
+      },
+      "readability": {
+        "required": true
+      }
+    },
+    {
+      "rule_id": "r6_10_ecommerce_declarations",
+      "citation": "Rule 6(10) of LMPC Rules 2011",
+      "field": "listing_declarations",
+      "check_type": "aggregate_visibility",
+      "severity": "critical",
+      "requires": [
+        "listing_declarations"
+      ],
+      "failure_message": "Mandatory declarations must be visible in the submitted listing evidence",
+      "applies_when": {
+        "mode_in": [
+          "ecommerce_listing"
+        ]
+      },
+      "placement": {
+        "relationship": "visible_in_submitted_screenshot"
+      }
+    },
+    {
+      "rule_id": "r7_font_size",
+      "citation": "Rule 7 of LMPC Rules 2011",
+      "field": "declaration_readability",
+      "check_type": "readability",
+      "severity": "warning",
+      "requires": [
+        "declaration_readability"
+      ],
+      "failure_message": "Declaration character height must meet the applicable Rule 7 minimum",
+      "applies_when": {
+        "mode_in": [
+          "retail_image"
+        ]
+      },
+      "readability": {
+        "required": true,
+        "confidence_aware": true
+      }
+    }
+  ]
+}

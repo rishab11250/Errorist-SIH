@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "postinstall": "node scripts/copy-tesseract-assets.mjs",
+    "postinstall": "node scripts/copy-tesseract-assets.mjs && node scripts/compile-rules.mjs",
+    "rules:compile": "node scripts/compile-rules.mjs",
     "ocr:assets": "node scripts/copy-tesseract-assets.mjs",
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/compile-rules.mjs && next dev",
+    "build": "node scripts/compile-rules.mjs && next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,css,json,yaml,yml}\"",
@@ -37,6 +38,7 @@
     "sonner": "2.0.8",
     "tailwind-merge": "2.5.4",
     "tesseract.js": "5.1.1",
+    "yaml": "^2.9.0",
     "zod": "3.23.8"
   },
   "devDependencies": {

@@ -77,6 +77,9 @@ importers:
       tesseract.js:
         specifier: 5.1.1
         version: 5.1.1
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
       zod:
         specifier: 3.23.8
         version: 3.23.8

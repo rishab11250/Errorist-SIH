@@ -1,5 +1,9 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 /** @type {import('next').NextConfig} */
 const backendUrl = (process.env.LMPC_BACKEND_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+const repositoryRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const contentSecurityPolicy = [
   "default-src 'self'",
   "img-src 'self' data: blob:",
@@ -17,6 +21,7 @@ const contentSecurityPolicy = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  outputFileTracingRoot: repositoryRoot,
   async rewrites() {
     return [
       {

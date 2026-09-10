@@ -18,3 +18,4 @@ export * from './extractors/country-origin';
 export { extractBestBefore, PATTERN as BEST_BEFORE_PATTERN } from './extractors/best-before';
 export { extractDimensions, PATTERN as DIMENSIONS_PATTERN } from './extractors/dimensions';
 export { extractUnitPrice, PATTERN as UNIT_PRICE_PATTERN } from './extractors/unit-price';
+export * from './package-gate';

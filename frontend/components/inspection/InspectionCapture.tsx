@@ -8,7 +8,14 @@ import { ScanProgress } from '@/components/ui/scan-progress';
 import { Spotlight } from '@/components/ui/spotlight';
 import { postScan } from '@/lib/api';
 import { runOCR, type OCRRunResult } from '@/lib/ocr';
-import { assessQuality, extractAll, loadDefaultRules, overallStatus, runEngine } from '@/lib/rules';
+import {
+  assessPackageContent,
+  assessQuality,
+  extractAll,
+  loadDefaultRules,
+  overallStatus,
+  runEngine,
+} from '@/lib/rules';
 import { savePendingScan, updateSyncStatus, type PendingScanRecord } from '@/lib/storage';
 import type { ScanContext, ScanRequest, ScanResponse } from '@/lib/types';
 import { CameraCaptureGuide } from './CameraCaptureGuide';
@@ -319,6 +326,12 @@ export function InspectionCapture({ onComplete }: Props) {
       if (operation !== operationRef.current) return;
       if (ocr.words.length === 0 || !ocr.words.some((word) => word.text.trim())) {
         throw new Error('No readable text was found. Retake or upload a clearer label image.');
+      }
+      const packageCheck = assessPackageContent(ocr.words);
+      if (!packageCheck.isPackage) {
+        throw new Error(
+          'Non-packaging image detected. No statutory product declarations (MRP, Net Quantity, Batch, or Manufacturer details) were found. Please scan a physical product label or e-commerce listing.'
+        );
       }
       setStage('analyzing');
 

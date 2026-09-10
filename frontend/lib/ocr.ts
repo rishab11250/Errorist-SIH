@@ -41,6 +41,48 @@ export interface OCRRunResult {
   imageHeight: number;
 }
 
+/**
+ * Normalizes predictable OCR misrecognitions on Indian commodity packaging.
+ * Cleans up character-level noise for statutory declarations without fabricating data.
+ */
+export function normalizePackagingLexicon(rawText: string): string {
+  if (!rawText) return rawText;
+  let text = rawText.trim();
+
+  // Currency corrections (?99, F99, t99 -> ₹99)
+  text = text.replace(/^[?ftF](\d+(?:\.\d+)?)$/, '₹$1');
+
+  // MRP prefix noise
+  text = text.replace(/^M\.?\s*R\.?\s*P\.?[:.]?$/i, 'MRP:');
+
+  // Net Quantity abbreviations (Net Oty, Net Qlv, Net Otv -> Net Qty)
+  text = text.replace(/\bNet\s*Oty\b/i, 'Net Qty');
+  text = text.replace(/\bNet\s*Qlv\b/i, 'Net Qty');
+  text = text.replace(/\bNet\s*Otv\b/i, 'Net Qty');
+  text = text.replace(/\bNet\s*Ouantity\b/i, 'Net Quantity');
+
+  // Metric unit confusion: 500q -> 500g, 200q -> 200g (q or 9 mistaken for g)
+  text = text.replace(/^(\d+)[q9]$/, '$1g');
+  text = text.replace(/^(\d+)k[q9]$/i, '$1kg');
+  text = text.replace(/^(\d+)m[1I|]$/i, '$1ml');
+
+  // FSSAI misreadings (ESsat, FSSAL, Issai)
+  if (/^(?:ESsat|FSSAL|Fssal|Issai)$/i.test(text)) {
+    text = 'FSSAI';
+  }
+
+  // License prefix
+  if (/^Lie\.?\s*No\.?$/i.test(text)) {
+    text = 'Lic. No.';
+  }
+
+  // Customer care misreadings
+  text = text.replace(/\bCustormer\s*Care\b/i, 'Customer Care');
+  text = text.replace(/\bCustmer\s*Care\b/i, 'Customer Care');
+
+  return text;
+}
+
 function throwIfAborted(signal?: AbortSignal) {
   if (signal?.aborted) throw new DOMException('The inspection was canceled.', 'AbortError');
 }
@@ -221,7 +263,7 @@ export async function runOCR(
       const origW = (x1 - x0) / scale;
       const origH = (y1 - y0) / scale;
       return {
-        text: word.text,
+        text: normalizePackagingLexicon(word.text),
         confidence: word.confidence / 100,
         bbox: normaliseBbox([origX, origY, origW, origH], width, height),
       };

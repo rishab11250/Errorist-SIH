@@ -278,31 +278,33 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
 
   const statusColor =
     quality.status === 'ready'
-      ? 'border-emerald-500 text-emerald-400 bg-emerald-500/15'
+      ? 'border-emerald-400/60 text-emerald-300 bg-emerald-950/80 shadow-[0_0_15px_rgba(16,185,129,0.35)]'
       : quality.status === 'blurry'
-        ? 'border-rose-500 text-rose-400 bg-rose-500/15'
-        : 'border-amber-500 text-amber-400 bg-amber-500/15';
+        ? 'border-rose-400/60 text-rose-300 bg-rose-950/80 shadow-[0_0_15px_rgba(244,63,94,0.35)]'
+        : 'border-amber-400/60 text-amber-300 bg-amber-950/80 shadow-[0_0_15px_rgba(245,158,11,0.35)]';
 
   const frameBorderColor =
     quality.status === 'ready'
       ? readyStreak >= 3
-        ? 'border-emerald-300 shadow-[0_0_25px_rgba(52,211,153,0.8)] ring-4 ring-emerald-400/50 scale-[1.01]'
-        : 'border-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.4)]'
+        ? 'border-emerald-300 shadow-[0_0_30px_rgba(52,211,153,0.85)] ring-4 ring-emerald-400/60 scale-[1.015]'
+        : 'border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.5)] ring-2 ring-emerald-400/30'
       : quality.status === 'blurry'
-        ? 'border-rose-400/80'
-        : 'border-amber-400/80';
+        ? 'border-rose-400/90 shadow-[0_0_15px_rgba(244,63,94,0.3)]'
+        : 'border-amber-400/90 shadow-[0_0_15px_rgba(245,158,11,0.3)]';
 
   if (cameraError) {
     return (
-      <div className="surface-panel rounded-xl border border-dashed p-6 text-center">
-        <AlertTriangle className="mx-auto size-10 text-amber-500" />
-        <p className="mt-3 font-semibold text-foreground">{cameraError}</p>
-        <p className="mt-1 text-sm text-muted-foreground">
+      <div className="surface-panel rounded-2xl border-2 border-dashed p-8 text-center shadow-lg">
+        <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-amber-500/15 text-amber-500">
+          <AlertTriangle className="size-7" />
+        </div>
+        <p className="mt-4 text-base font-semibold text-foreground">{cameraError}</p>
+        <p className="mt-1.5 text-sm text-muted-foreground max-w-md mx-auto">
           You can retry opening the camera or switch to file upload below.
         </p>
-        <div className="mt-4 flex justify-center gap-3">
-          <Button type="button" variant="outline" onClick={startCamera}>
-            <RefreshCw className="mr-2 size-4" /> Try camera again
+        <div className="mt-5 flex justify-center gap-3">
+          <Button type="button" variant="outline" onClick={startCamera} className="gap-2 font-semibold">
+            <RefreshCw className="size-4" /> Try camera again
           </Button>
         </div>
       </div>
@@ -310,76 +312,104 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
   }
 
   return (
-    <div className="relative mx-auto flex flex-col items-center overflow-hidden rounded-2xl bg-black shadow-2xl">
+    <div className="relative mx-auto flex flex-col items-center overflow-hidden rounded-2xl bg-neutral-950 shadow-2xl border border-neutral-800">
       {/* Video Viewport */}
-      <div className="relative aspect-[4/3] w-full max-w-2xl overflow-hidden sm:aspect-[16/10]">
+      <div className="relative aspect-[4/3] w-full max-w-2xl overflow-hidden sm:aspect-[16/10] bg-black">
         <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
 
-        {/* Framing Mask Overlay */}
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center p-4">
-          {/* Top Label */}
-          <div className="mb-2 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur-md">
+        {/* Ambient Dark Mask with Cutout Effect */}
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-between p-4 sm:p-6 bg-gradient-to-b from-black/60 via-transparent to-black/70">
+          {/* Top Header Label */}
+          <div className="flex items-center gap-2 rounded-full border border-white/15 bg-black/75 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-neutral-200 backdrop-blur-md shadow-md">
+            <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
             Primary Declaration Panel Guide
           </div>
 
-          {/* Guide Rectangle Box */}
+          {/* Target Declaration Panel Frame */}
           <div
-            className={`relative aspect-[16/9] w-[85%] max-w-[480px] rounded-lg border-2 transition-all duration-300 ${frameBorderColor}`}
+            className={`relative aspect-[16/9] w-[88%] max-w-[500px] rounded-xl border-2 transition-all duration-300 backdrop-brightness-105 ${frameBorderColor}`}
           >
-            {/* 4 ID-Scanner Style Corner Brackets */}
-            <div className="absolute -left-1 -top-1 size-5 border-l-4 border-t-4 border-white" />
-            <div className="absolute -right-1 -top-1 size-5 border-r-4 border-t-4 border-white" />
-            <div className="absolute -bottom-1 -left-1 size-5 border-b-4 border-l-4 border-white" />
-            <div className="absolute -bottom-1 -right-1 size-5 border-b-4 border-r-4 border-white" />
+            {/* High-Tech Corner Reticles */}
+            <div className="absolute -left-1.5 -top-1.5 size-6 border-l-[3.5px] border-t-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+            <div className="absolute -right-1.5 -top-1.5 size-6 border-r-[3.5px] border-t-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+            <div className="absolute -bottom-1.5 -left-1.5 size-6 border-b-[3.5px] border-l-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+            <div className="absolute -bottom-1.5 -right-1.5 size-6 border-b-[3.5px] border-r-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
 
-            {/* Inner Helper Grid / Text */}
+            {/* Subtle Crosshairs */}
+            <div className="absolute left-1/2 top-2 h-2 w-px -translate-x-1/2 bg-white/40" />
+            <div className="absolute bottom-2 left-1/2 h-2 w-px -translate-x-1/2 bg-white/40" />
+            <div className="absolute left-2 top-1/2 h-px w-2 -translate-y-1/2 bg-white/40" />
+            <div className="absolute right-2 top-1/2 h-px w-2 -translate-y-1/2 bg-white/40" />
+
+            {/* Central Helper Pill */}
             <div className="flex h-full flex-col items-center justify-center p-2 text-center">
-              <p className="rounded bg-black/50 px-2 py-0.5 text-xs font-medium text-white/90">
+              <p className="rounded-full border border-white/10 bg-black/60 px-3 py-1 text-xs font-medium text-white/95 backdrop-blur-md shadow-sm">
                 Frame MRP, Net Qty & Mfg Info Here
               </p>
             </div>
           </div>
 
-          {/* Dynamic Real-time Status Badge */}
-          <div
-            className={`mt-3 inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-semibold backdrop-blur-md transition-all ${statusColor}`}
-          >
-            {quality.status === 'ready' ? (
-              <CheckCircle2 className="size-4" />
-            ) : quality.status === 'too_dark' || quality.status === 'too_bright' ? (
-              <Sun className="size-4" />
-            ) : quality.status === 'glare' ? (
-              <Zap className="size-4" />
-            ) : (
-              <Focus className="size-4" />
-            )}
-            <span>{quality.message}</span>
+          {/* Dynamic Real-Time Status & Readiness Bar */}
+          <div className="flex flex-col items-center gap-1.5">
+            <div
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold backdrop-blur-md transition-all duration-200 ${statusColor}`}
+            >
+              {quality.status === 'ready' ? (
+                <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+              ) : quality.status === 'too_dark' || quality.status === 'too_bright' ? (
+                <Sun className="size-4 text-amber-400 shrink-0" />
+              ) : quality.status === 'glare' ? (
+                <Zap className="size-4 text-amber-400 shrink-0" />
+              ) : (
+                <Focus className="size-4 text-rose-400 shrink-0" />
+              )}
+              <span>{quality.message}</span>
+            </div>
+
+            {/* Auto-Snap Streak Indicator */}
+            {autoCapture && quality.status === 'ready' ? (
+              <div className="flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300/90 backdrop-blur-sm">
+                <span>Auto-snap lock:</span>
+                <div className="flex gap-1">
+                  {[0, 1, 2].map((idx) => (
+                    <span
+                      key={idx}
+                      className={`size-2 rounded-full transition-all duration-200 ${
+                        readyStreak > idx
+                          ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)] scale-110'
+                          : 'bg-neutral-600/70'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
 
       {/* Camera Controls Bar */}
-      <div className="flex w-full items-center justify-between bg-neutral-950 p-4 text-white">
+      <div className="flex w-full items-center justify-between bg-neutral-950/95 px-4 py-3.5 text-white border-t border-neutral-800/80 backdrop-blur-sm">
         <button
           type="button"
           onClick={() => setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'))}
-          className="rounded-full bg-neutral-800 p-2.5 text-neutral-300 transition-colors hover:bg-neutral-700"
+          className="rounded-full bg-neutral-900 border border-neutral-800 p-2.5 text-neutral-300 transition-all hover:bg-neutral-800 hover:text-white active:scale-95"
           title="Switch camera"
           aria-label="Switch camera front/back"
         >
           <RefreshCw className="size-5" />
         </button>
 
-        {/* Capture Action */}
+        {/* Primary Capture Action */}
         <div className="flex items-center gap-3">
           <Button
             type="button"
             size="lg"
             disabled={(!cameraActive || quality.status !== 'ready') && !canOverride}
             onClick={handleCapture}
-            className={`min-w-44 rounded-full px-6 py-6 text-base font-bold shadow-lg transition-all ${
+            className={`min-w-44 rounded-full px-6 py-6 text-base font-bold shadow-lg transition-all active:scale-98 ${
               quality.status === 'ready'
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/40'
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/60 ring-2 ring-emerald-400/40'
                 : 'bg-primary hover:bg-primary/90 text-primary-foreground'
             }`}
           >
@@ -392,13 +422,14 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
           </Button>
         </div>
 
+        {/* Auto-Snap Toggle */}
         <button
           type="button"
           onClick={() => setAutoCapture((prev) => !prev)}
-          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${
+          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95 ${
             autoCapture
-              ? 'border border-emerald-500/50 bg-emerald-500/20 text-emerald-300'
-              : 'border border-neutral-700 bg-neutral-800 text-neutral-400'
+              ? 'border border-emerald-500/60 bg-emerald-500/20 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
+              : 'border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-300'
           }`}
           title="Auto-snap after 3 steady frames (~1.3s)"
           aria-label={`Toggle auto-snap (currently ${autoCapture ? 'on' : 'off'})`}

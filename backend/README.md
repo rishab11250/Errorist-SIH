@@ -87,12 +87,14 @@ Every export uses the caller's authorized scan scope. Inspectors receive 404 for
 
 ## Backup and restore
 
-Stop the backend before copying SQLite files so the database and any journal are consistent.
+Create a consistent backup while the WAL-mode database remains live:
 
 ```bash
-install -d -m 700 /srv/errorist/backups
-cp --preserve=mode,timestamps /srv/errorist/data/lmpc.db \
-  /srv/errorist/backups/lmpc-$(date +%Y%m%d-%H%M%S).db
+mkdir -p /srv/errorist/backups
+cd backend
+.venv/bin/python -m scripts.backup_db \
+  --database /srv/errorist/data/lmpc.db \
+  --backup-dir /srv/errorist/backups
 ```
 
 To restore, stop the backend, preserve the current file under a different name, copy the selected backup to the configured `LMPC_DB_PATH`, ensure only the service account can read it, and start the backend. Startup validates and upgrades the restored database.

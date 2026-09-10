@@ -8,6 +8,8 @@ import { ScanProgress } from '@/components/ui/scan-progress';
 import { Spotlight } from '@/components/ui/spotlight';
 import { postScan } from '@/lib/api';
 import { runOCR, type OCRRunResult } from '@/lib/ocr';
+import { assessQuality, extractAll, loadDefaultRules, overallStatus, runEngine } from '@/lib/rules';
+import { savePendingScan, updateSyncStatus, type PendingScanRecord } from '@/lib/storage';
 import type { ScanContext, ScanRequest, ScanResponse } from '@/lib/types';
 import { CameraCaptureGuide } from './CameraCaptureGuide';
 
@@ -265,14 +267,123 @@ export function InspectionCapture({ onComplete }: Props) {
         throw new Error('No readable text was found. Retake or upload a clearer label image.');
       }
       setStage('analyzing');
-      const response = await postScan(
-        buildScanRequest(ocr, { mode, category, imported }),
-        controller.signal
+
+      const rules = loadDefaultRules();
+      const imageMeta = {
+        width: ocr.imageWidth,
+        height: ocr.imageHeight,
+        orientation: 1,
+      };
+      const scanContext: ScanContext = { mode, category, imported };
+      const localQuality = assessQuality(ocr.words);
+      const localExtracted = extractAll(ocr.words, imageMeta, scanContext, rules);
+      const localVerdicts = runEngine(
+        { extracted: localExtracted, quality: localQuality },
+        rules,
+        scanContext
       );
+      const localOverall = overallStatus(localVerdicts);
+
+      const localId =
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+      const pendingRecord: PendingScanRecord = {
+        local_id: localId,
+        captured_at: new Date().toISOString(),
+        rule_version: rules.version,
+        image_blob: scanFile,
+        ocr_payload: ocr.words,
+        scan_context: scanContext,
+        verdicts: localVerdicts,
+        sync_status: 'pending',
+        sync_attempts: 0,
+      };
+
+      try {
+        await savePendingScan(pendingRecord);
+      } catch (storageErr) {
+        console.warn('Could not save pending scan to IndexedDB:', storageErr);
+      }
       if (operation !== operationRef.current) return;
+
+      const offlineNumericId =
+        Math.abs(
+          localId.split('').reduce((acc, char) => (acc << 5) - acc + char.charCodeAt(0), 0)
+        ) || Date.now();
+
+      const qualitySummary: ScanResponse['quality'] = {
+        status: localQuality.status,
+        score: localQuality.score,
+        guidance: localQuality.guidance,
+        metrics: localQuality.metrics.map((m) => ({
+          name: m.name,
+          value: m.value,
+          unit: m.unit,
+          confidence: m.confidence,
+          method: m.method,
+          evidence_bboxes: m.evidence_bboxes ?? [],
+        })),
+      };
+
+      const extractedFields: ScanResponse['extracted_fields'] = {};
+      for (const [key, field] of Object.entries(localExtracted)) {
+        extractedFields[key] = field
+          ? {
+              name: field.name,
+              value: field.value,
+              bbox: field.bbox,
+              confidence: field.confidence,
+              evidence_bboxes: field.evidence_spans || [],
+            }
+          : null;
+      }
+
+      const localResponse: ScanResponse = {
+        scan_id: offlineNumericId,
+        processing_status: 'complete',
+        quality: qualitySummary,
+        extracted_fields: extractedFields,
+        verdicts: localVerdicts,
+        overall_status: localOverall,
+        analysis_version: rules.version,
+      };
+
+      const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+      if (isOffline) {
+        setStage('saving');
+        setStage('complete');
+        onComplete({ ...ocr, response: localResponse });
+        return;
+      }
+
+      let finalResponse = localResponse;
+      try {
+        finalResponse = await postScan(buildScanRequest(ocr, scanContext), controller.signal);
+        if (operation !== operationRef.current) return;
+        try {
+          await updateSyncStatus(localId, 'synced');
+        } catch {}
+      } catch (err) {
+        if (operation !== operationRef.current) return;
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          throw err;
+        }
+        const isNetworkFailure =
+          err instanceof TypeError ||
+          (err instanceof Error &&
+            /failed to fetch|fetch failed|network|load failed|offline/i.test(err.message));
+        if (isNetworkFailure) {
+          finalResponse = localResponse;
+        } else {
+          throw err;
+        }
+      }
+
       setStage('saving');
       setStage('complete');
-      onComplete({ ...ocr, response });
+      onComplete({ ...ocr, response: finalResponse });
     } catch (reason) {
       if (operation !== operationRef.current) return;
       setStage('error');

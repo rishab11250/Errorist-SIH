@@ -77,3 +77,10 @@ export function listPendingScans() {
 export function countUnsyncedPendingScans() {
   return runtime().countUnsyncedRecords();
 }
+
+export async function getPendingOrFailedScans(): Promise<PendingScanRecord[]> {
+  const records = await listPendingScans();
+  return records.filter(
+    (record) => record.sync_status === 'pending' || record.sync_status === 'failed'
+  );
+}

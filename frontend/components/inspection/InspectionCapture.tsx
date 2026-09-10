@@ -7,6 +7,7 @@ import { useCallback, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScanProgress } from '@/components/ui/scan-progress';
 import { Spotlight } from '@/components/ui/spotlight';
+import { cn } from '@/lib/cn';
 import { postScan } from '@/lib/api';
 import { runOCR, type OCRRunResult } from '@/lib/ocr';
 import {
@@ -214,6 +215,7 @@ export function InspectionCapture({ onComplete }: Props) {
     status: 'good' | 'warning';
     notes: string[];
   } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
   const operationRef = useRef(0);
   const [scanWorkflow, setScanWorkflow] = useState<'single' | 'multi'>('single');
@@ -378,9 +380,20 @@ export function InspectionCapture({ onComplete }: Props) {
     reader.readAsDataURL(selected);
   }, []);
 
+  const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const onDragLeave = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+  }, []);
+
   const onDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
+      setIsDragging(false);
       if (busy) return;
       const selected = event.dataTransfer.files?.[0];
       if (selected) handleFile(selected);
@@ -967,25 +980,33 @@ export function InspectionCapture({ onComplete }: Props) {
           <>
             {mode === 'retail_image' && !file ? (
               <div className="space-y-4">
-                <div className="flex items-center justify-center gap-2">
-                  <Button
-                    type="button"
-                    variant={captureMethod === 'camera' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setCaptureMethod('camera')}
-                    className="gap-2 font-semibold"
-                  >
-                    <Camera className="size-4" /> Guided Camera
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={captureMethod === 'upload' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setCaptureMethod('upload')}
-                    className="gap-2 font-semibold"
-                  >
-                    <ImageUp className="size-4" /> Upload File
-                  </Button>
+                <div className="flex items-center justify-center">
+                  <div className="inline-flex rounded-lg border border-border/80 bg-muted/40 p-1 shadow-inner">
+                    <Button
+                      type="button"
+                      variant={captureMethod === 'camera' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setCaptureMethod('camera')}
+                      className={cn(
+                        'gap-2 font-semibold transition-all',
+                        captureMethod === 'camera' && 'shadow-sm'
+                      )}
+                    >
+                      <Camera className="size-4" /> Guided Camera
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={captureMethod === 'upload' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setCaptureMethod('upload')}
+                      className={cn(
+                        'gap-2 font-semibold transition-all',
+                        captureMethod === 'upload' && 'shadow-sm'
+                      )}
+                    >
+                      <ImageUp className="size-4" /> Upload File
+                    </Button>
+                  </div>
                 </div>
 
                 {captureMethod === 'camera' ? (
@@ -1007,9 +1028,15 @@ export function InspectionCapture({ onComplete }: Props) {
 
             {mode === 'ecommerce_listing' || captureMethod === 'upload' || Boolean(file) ? (
               <div
-                onDragOver={(event) => event.preventDefault()}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
                 onDrop={onDrop}
-                className="surface-panel border-2 border-dashed p-5 text-center sm:p-8"
+                className={cn(
+                  'surface-panel relative rounded-xl border-2 border-dashed p-5 text-center transition-all duration-200 sm:p-8',
+                  isDragging
+                    ? 'border-primary bg-primary/10 shadow-lg ring-4 ring-primary/20 scale-[1.01]'
+                    : 'border-border/80 hover:border-primary/50'
+                )}
               >
                 {preview && secondaryPreview ? (
                   <div className="space-y-4">

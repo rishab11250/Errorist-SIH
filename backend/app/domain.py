@@ -37,6 +37,7 @@ class ExtractedField:
     bbox: tuple[float, float, float, float] | None
     confidence: float
     evidence_spans: list[tuple[float, float, float, float]] = field(default_factory=list)
+    conflicting_values: list[str] = field(default_factory=list)
 
 
 Mode = Literal["retail_image", "ecommerce_listing"]

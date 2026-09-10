@@ -275,6 +275,33 @@ export function validateUnitSalePrice(
   return [true, null];
 }
 
+export function isSmallPackExempt(
+  netQtyText: string | null | undefined
+): [boolean, string | null] {
+  if (!netQtyText) return [false, null];
+  const m = /(\d+(?:\.\d+)?)\s*([a-zA-Z]+)?/.exec(netQtyText);
+  if (!m) return [false, null];
+  const val = parseFloat(m[1]);
+  if (isNaN(val) || val <= 0) return [false, null];
+  const unitRaw = (m[2] || '').toLowerCase();
+  if (!unitRaw) {
+    if (val === 1.0) return [true, 'single piece/unit package'];
+    return [false, null];
+  }
+  const info = UNIT_FACTORS[unitRaw];
+  if (!info) return [false, null];
+  const [dim, factor] = info;
+  const qtyInBase = val * factor;
+  if ((dim === 'mass' || dim === 'volume') && qtyInBase <= 10.0) {
+    const unitDisplay = dim === 'mass' ? 'g' : 'ml';
+    return [true, `net quantity ${val}${unitRaw} <= 10${unitDisplay}`];
+  }
+  if (dim === 'count' && qtyInBase === 1.0) {
+    return [true, `single unit/piece package (${val} ${unitRaw})`];
+  }
+  return [false, null];
+}
+
 function collectEvidenceBoxes(
   extracted: ExtractedField | null | undefined,
   readability: ReadabilityAssessment | null | undefined,
@@ -591,6 +618,22 @@ export function verdictForCheck(
     });
   }
 
+  if (check.rule_id === 'r6_11_unit_sale_price' && !hasValue) {
+    const netQtyField = analysis.extracted.net_quantity;
+    const netQtyText = netQtyField ? netQtyField.value : null;
+    const [isExempt, exemptReason] = isSmallPackExempt(netQtyText);
+    if (isExempt) {
+      return buildVerdict(check, rules, {
+        status: 'na',
+        reasoning: `Unit sale price declaration is exempt under Rule 6(11) Second Proviso and Rule 26 of LMPC Rules 2011 (${exemptReason}).`,
+        confidence: netQtyField ? netQtyField.confidence : 1.0,
+        evidence: netQtyText ? `Exempted: ${netQtyText}` : 'Exempted',
+        evidence_bboxes: netQtyField ? netQtyField.evidence_spans : boxes,
+        measurement_method: method,
+      });
+    }
+  }
+
   if (!hasValue && check.exemption && Object.keys(check.exemption).length > 0) {
     return buildVerdict(check, rules, {
       status: 'manual_review',
@@ -696,17 +739,36 @@ export function verdictForCheck(
     }
   }
 
+  let mrpConflictNote: string | null = null;
+  if (
+    check.rule_id === 'r6_1_e_mrp' &&
+    hasValue &&
+    extracted &&
+    extracted.value
+  ) {
+    const conflicting = extracted.conflicting_values || [];
+    if (conflicting.length > 1) {
+      const pricesStr = conflicting
+        .map((p) => (p.startsWith('Rs') || p.startsWith('₹') ? p : `Rs ${p}`))
+        .join(', ');
+      mrpConflictNote = `Multiple conflicting MRP declarations detected (${pricesStr}). Potential Rule 18(2) violation (dual MRP / price tampering / over-stickering).`;
+    }
+  }
+
   const warningPresent = Boolean(
     analysis.quality.status === 'usable_with_warnings' ||
       (extracted &&
         extracted.confidence < rules.confidence_thresholds.pass_min) ||
       (readability && readability.status === 'warn') ||
       (placement && placement.status === 'warn') ||
-      uspMismatchNote !== null
+      uspMismatchNote !== null ||
+      mrpConflictNote !== null
   );
 
   let reasoning: string;
-  if (uspMismatchNote) {
+  if (mrpConflictNote) {
+    reasoning = mrpConflictNote;
+  } else if (uspMismatchNote) {
     reasoning = `Declaration present with mathematical discrepancy: ${uspMismatchNote}`;
   } else if (warningPresent) {
     reasoning =

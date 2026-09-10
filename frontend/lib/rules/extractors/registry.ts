@@ -72,6 +72,7 @@ function runMrp(
       bbox: extracted.bbox,
       confidence: extracted.confidence,
       evidence_spans: extracted.evidence_spans,
+      conflicting_values: extracted.conflicting_values,
     };
   }
   return extracted;

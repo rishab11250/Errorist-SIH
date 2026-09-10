@@ -192,6 +192,37 @@ def _validate_unit_sale_price(
     return True, None
 
 
+def _is_small_pack_exempt(net_qty_text: str | None) -> tuple[bool, str | None]:
+    """Rule 6(11) Second Proviso / Rule 26: <= 10g or <= 10ml or single item (count == 1)."""
+    if not net_qty_text:
+        return False, None
+    m = re.search(r"(\d+(?:\.\d+)?)\s*([a-zA-Z]+)?", net_qty_text)
+    if not m:
+        return False, None
+    try:
+        val = float(m.group(1))
+    except ValueError:
+        return False, None
+    if val <= 0:
+        return False, None
+    unit_raw = (m.group(2) or "").lower()
+    if not unit_raw:
+        if val == 1.0:
+            return True, "single piece/unit package"
+        return False, None
+    info = UNIT_FACTORS.get(unit_raw)
+    if not info:
+        return False, None
+    dim, factor = info
+    qty_in_base = val * factor
+    if dim in ("mass", "volume") and qty_in_base <= 10.0:
+        unit_display = "g" if dim == "mass" else "ml"
+        return True, f"net quantity {val:g}{unit_raw} <= 10{unit_display}"
+    if dim == "count" and qty_in_base == 1.0:
+        return True, f"single unit/piece package ({val:g} {unit_raw})"
+    return False, None
+
+
 def _legacy_analysis(extracted: dict[str, ExtractedField | None]) -> AnalysisInput:
     return AnalysisInput(
         extracted=extracted,
@@ -456,6 +487,25 @@ def _verdict_for_check(
             evidence_bboxes=boxes,
             measurement_method=method,
         )
+    if check.rule_id == "r6_11_unit_sale_price" and not has_value:
+        net_qty_field = analysis.extracted.get("net_quantity")
+        net_qty_text = net_qty_field.value if net_qty_field else None
+        is_exempt, exempt_reason = _is_small_pack_exempt(net_qty_text)
+        if is_exempt:
+            return _verdict(
+                check,
+                rules,
+                status="na",
+                reasoning=(
+                    f"Unit sale price declaration is exempt under Rule 6(11) Second Proviso and "
+                    f"Rule 26 of LMPC Rules 2011 ({exempt_reason})."
+                ),
+                confidence=net_qty_field.confidence if net_qty_field else 1.0,
+                evidence=f"Exempted: {net_qty_text}" if net_qty_text else "Exempted",
+                evidence_bboxes=net_qty_field.evidence_spans if net_qty_field else boxes,
+                measurement_method=method,
+            )
+
     if not has_value and check.exemption:
         return _verdict(
             check,
@@ -547,14 +597,27 @@ def _verdict_for_check(
         if not valid:
             usp_mismatch_note = note
 
+    mrp_conflict_note: str | None = None
+    if check.rule_id == "r6_1_e_mrp" and has_value and extracted is not None:
+        conflicting = getattr(extracted, "conflicting_values", None) or []
+        if len(conflicting) > 1:
+            prices_str = ", ".join(f"Rs {p}" if not p.startswith(("Rs", "₹")) else p for p in conflicting)
+            mrp_conflict_note = (
+                f"Multiple conflicting MRP declarations detected ({prices_str}). "
+                "Potential Rule 18(2) violation (dual MRP / price tampering / over-stickering)."
+            )
+
     warning_present = (
         analysis.quality.status == "usable_with_warnings"
         or (extracted is not None and extracted.confidence < rules.confidence_thresholds.pass_min)
         or (readability is not None and readability.status == "warn")
         or (placement is not None and placement.status == "warn")
         or (usp_mismatch_note is not None)
+        or (mrp_conflict_note is not None)
     )
-    if usp_mismatch_note:
+    if mrp_conflict_note:
+        reasoning = mrp_conflict_note
+    elif usp_mismatch_note:
         reasoning = f"Declaration present with mathematical discrepancy: {usp_mismatch_note}"
     elif warning_present:
         reasoning = "The declaration is present, but one or more evidence signals carry a warning."

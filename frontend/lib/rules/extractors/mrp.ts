@@ -14,14 +14,29 @@ export function extractMrp(
   verticalTolerance = 0.06
 ): ExtractedField {
   const phrase = compileRegex(phraseRegex, 'i');
-  let priceWord: OCRWord | null = null;
-  let value: string | null = null;
+  const candidates: Array<{
+    priceWord: OCRWord;
+    value: string;
+    numeric: number;
+  }> = [];
+  const seenNumeric = new Set<number>();
 
   for (let i = 0; i < ocrWords.length; i++) {
     let sampleText = ocrWords
       .slice(i, Math.min(i + 4, ocrWords.length))
       .map((w) => w.text)
       .join(' ');
+
+    if (/\b(?:save|off|cashback|discount)\b/i.test(sampleText)) {
+      continue;
+    }
+    if (
+      /\/\s*(?:g|gm|kg|ml|l|unit|u|pc|piece)\b|\b(?:per\s+(?:g|gm|kg|ml|l|unit|u|pc|piece))\b|\b(?:usp|unit\s*price)\b/i.test(
+        sampleText
+      )
+    ) {
+      continue;
+    }
 
     let m = PRICE_PATTERN.exec(sampleText);
     if (!m && MRP_PREFIX_BRANCH.test(sampleText) && !/\d/.test(sampleText)) {
@@ -41,20 +56,27 @@ export function extractMrp(
         .replace(/I/g, '1');
 
       if (/\d/.test(cleaned)) {
-        priceWord = ocrWords[i];
-        value = cleaned;
-        break;
+        const numVal = parseFloat(cleaned.replace(/,/g, ''));
+        if (!isNaN(numVal) && numVal > 0 && !seenNumeric.has(numVal)) {
+          seenNumeric.add(numVal);
+          candidates.push({
+            priceWord: ocrWords[i],
+            value: cleaned,
+            numeric: numVal,
+          });
+        }
       }
     }
   }
 
-  if (!priceWord) {
+  if (candidates.length === 0) {
     return {
       name: 'mrp',
       value: null,
       bbox: null,
       confidence: 0.0,
       evidence_spans: [],
+      conflicting_values: [],
     };
   }
 
@@ -72,40 +94,59 @@ export function extractMrp(
     ? verticalTolerance
     : verticalTolerance * (imageMeta.height > 0 ? imageMeta.height : 1000.0);
 
-  const nearby = ocrWords.filter(
-    (w) => Math.abs(w.bbox[1] - priceWord!.bbox[1]) <= vertTol
-  );
-  const joined = nearby.map((w) => w.text).join(' ');
-  const match = phrase.exec(joined);
+  let bestCand = candidates[0];
+  let bestPhraseWords: OCRWord[] = [];
+  let bestMatch: RegExpExecArray | null = null;
 
-  if (!match) {
+  for (const cand of candidates) {
+    const nearby = ocrWords.filter(
+      (w) => Math.abs(w.bbox[1] - cand.priceWord.bbox[1]) <= vertTol
+    );
+    const joined = nearby.map((w) => w.text).join(' ');
+    const match = phrase.exec(joined);
+    if (match) {
+      bestCand = cand;
+      bestMatch = match;
+      let pos = 0;
+      const phraseWords: OCRWord[] = [];
+      const matchStart = match.index;
+      const matchEnd = match.index + match[0].length;
+      for (const w of nearby) {
+        const start = pos;
+        const end = start + w.text.length;
+        if (!(end < matchStart || start > matchEnd)) {
+          phraseWords.push(w);
+        }
+        pos = end + 1;
+      }
+      bestPhraseWords = phraseWords;
+      break;
+    }
+  }
+
+  const priceWord = bestCand.priceWord;
+  const value = bestCand.value;
+  const conflicting =
+    candidates.length > 1 ? candidates.map((c) => c.value) : [];
+  const extraSpans = candidates
+    .filter((c) => c.priceWord !== priceWord)
+    .map((c) => c.priceWord.bbox);
+
+  if (!bestMatch) {
     return {
       name: 'mrp',
       value: null,
       bbox: priceWord.bbox,
       confidence: priceWord.confidence,
-      evidence_spans: [priceWord.bbox],
+      evidence_spans: [priceWord.bbox, ...extraSpans],
+      conflicting_values: conflicting,
     };
   }
 
-  let pos = 0;
-  const phraseWords: OCRWord[] = [];
-  const matchStart = match.index;
-  const matchEnd = match.index + match[0].length;
-
-  for (const w of nearby) {
-    const start = pos;
-    const end = start + w.text.length;
-    if (!(end < matchStart || start > matchEnd)) {
-      phraseWords.push(w);
-    }
-    pos = end + 1;
-  }
-
   const evidenceWords =
-    phraseWords.length > 0
-      ? [priceWord, ...phraseWords.filter((w) => w !== priceWord)]
-      : [priceWord, ...nearby];
+    bestPhraseWords.length > 0
+      ? [priceWord, ...bestPhraseWords.filter((w) => w !== priceWord)]
+      : [priceWord];
 
   return {
     name: 'mrp',
@@ -115,6 +156,8 @@ export function extractMrp(
     evidence_spans: [
       priceWord.bbox,
       ...evidenceWords.filter((w) => w !== priceWord).map((w) => w.bbox),
+      ...extraSpans,
     ],
+    conflicting_values: conflicting,
   };
 }

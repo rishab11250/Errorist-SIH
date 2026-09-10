@@ -26,10 +26,20 @@ def extract_mrp(
     vertical_tolerance: float = 0.06,
 ) -> ExtractedField | None:
     phrase = re.compile(phrase_regex, re.I)
-    price_word = None
-    value = None
+    candidates: list[dict] = []
+    seen_numeric: set[float] = set()
+
     for i in range(len(ocr_words)):
         sample_text = " ".join(w.text for w in ocr_words[i : min(i + 4, len(ocr_words))])
+        if re.search(r"\b(?:save|off|cashback|discount)\b", sample_text, re.I):
+            continue
+        if re.search(
+            r"/\s*(?:g|gm|kg|ml|l|unit|u|pc|piece)\b|\b(?:per\s+(?:g|gm|kg|ml|l|unit|u|pc|piece))\b|\b(?:usp|unit\s*price)\b",
+            sample_text,
+            re.I,
+        ):
+            continue
+
         m = PRICE_PATTERN.match(sample_text)
         if not m and MRP_PREFIX_BRANCH.match(sample_text) and not re.search(r"\d", sample_text):
             sample_text = " ".join(w.text for w in ocr_words[i : min(i + 8, len(ocr_words))])
@@ -40,11 +50,21 @@ def extract_mrp(
                 raw_val.replace("o", "0").replace("O", "0").replace("l", "1").replace("I", "1")
             )
             if re.search(r"\d", cleaned):
-                price_word = ocr_words[i]
-                value = cleaned
-                break
-    if not price_word:
+                try:
+                    num_val = float(cleaned.replace(",", ""))
+                except ValueError:
+                    num_val = None
+                if num_val is not None and num_val > 0 and num_val not in seen_numeric:
+                    seen_numeric.add(num_val)
+                    candidates.append({
+                        "price_word": ocr_words[i],
+                        "value": cleaned,
+                        "numeric": num_val,
+                    })
+
+    if not candidates:
         return ExtractedField("mrp", None, None, 0.0, [])
+
     is_normalized = bool(
         ocr_words
         and all(
@@ -57,30 +77,54 @@ def extract_mrp(
         if is_normalized
         else vertical_tolerance * (image_meta.height if image_meta.height > 0 else 1000.0)
     )
-    nearby = [w for w in ocr_words if abs(w.bbox[1] - price_word.bbox[1]) <= vert_tol]
-    joined = " ".join(w.text for w in nearby)
-    match = phrase.search(joined)
-    if not match:
+
+    best_cand = candidates[0]
+    best_phrase_words: list[OCRWord] = []
+    best_match = None
+
+    for cand in candidates:
+        nearby = [w for w in ocr_words if abs(w.bbox[1] - cand["price_word"].bbox[1]) <= vert_tol]
+        joined = " ".join(w.text for w in nearby)
+        match = phrase.search(joined)
+        if match:
+            best_cand = cand
+            best_match = match
+            pos = 0
+            for w in nearby:
+                start = pos
+                end = start + len(w.text)
+                if not (end < match.start() or start > match.end()):
+                    best_phrase_words.append(w)
+                pos = end + 1
+            break
+
+    price_word = best_cand["price_word"]
+    value = best_cand["value"]
+    conflicting = [c["value"] for c in candidates] if len(candidates) > 1 else []
+    extra_spans = [
+        c["price_word"].bbox for c in candidates if c["price_word"] is not price_word
+    ]
+
+    if not best_match:
         return ExtractedField(
-            "mrp", None, price_word.bbox, price_word.confidence, [price_word.bbox]
+            "mrp",
+            None,
+            price_word.bbox,
+            price_word.confidence,
+            [price_word.bbox, *extra_spans],
+            conflicting,
         )
-    pos = 0
-    phrase_words: list[OCRWord] = []
-    for w in nearby:
-        start = pos
-        end = start + len(w.text)
-        if not (end < match.start() or start > match.end()):
-            phrase_words.append(w)
-        pos = end + 1
+
     evidence_words = (
-        [price_word] + [w for w in phrase_words if w is not price_word]
-        if phrase_words
-        else [price_word, *nearby]
+        [price_word] + [w for w in best_phrase_words if w is not price_word]
+        if best_phrase_words
+        else [price_word]
     )
     return ExtractedField(
         "mrp",
         value,
         merge_bboxes(evidence_words),
         avg_confidence(evidence_words),
-        [price_word.bbox, *[w.bbox for w in evidence_words if w is not price_word]],
+        [price_word.bbox, *[w.bbox for w in evidence_words if w is not price_word], *extra_spans],
+        conflicting,
     )

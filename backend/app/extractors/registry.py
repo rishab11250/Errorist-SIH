@@ -51,6 +51,7 @@ def _mrp(words: list[OCRWord], meta: ImageMeta, rules: RulesConfig):
             bbox=extracted.bbox,
             confidence=extracted.confidence,
             evidence_spans=extracted.evidence_spans,
+            conflicting_values=extracted.conflicting_values,
         )
     return extracted
 

@@ -19,6 +19,7 @@ export interface ExtractedField {
   bbox: BoundingBox | null;
   confidence: number;
   evidence_spans: BoundingBox[];
+  conflicting_values?: string[];
 }
 
 export type Mode = 'retail_image' | 'ecommerce_listing';

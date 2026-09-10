@@ -174,17 +174,21 @@ export function InspectionResult({
       {isRetakeRecommended ? (
         <section
           aria-label="Quality Gate Intervention"
-          className="rounded-xl border-2 border-amber-500/40 bg-amber-500/10 p-6 sm:p-8 space-y-5"
+          className="rounded-2xl border-2 border-amber-500/40 bg-gradient-to-b from-amber-500/15 via-amber-500/5 to-background p-6 sm:p-8 space-y-6 shadow-xl"
         >
-          <div className="flex flex-col sm:flex-row items-start gap-4">
-            <div className="rounded-xl bg-amber-500/20 p-3 text-amber-600 dark:text-amber-400 shrink-0">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
+            <div className="rounded-2xl bg-amber-500/20 border border-amber-500/30 p-3.5 text-amber-600 dark:text-amber-400 shrink-0 shadow-inner">
               <Camera className="size-8" />
             </div>
-            <div className="space-y-1">
-              <h2 className="text-xl font-bold text-amber-900 dark:text-amber-200">
+            <div className="space-y-1.5 flex-1">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                <ShieldAlert className="size-3.5" />
+                Quality Safeguard Active
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
                 Photo quality insufficient for reliable inspection
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 The image quality or OCR readability is below the required threshold to evaluate
                 LMPC mandatory declarations reliably. Showing false non-compliance violations on
                 unreadable evidence is misleading. Please retake the photo using the guided camera
@@ -194,11 +198,11 @@ export function InspectionResult({
           </div>
 
           {result.quality.guidance.length ? (
-            <div className="rounded-lg border bg-background/80 p-4 space-y-2">
+            <div className="rounded-xl border border-border/80 bg-surface/90 p-4 sm:p-5 space-y-2.5 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Recommended Actions
               </p>
-              <ul className="list-disc space-y-1 pl-5 text-sm">
+              <ul className="list-disc space-y-1.5 pl-5 text-sm">
                 {result.quality.guidance.map((g) => (
                   <li key={g} className="font-medium text-foreground">
                     {g}
@@ -209,21 +213,23 @@ export function InspectionResult({
           ) : null}
 
           {failedMetrics.length ? (
-            <div className="rounded-lg border bg-background/80 p-4 space-y-2">
+            <div className="rounded-xl border border-border/80 bg-surface/90 p-4 sm:p-5 space-y-3 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Failed Quality Checks
               </p>
-              <div className="grid gap-2.5 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {failedMetrics.map((item) => (
                   <div
                     key={item.label}
-                    className="flex items-center justify-between rounded-md border bg-muted/40 px-3.5 py-2.5 text-sm"
+                    className="flex items-center justify-between rounded-lg border border-fail/20 bg-fail/5 p-3.5 text-sm transition-all"
                   >
                     <div>
-                      <p className="font-medium">{item.label}</p>
-                      <p className="text-xs text-muted-foreground">Expected: {item.expected}</p>
+                      <p className="font-semibold text-foreground">{item.label}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Expected: {item.expected}</p>
                     </div>
-                    <span className="font-mono font-bold text-fail">{item.current}</span>
+                    <span className="font-mono font-bold text-fail bg-fail/10 border border-fail/20 rounded-md px-2.5 py-1 text-sm">
+                      {item.current}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -231,9 +237,9 @@ export function InspectionResult({
           ) : null}
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
-            <Button asChild size="lg" className="gap-2 font-semibold">
+            <Button asChild size="lg" className="gap-2.5 font-bold shadow-md bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-6 text-base">
               <Link href="/">
-                <RotateCcw className="size-4" /> Retake photo (Guided camera)
+                <RotateCcw className="size-5" /> Retake photo (Guided camera)
               </Link>
             </Button>
             <Button
@@ -241,6 +247,7 @@ export function InspectionResult({
               variant="outline"
               size="lg"
               onClick={() => setShowUnreliableReview((prev) => !prev)}
+              className="text-muted-foreground hover:text-foreground border-border hover:bg-muted/50"
             >
               {showUnreliableReview ? 'Hide raw results' : 'Review anyway (unreliable)'}
             </Button>
@@ -250,15 +257,15 @@ export function InspectionResult({
 
       <QualityPanel quality={result.quality} />
 
-      <section className={`rounded-lg border p-5 ${overall.className}`} aria-label="Overall status">
-        <div className="flex items-center gap-3">
-          <OverallIcon aria-hidden="true" className="size-7" />
+      <section className={`rounded-xl border p-5 sm:p-6 shadow-sm ${overall.className}`} aria-label="Overall status">
+        <div className="flex items-center gap-3.5">
+          <OverallIcon aria-hidden="true" className="size-8 shrink-0" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider">Overall status</p>
-            <h2 className="font-heading text-xl font-semibold">{overall.label}</h2>
+            <h2 className="font-heading text-xl sm:text-2xl font-bold">{overall.label}</h2>
           </div>
         </div>
-        <p className="mt-2 text-sm">{overall.detail}</p>
+        <p className="mt-2 text-sm leading-relaxed">{overall.detail}</p>
       </section>
 
       {isRetakeRecommended && !showUnreliableReview ? (
@@ -275,12 +282,12 @@ export function InspectionResult({
               activeRuleId={null}
             />
           </section>
-          <div className="surface-panel p-6 space-y-4">
+          <div className="surface-panel p-6 sm:p-8 space-y-4">
             <div className="flex items-center gap-3 text-amber-600 dark:text-amber-400">
-              <ShieldAlert className="size-6" />
-              <h3 className="font-heading text-lg font-semibold">Automated checks paused</h3>
+              <ShieldAlert className="size-7 shrink-0" />
+              <h3 className="font-heading text-lg font-bold">Automated checks paused</h3>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               To prevent false non-compliance verdicts caused by garbled OCR reading, detailed rule
               verdicts are withheld. Click <strong>&quot;Retake photo&quot;</strong> to capture a
               clearer image of the primary declaration panel, or toggle{' '}
@@ -294,10 +301,10 @@ export function InspectionResult({
           {isRetakeRecommended && showUnreliableReview ? (
             <div
               role="alert"
-              className="rounded-lg border border-warn/40 bg-warn/10 p-4 text-sm text-warn"
+              className="rounded-xl border border-warn/40 bg-warn/10 p-4 text-sm text-warn shadow-sm"
             >
               <p className="font-semibold">⚠️ Displaying unverified findings</p>
-              <p className="mt-1">
+              <p className="mt-1 text-xs sm:text-sm">
                 Image quality was marked retake recommended. Detections below may contain false
                 failures due to unreadable OCR.
               </p>
@@ -323,20 +330,25 @@ export function InspectionResult({
                 activeRuleId={activeRuleId}
               />
             </section>
-            <section aria-labelledby="findings-heading" className="space-y-3">
+            <section aria-labelledby="findings-heading" className="space-y-3.5">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 id="findings-heading" className="text-h2">
-                  Declaration checks
-                </h2>
+                <div>
+                  <h2 id="findings-heading" className="text-h2">
+                    Declaration checks
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Showing {visibleVerdicts.length} of {result.verdicts.length} statutory checks
+                  </p>
+                </div>
                 <label className="text-sm font-semibold">
                   <span className="sr-only">Filter findings</span>
                   <select
                     aria-label="Filter findings"
                     value={filter}
                     onChange={(event) => setFilter(event.target.value as ResultFilter)}
-                    className="h-11 rounded-md border bg-background px-3"
+                    className="h-11 rounded-lg border bg-background px-3 text-sm font-medium shadow-sm"
                   >
-                    <option value="all">All findings</option>
+                    <option value="all">All findings ({result.verdicts.length})</option>
                     <option value="attention">Needs attention</option>
                     <option value="pass">Passing only</option>
                   </select>
@@ -352,7 +364,7 @@ export function InspectionResult({
                   />
                 ))
               ) : (
-                <p className="surface-panel p-5 text-muted-foreground">
+                <p className="surface-panel p-6 text-center text-muted-foreground">
                   No findings match this filter.
                 </p>
               )}
@@ -361,29 +373,39 @@ export function InspectionResult({
         </>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 pt-2">
         <ReviewForm
           scanId={result.scanId}
           onSubmitted={(review) => setReviews((all) => [...all, review])}
         />
-        <section className="surface-panel p-5" aria-labelledby="review-history-heading">
-          <h2 id="review-history-heading" className="text-h2">
-            Review history
-          </h2>
+        <section className="surface-panel p-6" aria-labelledby="review-history-heading">
+          <div className="flex items-center justify-between border-b pb-3">
+            <h2 id="review-history-heading" className="text-h2">
+              Review history
+            </h2>
+            <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+              {reviews.length} actions
+            </span>
+          </div>
           {reviews.length ? (
-            <ol className="mt-4 space-y-4">
+            <ol className="mt-4 space-y-3.5">
               {reviews.map((review) => (
-                <li key={review.id} className="border-l-2 border-primary pl-3 text-sm">
-                  <p className="font-semibold capitalize">{review.action.replaceAll('_', ' ')}</p>
-                  <p>{review.note || 'No note recorded.'}</p>
-                  <p className="text-muted-foreground">
-                    {review.actor_display_name} · {new Date(review.created_at).toLocaleString()}
+                <li key={review.id} className="rounded-lg border bg-surface p-3.5 text-sm shadow-xs space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold capitalize text-foreground">{review.action.replaceAll('_', ' ')}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(review.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                  <p className="text-sm text-foreground/90">{review.note || 'No note recorded.'}</p>
+                  <p className="text-xs text-muted-foreground pt-0.5">
+                    {review.actor_display_name} · {new Date(review.created_at).toLocaleDateString()}
                   </p>
                 </li>
               ))}
             </ol>
           ) : (
-            <p className="mt-3 text-sm text-muted-foreground">No review actions recorded.</p>
+            <p className="mt-4 text-sm text-muted-foreground text-center py-6">No review actions recorded.</p>
           )}
         </section>
       </div>

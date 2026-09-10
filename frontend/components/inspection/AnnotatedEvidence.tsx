@@ -2,12 +2,12 @@ import { denormaliseBbox } from '@/lib/bbox';
 import Image from 'next/image';
 import type { Verdict } from '@/lib/types';
 
-const strokes: Record<Verdict['status'], string> = {
-  pass: '#15803d',
-  fail: '#b91c1c',
-  warn: '#b45309',
-  manual_review: '#7e22ce',
-  na: '#475569',
+const strokeColors: Record<Verdict['status'], string> = {
+  pass: '#10b981',
+  fail: '#ef4444',
+  warn: '#f59e0b',
+  manual_review: '#a855f7',
+  na: '#64748b',
 };
 
 interface AnnotatedEvidenceProps {
@@ -27,14 +27,14 @@ export function AnnotatedEvidence({
 }: AnnotatedEvidenceProps) {
   return (
     <figure className="space-y-3">
-      <div className="relative overflow-hidden rounded-md bg-muted">
+      <div className="relative overflow-hidden rounded-lg border border-border/60 bg-muted shadow-sm">
         <Image
           src={imageSrc}
           alt="Inspection evidence"
           width={imageWidth}
           height={imageHeight}
           unoptimized
-          className="h-auto w-full"
+          className="h-auto w-full object-contain"
         />
         <svg
           aria-hidden="true"
@@ -42,31 +42,77 @@ export function AnnotatedEvidence({
           viewBox={`0 0 ${imageWidth} ${imageHeight}`}
           preserveAspectRatio="none"
         >
+          <defs>
+            <filter id="evidence-shadow" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="0" stdDeviation="1.5" floodColor="#000000" floodOpacity="0.85" />
+            </filter>
+            <filter id="active-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#000000" floodOpacity="0.9" />
+              <feGaussianBlur stdDeviation="1" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
           {verdicts.flatMap((verdict) =>
             verdict.evidence_bboxes.map((bbox, index) => {
               const box = denormaliseBbox(bbox, imageWidth, imageHeight);
               const active = verdict.rule_id === activeRuleId;
+              const color = strokeColors[verdict.status] ?? '#64748b';
+              const isDashed = verdict.status === 'fail';
+              const isDotted = verdict.status === 'manual_review';
+
               return (
-                <rect
-                  key={`${verdict.rule_id}-${index}`}
-                  data-testid={`evidence-box-${verdict.rule_id}-${index}`}
-                  data-active={active ? 'true' : 'false'}
-                  x={box.x}
-                  y={box.y}
-                  width={box.w}
-                  height={box.h}
-                  fill={active ? `${strokes[verdict.status]}22` : 'transparent'}
-                  stroke={strokes[verdict.status]}
-                  strokeWidth={active ? 5 : 2}
-                  vectorEffect="non-scaling-stroke"
-                />
+                <g key={`${verdict.rule_id}-${index}`}>
+                  {/* Outer dark stroke for guaranteed contrast against white backgrounds */}
+                  <rect
+                    x={box.x}
+                    y={box.y}
+                    width={box.w}
+                    height={box.h}
+                    fill="transparent"
+                    stroke="#000000"
+                    strokeWidth={active ? 6 : 3.5}
+                    strokeOpacity={0.6}
+                    vectorEffect="non-scaling-stroke"
+                    rx={2}
+                  />
+                  {/* Main colored bounding box */}
+                  <rect
+                    data-testid={`evidence-box-${verdict.rule_id}-${index}`}
+                    data-active={active ? 'true' : 'false'}
+                    x={box.x}
+                    y={box.y}
+                    width={box.w}
+                    height={box.h}
+                    fill={active ? `${color}33` : 'transparent'}
+                    stroke={color}
+                    strokeWidth={active ? 4 : 2}
+                    strokeDasharray={isDashed ? '6 3' : isDotted ? '2 2' : undefined}
+                    filter={active ? 'url(#active-glow)' : 'url(#evidence-shadow)'}
+                    vectorEffect="non-scaling-stroke"
+                    rx={2}
+                  />
+                </g>
               );
             })
           )}
         </svg>
       </div>
-      <figcaption className="text-sm text-muted-foreground">
-        Select a finding to emphasize its matching evidence boxes. Status is also shown in text.
+      <figcaption className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+        <span>Select a finding below to highlight matching evidence spans.</span>
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
+            <span className="size-2 rounded-full bg-emerald-500" /> Pass
+          </span>
+          <span className="inline-flex items-center gap-1 font-medium text-red-600 dark:text-red-400">
+            <span className="size-2 rounded-full border border-red-500 bg-red-500/30" /> Fail (dashed)
+          </span>
+          <span className="inline-flex items-center gap-1 font-medium text-amber-600 dark:text-amber-400">
+            <span className="size-2 rounded-full bg-amber-500" /> Warning
+          </span>
+          <span className="inline-flex items-center gap-1 font-medium text-purple-600 dark:text-purple-400">
+            <span className="size-2 rounded-full border border-purple-500 bg-purple-500/30" /> Review (dotted)
+          </span>
+        </div>
       </figcaption>
     </figure>
   );

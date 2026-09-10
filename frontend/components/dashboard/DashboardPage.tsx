@@ -27,8 +27,7 @@ export function DashboardPage({
 }) {
   const router = useRouter();
   const { user } = useAuth();
-  const initialFilters = useMemo(() => filtersFromParams(initialSearchParams), []);
-  const [filters, setFilters] = useState(initialFilters);
+  const [filters, setFilters] = useState(() => filtersFromParams(initialSearchParams));
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);

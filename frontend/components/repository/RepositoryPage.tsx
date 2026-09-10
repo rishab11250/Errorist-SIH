@@ -27,9 +27,8 @@ export function RepositoryPage({
   const router = useRouter();
   const auth = useOptionalAuth();
   const sourceParams = initialSearchParams;
-  const initialFilters = useMemo(() => filtersFromParams(sourceParams), []);
   const initialPage = Math.max(1, Number.parseInt(String(sourceParams.page ?? '1'), 10) || 1);
-  const [filters, setFilters] = useState(initialFilters);
+  const [filters, setFilters] = useState(() => filtersFromParams(sourceParams));
   const [page, setPage] = useState(initialPage);
   const [result, setResult] = useState<HistoryResponse | null>(null);
   const [loading, setLoading] = useState(true);

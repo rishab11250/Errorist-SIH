@@ -34,6 +34,20 @@ describe('scan v2 contract', () => {
     expect(request.image_b64).toBe('aGVsbG8=');
   });
 
+  it.each(['food', 'non_food', 'cosmetics', 'seeds'] as const)(
+    'preserves the %s product category in the scan contract',
+    (category) => {
+      const request = buildScanRequest(ocrFixture, {
+        mode: 'retail_image',
+        category,
+        imported: false,
+      });
+
+      expect(request.scan_context.category).toBe(category);
+      expect(request.scan_context.mode).toBe('retail_image');
+    }
+  );
+
   it('uses manual-review status without collapsing it to warn', () => {
     expect(statusLabel('manual_review')).toBe('Manual review');
     expect(statusClass('manual_review')).toContain('review');

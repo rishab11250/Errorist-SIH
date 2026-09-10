@@ -7,9 +7,11 @@ import {
   installPendingScanSyncTriggers,
   PENDING_SCANS_SYNC_TAG,
   requestPendingScanSync,
+  syncSinglePendingScan,
   SYNC_PENDING_SCANS_MESSAGE,
 } from '@/lib/offline-sync';
 import { type PendingScanRecord, validatePendingScanRecord } from '@/lib/offline-scans';
+import { getPendingScan, savePendingScan } from '@/lib/storage';
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -42,6 +44,32 @@ function pendingRecord(): PendingScanRecord {
 }
 
 describe('offline scan sync', () => {
+  it('posts the captured snapshot and marks it synced after the backend accepts it', async () => {
+    const record = pendingRecord();
+    await savePendingScan(record);
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 201 })));
+
+    await syncSinglePendingScan(record);
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const [url, request] = vi.mocked(fetch).mock.calls[0];
+    expect(url).toBe('/api/scan/sync');
+    expect(request).toMatchObject({
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const body = JSON.parse(String(request?.body));
+    expect(body.local_id).toBe(record.local_id);
+    expect(body.rule_version).toBe(record.rule_version);
+    expect(body.image_b64).toBe('aW1hZ2U=');
+    expect(body.verdicts[0].rule_version).toBe(record.rule_version);
+
+    const stored = await getPendingScan(record.local_id);
+    expect(stored?.sync_status).toBe('synced');
+    expect(stored?.sync_attempts).toBe(1);
+  });
+
   it('rejects a verdict snapshot whose version differs from capture time', () => {
     const record = pendingRecord();
     record.verdicts[0].rule_version = 'new-backend-version';

@@ -248,4 +248,55 @@ describe('TypeScript vs Python Parity Verification', () => {
       });
     }
   });
+
+  describe('Rules Configuration Parity (YAML vs JSON)', () => {
+    it('asserts rules.json precisely mirrors rules.yaml without drift', async () => {
+      const fs = await import('node:fs/promises');
+      const path = await import('node:path');
+      const yaml = await import('yaml');
+
+      const yamlPath = path.resolve(__dirname, '../../backend/app/rules.yaml');
+      const jsonPath = path.resolve(__dirname, '../lib/rules/rules.json');
+
+      const yamlRaw = await fs.readFile(yamlPath, 'utf8');
+      const jsonRaw = await fs.readFile(jsonPath, 'utf8');
+
+      const parsedYaml = yaml.parse(yamlRaw);
+      const parsedJson = JSON.parse(jsonRaw);
+
+      // 1. Schema version and version date
+      expect(parsedJson.schema_version).toBe(parsedYaml.schema_version);
+      expect(parsedJson.version).toBe(parsedYaml.version);
+
+      // 2. Confidence thresholds
+      expect(parsedJson.confidence_thresholds).toEqual(parsedYaml.confidence_thresholds);
+
+      // 3. Font size rules
+      expect(parsedJson.font_size_rules).toEqual(parsedYaml.font_size_rules);
+
+      // 4. Checks rule IDs, citations, severities, and applicability
+      const yamlChecks = parsedYaml.checks;
+      const jsonChecks = parsedJson.checks;
+
+      expect(jsonChecks.length).toBe(yamlChecks.length);
+
+      const yamlMap = new Map(yamlChecks.map((c: any) => [c.rule_id, c]));
+      const jsonMap = new Map(jsonChecks.map((c: any) => [c.rule_id, c]));
+
+      expect(Array.from(jsonMap.keys()).sort()).toEqual(Array.from(yamlMap.keys()).sort());
+
+      for (const [ruleId, yCheck] of yamlMap.entries()) {
+        const jCheck: any = jsonMap.get(ruleId);
+        expect(jCheck, `Missing rule in JSON: ${ruleId}`).toBeDefined();
+        expect(jCheck.citation).toBe((yCheck as any).citation);
+        expect(jCheck.severity).toBe((yCheck as any).severity);
+        expect(jCheck.title).toBe((yCheck as any).title);
+        expect(jCheck.field).toBe((yCheck as any).field);
+        expect(jCheck.applies_when).toEqual((yCheck as any).applies_when);
+        expect(jCheck.thresholds).toEqual((yCheck as any).thresholds);
+        expect(jCheck.effective_from).toBe((yCheck as any).effective_from);
+        expect(jCheck.exemption).toEqual((yCheck as any).exemption);
+      }
+    });
+  });
 });

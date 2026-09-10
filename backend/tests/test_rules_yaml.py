@@ -139,3 +139,35 @@ def test_unknown_applicability_key_is_rejected(tmp_path: Path) -> None:
     invalid_rules.write_text(yaml.safe_dump(raw), encoding="utf-8")
     with pytest.raises(RulesLoadError, match="unsupported applicability"):
         load_rules(invalid_rules)
+
+
+def test_frontend_compiled_rules_json_matches_rules_yaml() -> None:
+    """Ensure frontend/lib/rules/rules.json has exact parity with backend/app/rules.yaml."""
+    import json
+
+    yaml_path = Path(__file__).parents[1] / "app" / "rules.yaml"
+    json_path = Path(__file__).parents[2] / "frontend" / "lib" / "rules" / "rules.json"
+
+    assert json_path.exists(), f"Missing compiled rules JSON: {json_path}"
+
+    raw_yaml = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
+    raw_json = json.loads(json_path.read_text(encoding="utf-8"))
+
+    assert raw_json["schema_version"] == raw_yaml["schema_version"]
+    assert raw_json["version"] == raw_yaml["version"]
+    assert raw_json["confidence_thresholds"] == raw_yaml["confidence_thresholds"]
+    assert raw_json["font_size_rules"] == raw_yaml["font_size_rules"]
+
+    yaml_checks = {c["rule_id"]: c for c in raw_yaml["checks"]}
+    json_checks = {c["rule_id"]: c for c in raw_json["checks"]}
+
+    assert set(json_checks.keys()) == set(yaml_checks.keys())
+
+    for rule_id, y_chk in yaml_checks.items():
+        j_chk = json_checks[rule_id]
+        assert j_chk["citation"] == y_chk["citation"]
+        assert j_chk["severity"] == y_chk["severity"]
+        assert j_chk.get("thresholds") == y_chk.get("thresholds")
+        assert j_chk.get("applies_when") == y_chk.get("applies_when")
+        assert j_chk.get("effective_from") == y_chk.get("effective_from")
+        assert j_chk.get("exemption") == y_chk.get("exemption")

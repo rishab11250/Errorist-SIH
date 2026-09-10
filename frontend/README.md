@@ -32,6 +32,12 @@ Production deployments should put Next.js behind HTTPS, set the backend's `LMPC_
 
 The production Content Security Policy keeps `connect-src` at `'self'`; label OCR must not depend on a CDN or other runtime internet service. Re-run `pnpm ocr:assets` after changing a pinned Tesseract package.
 
+## LMPC Rules Pipeline and Synchronization
+
+The client-side rules engine reads precompiled rules from `frontend/lib/rules/rules.json`, which is derived from the single source of truth in `backend/app/rules.yaml`.
+
+If you edit `backend/app/rules.yaml`, you **MUST** run `pnpm rules:compile` before committing, and CI/test suites (`pnpm rules:check` / `pytest backend/tests/test_rules_yaml.py`) will catch it and fail loudly if you don't. Automatic compilation also runs during `pnpm prebuild`, `pnpm pretest`, and `pnpm dev`.
+
 ## Formatting, tests, and production build
 
 Prettier is intentionally scoped to frontend source and configuration files. Markdown, generated Next.js files, dependencies, coverage, and the lockfile are excluded.

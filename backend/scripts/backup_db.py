@@ -21,9 +21,10 @@ def backup_database(database: Path, backup_dir: Path) -> Path:
     if destination.exists():
         raise FileExistsError(f"backup already exists: {destination}")
 
-    with sqlite3.connect(source) as source_connection:
-        with sqlite3.connect(destination) as destination_connection:
-            source_connection.backup(destination_connection)
+    with sqlite3.connect(source) as source_connection, sqlite3.connect(
+        destination
+    ) as destination_connection:
+        source_connection.backup(destination_connection)
     return destination
 
 

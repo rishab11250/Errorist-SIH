@@ -4,10 +4,9 @@ from __future__ import annotations
 
 import ipaddress
 import logging
-import os
 import re
-from urllib.parse import urlsplit
 import uuid
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError

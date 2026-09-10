@@ -353,9 +353,9 @@ def create_scan(
     session.add(scan)
     try:
         session.commit()
-    except IntegrityError:
+    except IntegrityError as exc:
         session.rollback()
-        raise AppError(409, "scan_conflict", "A conflicting scan record already exists.")
+        raise AppError(409, "scan_conflict", "A conflicting scan record already exists.") from exc
     session.refresh(scan)
 
     try:

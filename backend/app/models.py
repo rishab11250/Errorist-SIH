@@ -9,7 +9,6 @@ from uuid import UUID
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.errors import AppError
 from app.settings import DEFAULT_MAX_OCR_WORDS
 
 
@@ -102,11 +101,9 @@ class ScanRequest(BaseModel):
     @classmethod
     def validate_ocr_payload_length(cls, value: list[OCRWordIn]) -> list[OCRWordIn]:
         if len(value) > DEFAULT_MAX_OCR_WORDS:
-            raise AppError(
-                422,
-                "ocr_payload_too_large",
+            raise ValueError(
                 f"OCR word count ({len(value)}) exceeds "
-                f"maximum allowed limit of {DEFAULT_MAX_OCR_WORDS}.",
+                f"maximum allowed limit of {DEFAULT_MAX_OCR_WORDS}."
             )
         return value
 
@@ -186,11 +183,9 @@ class OfflineScanSyncRequest(BaseModel):
     @classmethod
     def validate_sync_ocr_payload_length(cls, value: list[OCRWordIn]) -> list[OCRWordIn]:
         if len(value) > DEFAULT_MAX_OCR_WORDS:
-            raise AppError(
-                422,
-                "ocr_payload_too_large",
+            raise ValueError(
                 f"OCR word count ({len(value)}) exceeds "
-                f"maximum allowed limit of {DEFAULT_MAX_OCR_WORDS}.",
+                f"maximum allowed limit of {DEFAULT_MAX_OCR_WORDS}."
             )
         return value
 

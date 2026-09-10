@@ -1,0 +1,9 @@
+{
+  "name": "lmpc-backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node dev.mjs",
+    "start": "node dev.mjs"
+  }
+}

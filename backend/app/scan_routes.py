@@ -8,11 +8,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.analysis_pipeline import PipelineError, analyze_scan
 from app.auth.dependencies import authorized_scan, get_auth_settings, require_user
-from app.db import Scan, User, VerdictRow, get_session
+from app.db import ReviewAction, Scan, User, VerdictRow, get_session
 from app.domain import AnalysisResult, ExtractedField, QualitySummary, Verdict
 from app.errors import AppError
 from app.models import (
@@ -351,7 +351,11 @@ def create_scan(
         owner_user_id=current_user.id,
     )
     session.add(scan)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise AppError(409, "scan_conflict", "A conflicting scan record already exists.")
     session.refresh(scan)
 
     try:
@@ -399,11 +403,17 @@ def get_scan(
     scan = authorized_scan(session, current_user, scan_id)
     if scan is None:
         raise HTTPException(status_code=404, detail="scan_not_found")
-    # Eagerly load relationships to avoid N+1 queries
-    session.refresh(scan, attribute_names=["verdicts", "review_actions"])
-    for action in scan.review_actions:
-        if action.actor is None:
-            session.refresh(action, attribute_names=["actor"])
+    session.refresh(scan, attribute_names=["verdicts"])
+    # Eagerly load review_actions with actor to avoid N+1 queries
+    scan.review_actions = (
+        session.execute(
+            select(ReviewAction)
+            .where(ReviewAction.scan_id == scan.id)
+            .options(selectinload(ReviewAction.actor))
+        )
+        .scalars()
+        .all()
+    )
     return {
         "scan": {
             "id": scan.id,

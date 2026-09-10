@@ -34,7 +34,8 @@
       request.onupgradeneeded = () => {
         const database = request.result;
         if (!database.objectStoreNames.contains(STORE_NAME)) {
-          database.createObjectStore(STORE_NAME, { keyPath: 'local_id' });
+          const store = database.createObjectStore(STORE_NAME, { keyPath: 'local_id' });
+          store.createIndex('by-sync-status', 'sync_status');
         }
       };
       request.onsuccess = () => {

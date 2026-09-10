@@ -1,0 +1,11 @@
+{
+  "name": "errorist-sih",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -C frontend dev",
+    "dev:backend": "pnpm -C backend dev",
+    "dev:frontend": "pnpm -C frontend dev",
+    "dev:all": "node scripts/dev-all.mjs"
+  }
+}

@@ -24,15 +24,21 @@ export function PwaRegistration() {
 
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') return;
+    let mounted = true;
     let removeSyncTriggers: (() => void) | undefined;
     void registerPwaServiceWorker(pathname === '/')
       .then((registration) => {
-        if (registration) removeSyncTriggers = installPendingScanSyncTriggers(registration);
+        if (registration && mounted) {
+          removeSyncTriggers = installPendingScanSyncTriggers(registration);
+        }
       })
       .catch((error: unknown) => {
         console.error('PWA service worker registration failed.', error);
       });
-    return () => removeSyncTriggers?.();
+    return () => {
+      mounted = false;
+      removeSyncTriggers?.();
+    };
   }, [pathname]);
 
   return null;

@@ -1,12 +1,17 @@
 # Python
 __pycache__/
 *.py[cod]
+
+# Large binaries
+SIH.pdf
 *.egg-info/
 .venv/
 .pytest_cache/
 .ruff_cache/
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
 
 # Node
 node_modules/

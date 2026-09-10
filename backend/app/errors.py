@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import ipaddress
 import logging
 import re
+from urllib.parse import urlsplit
 import uuid
 
 from fastapi import FastAPI, Request
@@ -16,6 +18,32 @@ from starlette.responses import Response
 from app.settings import AuthSettings
 
 logger = logging.getLogger(__name__)
+
+
+def is_allowed_origin(origin: str, allowed_origins: tuple[str, ...]) -> bool:
+    clean = origin.rstrip("/")
+    if clean in allowed_origins:
+        return True
+    try:
+        parsed = urlsplit(clean)
+        host = (parsed.hostname or "").lower()
+        if (
+            host.endswith(".ngrok-free.app")
+            or host.endswith(".ngrok-free.dev")
+            or host.endswith(".ngrok.app")
+            or host.endswith(".ngrok.dev")
+            or host.endswith(".ngrok.io")
+            or host.endswith(".trycloudflare.com")
+            or host.endswith(".localtunnel.me")
+        ):
+            return True
+        ip = ipaddress.ip_address(host)
+        if ip.is_private or ip.is_loopback:
+            return True
+    except Exception:
+        pass
+    return False
+
 
 _REQUEST_ID = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 _ERROR_CODE = re.compile(r"^[a-z][a-z0-9_]*$")
@@ -83,7 +111,7 @@ class BrowserRequestSecurityMiddleware(BaseHTTPMiddleware):
         if request.url.path.startswith("/api/") and request.method in {"POST", "PATCH", "DELETE"}:
             settings = getattr(request.app.state, "auth_settings", AuthSettings())
             origin = request.headers.get("origin")
-            if origin is not None and origin.rstrip("/") not in settings.allowed_browser_origins:
+            if origin is not None and not is_allowed_origin(origin, settings.allowed_browser_origins):
                 return JSONResponse(
                     status_code=403,
                     content=error_body(

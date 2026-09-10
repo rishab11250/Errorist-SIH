@@ -333,7 +333,8 @@ def test_scan_rejects_oversized_ocr_payload(client: TestClient) -> None:
     response = client.post("/api/scan", json=payload)
     assert response.status_code == 422
     body = response.json()
-    assert body["error"] == "ocr_payload_too_large"
+    assert body["error"] == "validation_error"
+    assert "exceeds" in body["detail"] and "maximum allowed limit" in body["detail"]
 
 
 def test_real_test_fixtures_fit_under_max_ocr_words() -> None:

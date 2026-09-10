@@ -47,6 +47,7 @@ _browser_origins = AuthSettings.from_env().allowed_browser_origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=list(_browser_origins),
+    allow_origin_regex=r"https?://([A-Za-z0-9._-]+\.(ngrok-free\.app|ngrok-free\.dev|ngrok\.app|ngrok\.dev|ngrok\.io|trycloudflare\.com|localtunnel\.me)|localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "X-Request-ID"],

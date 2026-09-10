@@ -1,6 +1,6 @@
 import '@/offline/idb.js';
 
-import type { OCRWord, ScanContext, Verdict } from './types';
+import type { OCRWord, ScanContext, Verdict } from '@/lib/rules/domain';
 
 export const OFFLINE_DB_NAME = 'lmpc-offline';
 export const OFFLINE_DB_VERSION = 1;

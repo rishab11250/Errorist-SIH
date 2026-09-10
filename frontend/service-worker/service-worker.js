@@ -30,11 +30,16 @@ function validatePendingScan(record) {
 async function blobToBase64(blob) {
   const bytes = new Uint8Array(await blob.arrayBuffer());
   const chunkSize = 0x8000;
-  let binary = '';
+  const parts = [];
   for (let offset = 0; offset < bytes.length; offset += chunkSize) {
-    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+    const chunk = bytes.subarray(offset, offset + chunkSize);
+    let str = '';
+    for (let i = 0; i < chunk.length; i++) {
+      str += String.fromCharCode(chunk[i]);
+    }
+    parts.push(str);
   }
-  return btoa(binary);
+  return btoa(parts.join(''));
 }
 
 async function notifyPendingScansChanged() {

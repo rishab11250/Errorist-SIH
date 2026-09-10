@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertTriangle, Camera, CheckCircle2, ImageUp, RotateCcw, X } from 'lucide-react';
+import NextImage from 'next/image';
 import { useCallback, useId, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -604,9 +605,12 @@ export function InspectionCapture({ onComplete }: Props) {
                         Panel 1 · Primary
                       </span>
                     </div>
-                    <img
+                    <NextImage
                       src={preview}
                       alt="Primary evidence panel"
+                      width={dimensions?.width ?? 1600}
+                      height={dimensions?.height ?? 900}
+                      unoptimized
                       className="mx-auto max-h-64 rounded object-contain"
                     />
                     <p className="truncate text-xs text-muted-foreground">{file?.name}</p>
@@ -629,9 +633,12 @@ export function InspectionCapture({ onComplete }: Props) {
                         <X className="size-4" />
                       </button>
                     </div>
-                    <img
+                    <NextImage
                       src={secondaryPreview}
                       alt="Secondary evidence panel"
+                      width={secondaryDimensions?.width ?? 1600}
+                      height={secondaryDimensions?.height ?? 900}
+                      unoptimized
                       className="mx-auto max-h-64 rounded object-contain"
                     />
                     <p className="truncate text-xs text-muted-foreground">{secondaryFile?.name}</p>
@@ -644,9 +651,12 @@ export function InspectionCapture({ onComplete }: Props) {
               </div>
             ) : preview ? (
               <div className="space-y-3">
-                <img
+                <NextImage
                   src={preview}
                   alt="Selected evidence preview"
+                  width={dimensions?.width ?? 1600}
+                  height={dimensions?.height ?? 900}
+                  unoptimized
                   className="mx-auto max-h-80 rounded-md object-contain"
                   onLoad={(event) => {
                     setDimensions({

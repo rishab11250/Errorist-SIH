@@ -1,4 +1,5 @@
 import { denormaliseBbox } from '@/lib/bbox';
+import Image from 'next/image';
 import type { Verdict } from '@/lib/types';
 
 const strokes: Record<Verdict['status'], string> = {
@@ -27,7 +28,14 @@ export function AnnotatedEvidence({
   return (
     <figure className="space-y-3">
       <div className="relative overflow-hidden rounded-md bg-muted">
-        <img src={imageSrc} alt="Inspection evidence" className="h-auto w-full" />
+        <Image
+          src={imageSrc}
+          alt="Inspection evidence"
+          width={imageWidth}
+          height={imageHeight}
+          unoptimized
+          className="h-auto w-full"
+        />
         <svg
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 size-full"

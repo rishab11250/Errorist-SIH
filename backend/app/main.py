@@ -6,8 +6,11 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
-from app import __version__
+from app import __version__, db
 from app.auth.routes import router as auth_router
 from app.dashboard_routes import router as dashboard_router
 from app.db import init_db
@@ -70,8 +73,18 @@ app.include_router(exports_router)
 
 @app.get("/api/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
-    """Liveness probe. Returns service version + rules version."""
+    """Readiness probe that verifies the configured database is reachable."""
     cfg = get_active_rules()
+    try:
+        if db.SessionLocal is None:
+            raise RuntimeError("DB not initialized")
+        with db.SessionLocal() as session:
+            session.execute(text("SELECT 1"))
+    except (SQLAlchemyError, RuntimeError):
+        return JSONResponse(
+            status_code=503,
+            content=HealthResponse(status="degraded", rules_version=cfg.version).model_dump(),
+        )
     return HealthResponse(status="ok", rules_version=cfg.version)
 
 

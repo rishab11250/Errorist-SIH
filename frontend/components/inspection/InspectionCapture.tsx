@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, Camera, CheckCircle2, ImageUp, RotateCcw, X } from 'lucide-react';
+import { AlertTriangle, Camera, CheckCircle2, ImageUp, Layers, Plus, RotateCcw, Trash2, X } from 'lucide-react';
 import NextImage from 'next/image';
 import { useCallback, useId, useRef, useState } from 'react';
 
@@ -17,9 +17,32 @@ import {
   overallStatus,
   runEngine,
 } from '@/lib/rules';
+import {
+  computeAverageQuality,
+  createMultiSectionComposite,
+  fuseMultiSectionExtractions,
+  verifyProductConsistency,
+  type SectionCaptureData,
+} from '@/lib/rules/multi-section';
 import { savePendingScan, updateSyncStatus, type PendingScanRecord } from '@/lib/storage';
 import type { ScanContext, ScanRequest, ScanResponse } from '@/lib/types';
 import { CameraCaptureGuide } from './CameraCaptureGuide';
+
+interface SectionSlot {
+  id: string;
+  label: string;
+  file: File | null;
+  preview: string | null;
+  dimensions: { width: number; height: number } | null;
+  preScanQuality: { status: 'good' | 'warning'; notes: string[] } | null;
+}
+
+const DEFAULT_SECTIONS: SectionSlot[] = [
+  { id: 'sec-1', label: '1. Front / Brand & Product Name', file: null, preview: null, dimensions: null, preScanQuality: null },
+  { id: 'sec-2', label: '2. Nutrition & Ingredients Panel', file: null, preview: null, dimensions: null, preScanQuality: null },
+  { id: 'sec-3', label: '3. Manufacturer, FSSAI & Barcode', file: null, preview: null, dimensions: null, preScanQuality: null },
+  { id: 'sec-4', label: '4. MRP, Net Quantity & Dates Flap', file: null, preview: null, dimensions: null, preScanQuality: null },
+];
 
 interface Props {
   onComplete: (result: OCRRunResult & { response: ScanResponse }) => void;
@@ -193,6 +216,72 @@ export function InspectionCapture({ onComplete }: Props) {
   } | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
   const operationRef = useRef(0);
+  const [scanWorkflow, setScanWorkflow] = useState<'single' | 'multi'>('single');
+  const [sections, setSections] = useState<SectionSlot[]>(DEFAULT_SECTIONS);
+
+  const handleSectionFile = useCallback((index: number, selected: File) => {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(selected.type)) {
+      setError('Choose a JPEG, PNG, or WebP evidence image.');
+      return;
+    }
+    if (selected.size > MAX_IMAGE_BYTES) {
+      setError('Choose an evidence image no larger than 10 MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSections((prev) => {
+        const copy = [...prev];
+        copy[index] = {
+          ...copy[index],
+          file: selected,
+          preview: reader.result as string,
+          dimensions: null,
+          preScanQuality: null,
+        };
+        return copy;
+      });
+    };
+    reader.readAsDataURL(selected);
+  }, []);
+
+  const removeSectionFile = useCallback((index: number) => {
+    setSections((prev) => {
+      const copy = [...prev];
+      copy[index] = {
+        ...copy[index],
+        file: null,
+        preview: null,
+        dimensions: null,
+        preScanQuality: null,
+      };
+      return copy;
+    });
+  }, []);
+
+  const addCustomSection = useCallback(() => {
+    setSections((prev) => {
+      if (prev.length >= 6) return prev;
+      return [
+        ...prev,
+        {
+          id: `sec-${Date.now()}`,
+          label: `Section ${prev.length + 1} · Additional Panel`,
+          file: null,
+          preview: null,
+          dimensions: null,
+          preScanQuality: null,
+        },
+      ];
+    });
+  }, []);
+
+  const removeSectionSlot = useCallback((index: number) => {
+    setSections((prev) => {
+      if (prev.length <= 2) return prev;
+      return prev.filter((_, i) => i !== index);
+    });
+  }, []);
 
   const checkPreScanQuality = useCallback((img: HTMLImageElement) => {
     try {
@@ -309,7 +398,10 @@ export function InspectionCapture({ onComplete }: Props) {
   }
 
   async function handleScan() {
-    if (!file || busy) return;
+    if (busy) return;
+    if (scanWorkflow === 'single' && !file) return;
+    if (scanWorkflow === 'multi' && sections.filter((s) => s.file !== null).length < 2) return;
+
     const operation = ++operationRef.current;
     const controller = new AbortController();
     controllerRef.current = controller;
@@ -317,7 +409,184 @@ export function InspectionCapture({ onComplete }: Props) {
     setProgress(0);
     setError(null);
     setStage('reading');
+
     try {
+      if (scanWorkflow === 'multi') {
+        const activeSections = sections.filter((s) => s.file !== null) as Array<
+          SectionSlot & { file: File }
+        >;
+        if (activeSections.length < 2) {
+          throw new Error(
+            'Capture or upload at least 2 package sections (e.g. front & nutrition/MRP) to perform a multi-section bulk inspection.'
+          );
+        }
+
+        setStage('ocr');
+        const sectionCaptures: SectionCaptureData[] = [];
+
+        for (let i = 0; i < activeSections.length; i++) {
+          const sec = activeSections[i];
+          const scanFile = await downscaleImageFile(sec.file, 1600);
+          const ocr = await runOCR(
+            scanFile,
+            (p) => setProgress((i + p) / activeSections.length),
+            controller.signal
+          );
+          if (operation !== operationRef.current) return;
+          if (ocr.words.length === 0 || !ocr.words.some((w) => w.text.trim())) {
+            throw new Error(
+              `Section "${sec.label}" has no readable text. Retake or upload a clearer close-up image.`
+            );
+          }
+          const quality = assessQuality(ocr.words);
+          sectionCaptures.push({
+            id: sec.id,
+            label: sec.label,
+            file: scanFile,
+            ocr,
+            quality,
+          });
+        }
+
+        // 1. Cross-section product consistency verification
+        const consistency = verifyProductConsistency(
+          sectionCaptures.map((s) => ({ words: s.ocr.words, label: s.label }))
+        );
+        if (!consistency.isConsistent) {
+          throw new Error(
+            `Product Mismatch Rejected: The scanned sections appear to be from different products (${consistency.reason}). Ensure all close-up captures are from the same package.`
+          );
+        }
+
+        // 2. Statutory packaging verification across all captured words
+        const allWords = sectionCaptures.flatMap((s) => s.ocr.words);
+        const packageCheck = assessPackageContent(allWords);
+        if (!packageCheck.isPackage) {
+          throw new Error(
+            'Non-packaging image detected. No statutory product declarations (MRP, Net Quantity, Batch, or Manufacturer details) were found across any scanned sections. Please scan a physical product label or e-commerce listing.'
+          );
+        }
+
+        setStage('analyzing');
+        const rules = loadDefaultRules();
+        const scanContext: ScanContext = { mode, category, imported };
+        const avgQuality = computeAverageQuality(sectionCaptures.map((s) => s.quality));
+        const { mergedExtracted, fusedVerdicts } = fuseMultiSectionExtractions(
+          sectionCaptures,
+          rules,
+          scanContext
+        );
+        const localOverall = overallStatus(fusedVerdicts);
+
+        const { compositeFile, compositeOCR } = await createMultiSectionComposite(sectionCaptures);
+        if (operation !== operationRef.current) return;
+
+        const localId =
+          typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+        const offlineNumericId =
+          Math.abs(
+            localId.split('').reduce((acc, char) => (acc << 5) - acc + char.charCodeAt(0), 0)
+          ) || Date.now();
+
+        const qualitySummary: ScanResponse['quality'] = {
+          status: avgQuality.status,
+          score: avgQuality.score,
+          guidance: avgQuality.guidance,
+          metrics: avgQuality.metrics.map((m) => ({
+            name: m.name,
+            value: m.value,
+            unit: m.unit,
+            confidence: m.confidence,
+            method: m.method,
+            evidence_bboxes: m.evidence_bboxes ?? [],
+          })),
+        };
+
+        const extractedFields: ScanResponse['extracted_fields'] = {};
+        for (const [key, field] of Object.entries(mergedExtracted)) {
+          extractedFields[key] = field
+            ? {
+                name: field.name,
+                value: field.value,
+                bbox: field.bbox,
+                confidence: field.confidence,
+                evidence_bboxes: field.evidence_spans || [],
+              }
+            : null;
+        }
+
+        const localResponse: ScanResponse = {
+          scan_id: offlineNumericId,
+          processing_status: 'complete',
+          quality: qualitySummary,
+          extracted_fields: extractedFields,
+          verdicts: fusedVerdicts,
+          overall_status: localOverall,
+          analysis_version: rules.version,
+        };
+
+        const pendingRecord: PendingScanRecord = {
+          local_id: localId,
+          captured_at: new Date().toISOString(),
+          rule_version: rules.version,
+          image_blob: compositeFile,
+          ocr_payload: compositeOCR.words,
+          scan_context: scanContext,
+          verdicts: fusedVerdicts,
+          sync_status: 'pending',
+          sync_attempts: 0,
+        };
+
+        try {
+          await savePendingScan(pendingRecord);
+        } catch (storageErr) {
+          console.warn('Could not save pending scan to IndexedDB:', storageErr);
+        }
+        if (operation !== operationRef.current) return;
+
+        const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+        if (isOffline) {
+          setStage('saving');
+          setStage('complete');
+          onComplete({ ...compositeOCR, response: localResponse });
+          return;
+        }
+
+        let finalResponse = localResponse;
+        try {
+          finalResponse = await postScan(
+            buildScanRequest(compositeOCR, scanContext),
+            controller.signal
+          );
+          if (operation !== operationRef.current) return;
+          try {
+            await updateSyncStatus(localId, 'synced');
+          } catch {}
+        } catch (err) {
+          if (operation !== operationRef.current) return;
+          if (err instanceof DOMException && err.name === 'AbortError') {
+            throw err;
+          }
+          const isNetworkFailure =
+            err instanceof TypeError ||
+            (err instanceof Error &&
+              /failed to fetch|fetch failed|network|load failed|offline/i.test(err.message));
+          if (isNetworkFailure) {
+            finalResponse = localResponse;
+          } else {
+            throw err;
+          }
+        }
+
+        setStage('saving');
+        setStage('complete');
+        onComplete({ ...compositeOCR, response: finalResponse });
+        return;
+      }
+
       const rawFile = secondaryFile
         ? await createCompositeEvidenceFile(file, secondaryFile)
         : file;
@@ -485,6 +754,38 @@ export function InspectionCapture({ onComplete }: Props) {
           </p>
         </header>
 
+        {/* Scan Workflow Selector */}
+        <div className="flex items-center justify-center p-1 bg-muted/60 rounded-xl border max-w-md mx-auto">
+          <button
+            type="button"
+            onClick={() => {
+              setScanWorkflow('single');
+              setError(null);
+            }}
+            className={`flex-1 py-2 px-3 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
+              scanWorkflow === 'single'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Standard Scan
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setScanWorkflow('multi');
+              setError(null);
+            }}
+            className={`flex-1 py-2 px-3 text-xs sm:text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              scanWorkflow === 'multi'
+                ? 'bg-background text-primary shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Layers className="size-4" /> Multi-Section (Bulk / Tall)
+          </button>
+        </div>
+
         <fieldset disabled={busy} className="space-y-3">
           <legend className="font-heading font-semibold">Evidence source</legend>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -550,226 +851,342 @@ export function InspectionCapture({ onComplete }: Props) {
           </label>
         </div>
 
-        {mode === 'retail_image' && !file ? (
-          <div className="space-y-4">
-            <div className="flex items-center justify-center gap-2">
-              <Button
-                type="button"
-                variant={captureMethod === 'camera' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setCaptureMethod('camera')}
-                className="gap-2 font-semibold"
-              >
-                <Camera className="size-4" /> Guided Camera
-              </Button>
-              <Button
-                type="button"
-                variant={captureMethod === 'upload' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setCaptureMethod('upload')}
-                className="gap-2 font-semibold"
-              >
-                <ImageUp className="size-4" /> Upload File
-              </Button>
+        {scanWorkflow === 'multi' ? (
+          <div className="space-y-5">
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground space-y-1">
+              <div className="flex items-center gap-2 font-semibold text-primary">
+                <Layers className="size-4" /> Multi-Section Bulk Scanner for Tall / Detailed Packaging
+              </div>
+              <p className="text-muted-foreground text-xs leading-relaxed">
+                Capture small close-up sections of long or tall packages (e.g. noodles, rolls) at native resolution.
+                The engine verifies all sections belong to the same product, averages quality scores, and synthesizes a complete statutory report.
+              </p>
             </div>
 
-            {captureMethod === 'camera' ? (
-              <div className="space-y-3">
-                <CameraCaptureGuide onCapture={handleFile} disabled={busy} />
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={() => setCaptureMethod('upload')}
-                    className="text-xs text-muted-foreground underline hover:text-foreground"
+            <div className="grid gap-4 sm:grid-cols-2">
+              {sections.map((slot, index) => {
+                const slotInputId = `section-slot-input-${slot.id}`;
+                return (
+                  <div
+                    key={slot.id}
+                    className="relative rounded-lg border bg-card p-4 space-y-3 transition-colors hover:border-primary/40 shadow-sm"
                   >
-                    Having trouble? Switch to file upload
-                  </button>
-                </div>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-
-        {mode === 'ecommerce_listing' || captureMethod === 'upload' || Boolean(file) ? (
-          <div
-            onDragOver={(event) => event.preventDefault()}
-            onDrop={onDrop}
-            className="surface-panel border-2 border-dashed p-5 text-center sm:p-8"
-          >
-            {preview && secondaryPreview ? (
-              <div className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2 rounded-lg border bg-background/50 p-3 text-left">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                        Panel 1 · Primary
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-primary truncate">
+                        {slot.label}
                       </span>
+                      {sections.length > 2 && (
+                        <button
+                          type="button"
+                          onClick={() => removeSectionSlot(index)}
+                          className="text-muted-foreground hover:text-destructive p-1 rounded transition-colors"
+                          title="Remove this section slot"
+                          disabled={busy}
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      )}
                     </div>
-                    <NextImage
-                      src={preview}
-                      alt="Primary evidence panel"
-                      width={dimensions?.width ?? 1600}
-                      height={dimensions?.height ?? 900}
-                      unoptimized
-                      className="mx-auto max-h-64 rounded object-contain"
-                    />
-                    <p className="truncate text-xs text-muted-foreground">{file?.name}</p>
+
+                    {slot.preview ? (
+                      <div className="space-y-2 rounded border bg-background/60 p-2">
+                        <NextImage
+                          src={slot.preview}
+                          alt={slot.label}
+                          width={slot.dimensions?.width ?? 800}
+                          height={slot.dimensions?.height ?? 600}
+                          unoptimized
+                          className="mx-auto max-h-40 rounded object-contain"
+                          onLoad={(e) => {
+                            const img = e.currentTarget;
+                            setSections((prev) => {
+                              const copy = [...prev];
+                              copy[index] = {
+                                ...copy[index],
+                                dimensions: { width: img.naturalWidth, height: img.naturalHeight },
+                              };
+                              return copy;
+                            });
+                          }}
+                        />
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span className="truncate max-w-[180px]">{slot.file?.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeSectionFile(index)}
+                            className="text-fail hover:underline flex items-center gap-1 font-medium"
+                            disabled={busy}
+                          >
+                            <X className="size-3" /> Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="border border-dashed rounded-lg p-5 text-center space-y-2 bg-muted/20">
+                        <Camera className="size-6 mx-auto text-muted-foreground/70" />
+                        <p className="text-xs text-muted-foreground">Upload or capture close-up</p>
+                        <label
+                          htmlFor={slotInputId}
+                          className="inline-flex cursor-pointer items-center justify-center rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
+                        >
+                          <span>Select Image</span>
+                        </label>
+                        <input
+                          id={slotInputId}
+                          aria-label={slot.label}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="sr-only"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleSectionFile(index, f);
+                          }}
+                          disabled={busy}
+                        />
+                      </div>
+                    )}
                   </div>
-                  <div className="space-y-2 rounded-lg border bg-background/50 p-3 text-left">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                        Panel 2 · Secondary / Sticker
-                      </span>
+                );
+              })}
+            </div>
+
+            {sections.length < 6 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addCustomSection}
+                className="w-full gap-2 border-dashed"
+                disabled={busy}
+              >
+                <Plus className="size-4" /> Add Another Package Section Slot
+              </Button>
+            )}
+          </div>
+        ) : (
+          <>
+            {mode === 'retail_image' && !file ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    type="button"
+                    variant={captureMethod === 'camera' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setCaptureMethod('camera')}
+                    className="gap-2 font-semibold"
+                  >
+                    <Camera className="size-4" /> Guided Camera
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={captureMethod === 'upload' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setCaptureMethod('upload')}
+                    className="gap-2 font-semibold"
+                  >
+                    <ImageUp className="size-4" /> Upload File
+                  </Button>
+                </div>
+
+                {captureMethod === 'camera' ? (
+                  <div className="space-y-3">
+                    <CameraCaptureGuide onCapture={handleFile} disabled={busy} />
+                    <div className="text-center">
                       <button
                         type="button"
-                        onClick={() => {
-                          setSecondaryFile(null);
-                          setSecondaryPreview(null);
-                          setSecondaryDimensions(null);
-                        }}
-                        className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                        title="Remove secondary panel"
+                        onClick={() => setCaptureMethod('upload')}
+                        className="text-xs text-muted-foreground underline hover:text-foreground"
                       >
-                        <X className="size-4" />
+                        Having trouble? Switch to file upload
                       </button>
                     </div>
-                    <NextImage
-                      src={secondaryPreview}
-                      alt="Secondary evidence panel"
-                      width={secondaryDimensions?.width ?? 1600}
-                      height={secondaryDimensions?.height ?? 900}
-                      unoptimized
-                      className="mx-auto max-h-64 rounded object-contain"
-                    />
-                    <p className="truncate text-xs text-muted-foreground">{secondaryFile?.name}</p>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Multi-panel mode active: Panels will be composited into a single evidence
-                  inspection.
-                </p>
-              </div>
-            ) : preview ? (
-              <div className="space-y-3">
-                <NextImage
-                  src={preview}
-                  alt="Selected evidence preview"
-                  width={dimensions?.width ?? 1600}
-                  height={dimensions?.height ?? 900}
-                  unoptimized
-                  className="mx-auto max-h-80 rounded-md object-contain"
-                  onLoad={(event) => {
-                    setDimensions({
-                      width: event.currentTarget.naturalWidth,
-                      height: event.currentTarget.naturalHeight,
-                    });
-                    checkPreScanQuality(event.currentTarget);
-                  }}
-                />
-                {preScanQuality ? (
-                  <div
-                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${
-                      preScanQuality.status === 'good'
-                        ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                        : 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                    }`}
-                  >
-                    {preScanQuality.status === 'good' ? (
-                      <CheckCircle2 className="size-3.5" />
-                    ) : (
-                      <AlertTriangle className="size-3.5" />
-                    )}
-                    <span>Pre-scan: {preScanQuality.notes.join(' · ')}</span>
                   </div>
                 ) : null}
               </div>
-            ) : (
-              <div className="py-8">
-                {mode === 'retail_image' ? (
-                  <Camera aria-hidden="true" className="mx-auto size-9 text-primary" />
-                ) : (
-                  <ImageUp aria-hidden="true" className="mx-auto size-9 text-primary" />
-                )}
-                <p className="mt-3 font-semibold">
-                  {mode === 'retail_image'
-                    ? 'Take or upload a clear package photo'
-                    : 'Upload listing screenshot evidence'}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  JPEG, PNG, or WebP · up to 10 MB
-                </p>
-              </div>
-            )}
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-              <label
-                htmlFor={fileInputId}
-                className="inline-flex min-h-11 cursor-pointer items-center rounded-md border bg-background px-4 py-2 text-sm font-semibold hover:bg-muted"
-              >
-                {file ? 'Replace primary image' : 'Choose evidence image'}
-              </label>
-              {file && mode === 'retail_image' && !secondaryFile ? (
-                <label
-                  htmlFor={secondaryInputId}
-                  className="inline-flex min-h-11 cursor-pointer items-center rounded-md border border-primary/40 bg-primary/5 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10"
-                >
-                  + Add secondary panel (MRP sticker / back)
-                </label>
-              ) : null}
-              {file && mode === 'retail_image' ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setFile(null);
-                    setPreview(null);
-                    setSecondaryFile(null);
-                    setSecondaryPreview(null);
-                    setCaptureMethod('camera');
-                  }}
-                  className="gap-2"
-                >
-                  <Camera className="size-4" /> Retake with Guided Camera
-                </Button>
-              ) : null}
-            </div>
-            {file && !secondaryFile ? (
-              <p className="mt-3 break-all text-sm text-muted-foreground">
-                {file.name}
-                {dimensions ? ` · ${dimensions.width} × ${dimensions.height}px` : ''}
-              </p>
             ) : null}
-          </div>
-        ) : null}
 
-        <input
-          id={fileInputId}
-          aria-label="Evidence image"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          capture={mode === 'retail_image' ? 'environment' : undefined}
-          onChange={(event) => {
-            const selected = event.target.files?.[0];
-            if (selected) handleFile(selected);
-          }}
-          className="sr-only"
-          disabled={busy}
-        />
+            {mode === 'ecommerce_listing' || captureMethod === 'upload' || Boolean(file) ? (
+              <div
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={onDrop}
+                className="surface-panel border-2 border-dashed p-5 text-center sm:p-8"
+              >
+                {preview && secondaryPreview ? (
+                  <div className="space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2 rounded-lg border bg-background/50 p-3 text-left">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                            Panel 1 · Primary
+                          </span>
+                        </div>
+                        <NextImage
+                          src={preview}
+                          alt="Primary evidence panel"
+                          width={dimensions?.width ?? 1600}
+                          height={dimensions?.height ?? 900}
+                          unoptimized
+                          className="mx-auto max-h-64 rounded object-contain"
+                        />
+                        <p className="truncate text-xs text-muted-foreground">{file?.name}</p>
+                      </div>
+                      <div className="space-y-2 rounded-lg border bg-background/50 p-3 text-left">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                            Panel 2 · Secondary / Sticker
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSecondaryFile(null);
+                              setSecondaryPreview(null);
+                              setSecondaryDimensions(null);
+                            }}
+                            className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                            title="Remove secondary panel"
+                          >
+                            <X className="size-4" />
+                          </button>
+                        </div>
+                        <NextImage
+                          src={secondaryPreview}
+                          alt="Secondary evidence panel"
+                          width={secondaryDimensions?.width ?? 1600}
+                          height={secondaryDimensions?.height ?? 900}
+                          unoptimized
+                          className="mx-auto max-h-64 rounded object-contain"
+                        />
+                        <p className="truncate text-xs text-muted-foreground">{secondaryFile?.name}</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Multi-panel mode active: Panels will be composited into a single evidence
+                      inspection.
+                    </p>
+                  </div>
+                ) : preview ? (
+                  <div className="space-y-3">
+                    <NextImage
+                      src={preview}
+                      alt="Selected evidence preview"
+                      width={dimensions?.width ?? 1600}
+                      height={dimensions?.height ?? 900}
+                      unoptimized
+                      className="mx-auto max-h-80 rounded-md object-contain"
+                      onLoad={(event) => {
+                        setDimensions({
+                          width: event.currentTarget.naturalWidth,
+                          height: event.currentTarget.naturalHeight,
+                        });
+                        checkPreScanQuality(event.currentTarget);
+                      }}
+                    />
+                    {preScanQuality ? (
+                      <div
+                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${
+                          preScanQuality.status === 'good'
+                            ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                            : 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                        }`}
+                      >
+                        {preScanQuality.status === 'good' ? (
+                          <CheckCircle2 className="size-3.5" />
+                        ) : (
+                          <AlertTriangle className="size-3.5" />
+                        )}
+                        <span>Pre-scan: {preScanQuality.notes.join(' · ')}</span>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="py-8">
+                    {mode === 'retail_image' ? (
+                      <Camera aria-hidden="true" className="mx-auto size-9 text-primary" />
+                    ) : (
+                      <ImageUp aria-hidden="true" className="mx-auto size-9 text-primary" />
+                    )}
+                    <p className="mt-3 font-semibold">
+                      {mode === 'retail_image'
+                        ? 'Take or upload a clear package photo'
+                        : 'Upload listing screenshot evidence'}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      JPEG, PNG, or WebP · up to 10 MB
+                    </p>
+                  </div>
+                )}
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                  <label
+                    htmlFor={fileInputId}
+                    className="inline-flex min-h-11 cursor-pointer items-center rounded-md border bg-background px-4 py-2 text-sm font-semibold hover:bg-muted"
+                  >
+                    {file ? 'Replace primary image' : 'Choose evidence image'}
+                  </label>
+                  {file && mode === 'retail_image' && !secondaryFile ? (
+                    <label
+                      htmlFor={secondaryInputId}
+                      className="inline-flex min-h-11 cursor-pointer items-center rounded-md border border-primary/40 bg-primary/5 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10"
+                    >
+                      + Add secondary panel (MRP sticker / back)
+                    </label>
+                  ) : null}
+                  {file && mode === 'retail_image' ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setFile(null);
+                        setPreview(null);
+                        setSecondaryFile(null);
+                        setSecondaryPreview(null);
+                        setCaptureMethod('camera');
+                      }}
+                      className="gap-2"
+                    >
+                      <Camera className="size-4" /> Retake with Guided Camera
+                    </Button>
+                  ) : null}
+                </div>
+                {file && !secondaryFile ? (
+                  <p className="mt-3 break-all text-sm text-muted-foreground">
+                    {file.name}
+                    {dimensions ? ` · ${dimensions.width} × ${dimensions.height}px` : ''}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
-        {mode === 'retail_image' ? (
-          <input
-            id={secondaryInputId}
-            aria-label="Secondary package panel"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={(event) => {
-              const selected = event.target.files?.[0];
-              if (selected) handleSecondaryFile(selected);
-            }}
-            className="sr-only"
-            disabled={busy}
-          />
-        ) : null}
+            <input
+              id={fileInputId}
+              aria-label="Evidence image"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              capture={mode === 'retail_image' ? 'environment' : undefined}
+              onChange={(event) => {
+                const selected = event.target.files?.[0];
+                if (selected) handleFile(selected);
+              }}
+              className="sr-only"
+              disabled={busy}
+            />
+
+            {mode === 'retail_image' ? (
+              <input
+                id={secondaryInputId}
+                aria-label="Secondary package panel"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => {
+                  const selected = event.target.files?.[0];
+                  if (selected) handleSecondaryFile(selected);
+                }}
+                className="sr-only"
+                disabled={busy}
+              />
+            ) : null}
+          </>
+        )}
 
         {busy ? (
           <div className="surface-panel space-y-4 p-5" role="status" aria-live="polite">
@@ -799,10 +1216,19 @@ export function InspectionCapture({ onComplete }: Props) {
           size="lg"
           className="w-full"
           onClick={handleScan}
-          disabled={!file || busy}
+          disabled={
+            busy ||
+            (scanWorkflow === 'single'
+              ? !file
+              : sections.filter((s) => s.file !== null).length < 2)
+          }
         >
           {stage === 'error' ? <RotateCcw aria-hidden="true" /> : null}
-          {stage === 'error' ? 'Retry inspection' : 'Start inspection'}
+          {stage === 'error'
+            ? 'Retry inspection'
+            : scanWorkflow === 'multi'
+              ? `Start multi-section inspection (${sections.filter((s) => s.file !== null).length} sections)`
+              : 'Start inspection'}
         </Button>
       </div>
     </div>

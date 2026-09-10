@@ -311,4 +311,134 @@ describe('inspection experience', () => {
       expect(screen.getByText(/Add secondary panel/i)).toBeVisible();
     });
   });
+
+  it('switches to multi-section bulk mode and displays section slots', async () => {
+    render(<InspectionCapture onComplete={() => undefined} />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Multi-Section/i }));
+    expect(screen.getByText(/Multi-Section Bulk Scanner/i)).toBeVisible();
+    expect(screen.getByText(/1\. Front \/ Brand & Product Name/i)).toBeVisible();
+    expect(screen.getByText(/2\. Nutrition & Ingredients Panel/i)).toBeVisible();
+    expect(screen.getByText(/3\. Manufacturer, FSSAI & Barcode/i)).toBeVisible();
+    expect(screen.getByText(/4\. MRP, Net Quantity & Dates Flap/i)).toBeVisible();
+    expect(screen.getByRole('button', { name: /Start multi-section inspection \(0 sections\)/i })).toBeDisabled();
+  });
+
+  it('rejects multi-section scan when sections belong to different products', async () => {
+    runOCRMock.mockImplementation(async (file?: File) => {
+      if (file?.name?.includes('maggi')) {
+        return {
+          words: [
+            { text: 'Maggi', confidence: 0.99, bbox: [0.1, 0.1, 0.3, 0.1] },
+            { text: 'Noodles', confidence: 0.95, bbox: [0.1, 0.2, 0.3, 0.1] },
+            { text: 'MRP ₹20.00', confidence: 0.95, bbox: [0.1, 0.3, 0.3, 0.1] },
+          ],
+          lines: [],
+          imageDataUrl: 'data:image/jpeg;base64,bWFnZ2k=',
+          imageWidth: 800,
+          imageHeight: 600,
+        };
+      }
+      return {
+        words: [
+          { text: 'Sunfeast YiPPee!', confidence: 0.99, bbox: [0.1, 0.1, 0.3, 0.1] },
+          { text: 'Net Quantity: 70g', confidence: 0.95, bbox: [0.1, 0.2, 0.3, 0.1] },
+          { text: 'Batch No: AB12', confidence: 0.95, bbox: [0.1, 0.3, 0.3, 0.1] },
+        ],
+        lines: [],
+        imageDataUrl: 'data:image/jpeg;base64,eWlwcGVl',
+        imageWidth: 800,
+        imageHeight: 600,
+      };
+    });
+
+    render(<InspectionCapture onComplete={() => undefined} />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Multi-Section/i }));
+
+    const file1 = new File(['sec1'], 'brand-maggi.jpg', { type: 'image/jpeg' });
+    const file2 = new File(['sec2'], 'brand-yippee.jpg', { type: 'image/jpeg' });
+
+    const slot1Input = screen.getByLabelText(/1\. Front \/ Brand & Product Name/i);
+    const slot2Input = screen.getByLabelText(/2\. Nutrition & Ingredients Panel/i);
+
+    await user.upload(slot1Input, file1);
+    await user.upload(slot2Input, file2);
+
+    const startBtn = screen.getByRole('button', { name: /Start multi-section inspection \(2 sections\)/i });
+    expect(startBtn).not.toBeDisabled();
+    await user.click(startBtn);
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(/Product Mismatch Rejected/i);
+    });
+  });
+
+  it('fuses multi-section scan for consistent product captures and invokes onComplete', async () => {
+    const onComplete = vi.fn();
+    server.use(
+      http.post('/api/scan', () => {
+        return HttpResponse.json({
+          scan_id: 88,
+          processing_status: 'complete',
+          quality: { status: 'acceptable', score: 92, metrics: [], guidance: [] },
+          extracted_fields: { mrp: { name: 'mrp', value: '₹20.00', bbox: [0.1, 0.1, 0.2, 0.1], confidence: 0.95 } },
+          verdicts: [],
+          overall_status: 'compliant',
+          analysis_version: 'v2',
+        });
+      })
+    );
+
+    runOCRMock.mockImplementation(async (file?: File) => {
+      if (file?.name?.includes('front')) {
+        return {
+          words: [
+            { text: 'Sunfeast', confidence: 0.99, bbox: [0.1, 0.1, 0.3, 0.1] },
+            { text: 'YiPPee!', confidence: 0.99, bbox: [0.1, 0.2, 0.3, 0.1] },
+            { text: 'Noodles', confidence: 0.95, bbox: [0.1, 0.3, 0.3, 0.1] },
+          ],
+          lines: [],
+          imageDataUrl: 'data:image/jpeg;base64,eWlwcGVlMQ==',
+          imageWidth: 800,
+          imageHeight: 600,
+        };
+      }
+      return {
+        words: [
+          { text: 'Sunfeast', confidence: 0.98, bbox: [0.1, 0.1, 0.3, 0.1] },
+          { text: 'MRP ₹20.00', confidence: 0.95, bbox: [0.1, 0.2, 0.3, 0.1] },
+          { text: 'Net Qty: 70g', confidence: 0.95, bbox: [0.1, 0.3, 0.3, 0.1] },
+          { text: 'Lic. No. 10012011000123', confidence: 0.95, bbox: [0.1, 0.4, 0.3, 0.1] },
+        ],
+        lines: [],
+        imageDataUrl: 'data:image/jpeg;base64,eWlwcGVlMg==',
+        imageWidth: 800,
+        imageHeight: 600,
+      };
+    });
+
+    render(<InspectionCapture onComplete={onComplete} />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Multi-Section/i }));
+
+    const file1 = new File(['sec1'], 'panel-front.jpg', { type: 'image/jpeg' });
+    const file2 = new File(['sec2'], 'panel-mrp.jpg', { type: 'image/jpeg' });
+
+    const slot1Input = screen.getByLabelText(/1\. Front \/ Brand & Product Name/i);
+    const slot2Input = screen.getByLabelText(/2\. Nutrition & Ingredients Panel/i);
+
+    await user.upload(slot1Input, file1);
+    await user.upload(slot2Input, file2);
+
+    const startBtn = screen.getByRole('button', { name: /Start multi-section inspection \(2 sections\)/i });
+    await user.click(startBtn);
+
+    await waitFor(() => {
+      expect(onComplete).toHaveBeenCalledTimes(1);
+    });
+
+    const callArg = onComplete.mock.calls[0][0];
+    expect(callArg.response).toBeDefined();
+  });
 });

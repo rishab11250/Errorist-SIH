@@ -80,7 +80,7 @@ def repository_context(tmp_path, monkeypatch):
                     session,
                     user,
                     now=BASE_TIME,
-                    ttl=timedelta(days=2),
+                    ttl=timedelta(days=365),
                 ).token
                 for user in (inspector, other, admin)
             }

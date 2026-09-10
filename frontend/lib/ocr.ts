@@ -177,9 +177,12 @@ export async function runOCR(
       cropHeight = contentH;
     }
 
-    const effectiveH = cropHeight;
-    if (effectiveH < 500) {
-      scale = Math.min(4, Math.max(2, Math.ceil(600 / effectiveH)));
+    const MAX_OCR_DIMENSION = 1600;
+    const maxCropDim = Math.max(cropWidth, cropHeight);
+    if (maxCropDim > MAX_OCR_DIMENSION) {
+      scale = MAX_OCR_DIMENSION / maxCropDim;
+    } else if (cropHeight < 500) {
+      scale = Math.min(4, Math.max(2, Math.ceil(600 / cropHeight)));
     } else if (cropWidth < 800) {
       scale = 2;
     }

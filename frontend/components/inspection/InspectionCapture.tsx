@@ -102,6 +102,59 @@ async function createCompositeEvidenceFile(file1: File, file2: File): Promise<Fi
   }
 }
 
+async function downscaleImageFile(file: File, maxDimension = 1600): Promise<File> {
+  if (
+    typeof window === 'undefined' ||
+    typeof document === 'undefined' ||
+    process.env.NODE_ENV === 'test'
+  ) {
+    return file;
+  }
+  if (file.type === 'image/svg+xml') return file;
+
+  try {
+    const img = await Promise.race([
+      loadImage(file),
+      new Promise<null>((r) => setTimeout(() => r(null), 1500)),
+    ]);
+    if (!img) return file;
+
+    const width = img.naturalWidth || img.width;
+    const height = img.naturalHeight || img.height;
+    const maxSide = Math.max(width, height);
+
+    if (!width || !height || (maxSide <= maxDimension && file.size <= 1_500_000)) {
+      return file;
+    }
+
+    const scale = maxSide > maxDimension ? maxDimension / maxSide : 1;
+    const targetW = Math.round(width * scale);
+    const targetH = Math.round(height * scale);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = targetW;
+    canvas.height = targetH;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return file;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, targetW, targetH);
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', 0.90)
+    );
+    if (!blob) return file;
+
+    return new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+      type: 'image/jpeg',
+      lastModified: Date.now(),
+    });
+  } catch {
+    return file;
+  }
+}
+
 function stageIndex(stage: CaptureStage) {
   return { ready: 0, reading: 0, ocr: 1, analyzing: 2, saving: 3, complete: 4, error: 0 }[stage];
 }
@@ -257,9 +310,10 @@ export function InspectionCapture({ onComplete }: Props) {
     setError(null);
     setStage('reading');
     try {
-      const scanFile = secondaryFile
+      const rawFile = secondaryFile
         ? await createCompositeEvidenceFile(file, secondaryFile)
         : file;
+      const scanFile = await downscaleImageFile(rawFile, 1600);
       setStage('ocr');
       const ocr = await runOCR(scanFile, setProgress, controller.signal);
       if (operation !== operationRef.current) return;

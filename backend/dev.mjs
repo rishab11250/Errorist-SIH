@@ -13,6 +13,10 @@ const python = existsSync(winPy)
 
 const child = spawn(python, ['-m', 'uvicorn', 'app.main:app', '--port', '8000', '--reload'], {
   stdio: 'inherit',
+  env: {
+    ...process.env,
+    LMPC_ALLOW_TUNNEL_ORIGINS: process.env.LMPC_ALLOW_TUNNEL_ORIGINS ?? 'true',
+  },
 });
 
 child.on('exit', (code) => {

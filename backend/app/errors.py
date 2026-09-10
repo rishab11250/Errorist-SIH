@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ipaddress
 import logging
+import os
 import re
 from urllib.parse import urlsplit
 import uuid
@@ -20,22 +21,31 @@ from app.settings import AuthSettings
 logger = logging.getLogger(__name__)
 
 
-def is_allowed_origin(origin: str, allowed_origins: tuple[str, ...]) -> bool:
+_TUNNEL_SUFFIXES = (
+    ".ngrok-free.app",
+    ".ngrok-free.dev",
+    ".ngrok.app",
+    ".ngrok.dev",
+    ".ngrok.io",
+    ".trycloudflare.com",
+    ".localtunnel.me",
+)
+
+
+def is_allowed_origin(
+    origin: str,
+    allowed_origins: tuple[str, ...],
+    allow_tunnels: bool = False,
+) -> bool:
     clean = origin.rstrip("/")
     if clean in allowed_origins:
         return True
+    if not allow_tunnels:
+        return False
     try:
         parsed = urlsplit(clean)
         host = (parsed.hostname or "").lower()
-        if (
-            host.endswith(".ngrok-free.app")
-            or host.endswith(".ngrok-free.dev")
-            or host.endswith(".ngrok.app")
-            or host.endswith(".ngrok.dev")
-            or host.endswith(".ngrok.io")
-            or host.endswith(".trycloudflare.com")
-            or host.endswith(".localtunnel.me")
-        ):
+        if any(host.endswith(suffix) for suffix in _TUNNEL_SUFFIXES):
             return True
         ip = ipaddress.ip_address(host)
         if ip.is_private or ip.is_loopback:
@@ -111,7 +121,9 @@ class BrowserRequestSecurityMiddleware(BaseHTTPMiddleware):
         if request.url.path.startswith("/api/") and request.method in {"POST", "PATCH", "DELETE"}:
             settings = getattr(request.app.state, "auth_settings", AuthSettings())
             origin = request.headers.get("origin")
-            if origin is not None and not is_allowed_origin(origin, settings.allowed_browser_origins):
+            if origin is not None and not is_allowed_origin(
+                origin, settings.allowed_browser_origins, settings.allow_tunnel_origins
+            ):
                 return JSONResponse(
                     status_code=403,
                     content=error_body(

@@ -29,8 +29,9 @@ class AuthSettings(BaseModel):
         "http://127.0.0.1:3000",
         "http://localhost:3000",
     )
+    allow_tunnel_origins: bool = False
 
-    @field_validator("cookie_secure", mode="before")
+    @field_validator("cookie_secure", "allow_tunnel_origins", mode="before")
     @classmethod
     def parse_strict_boolean(cls, value: object) -> object:
         if isinstance(value, bool):
@@ -98,6 +99,7 @@ class AuthSettings(BaseModel):
             "database_path": "LMPC_DB_PATH",
             "backend_origin": "LMPC_BACKEND_ORIGIN",
             "allowed_browser_origins": "LMPC_ALLOWED_BROWSER_ORIGINS",
+            "allow_tunnel_origins": "LMPC_ALLOW_TUNNEL_ORIGINS",
         }
         values = {
             field: os.environ[environment]

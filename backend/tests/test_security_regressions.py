@@ -147,3 +147,38 @@ def test_inspector_cannot_export_another_users_scan(security_context) -> None:
     scan_id = security_context["other_scan_id"]
     assert client.get(f"/api/exports/scans/{scan_id}.pdf").status_code == 404
     assert client.get(f"/api/exports/scans/{scan_id}.docx").status_code == 404
+
+
+def test_tunnel_origins_rejected_by_default(security_context) -> None:
+    client = security_context["client"]
+    response = client.post(
+        "/api/auth/login",
+        json={"username": "x", "password": "y"},
+        headers={"Origin": "https://test.ngrok-free.app"},
+    )
+    assert response.status_code == 403
+    assert response.json()["error"] == "cross_origin_request"
+
+
+def test_tunnel_origins_allowed_when_explicitly_enabled(security_context) -> None:
+    from app.settings import AuthSettings
+
+    client = security_context["client"]
+    app.state.auth_settings = AuthSettings(
+        allowed_browser_origins=("http://127.0.0.1:3000", "http://localhost:3000"),
+        allow_tunnel_origins=True,
+    )
+    try:
+        response = client.post(
+            "/api/auth/login",
+            json={"username": "missing", "password": "wrong"},
+            headers={"Origin": "https://test.ngrok-free.app"},
+        )
+        assert response.status_code == 401
+        assert response.json()["error"] == "invalid_credentials"
+    finally:
+        app.state.auth_settings = AuthSettings(
+            allowed_browser_origins=("http://127.0.0.1:3000", "http://localhost:3000"),
+            allow_tunnel_origins=False,
+        )
+

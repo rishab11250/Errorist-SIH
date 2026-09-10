@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { InspectionCapture } from '@/components/inspection/InspectionCapture';
 import { InspectionResult } from '@/components/inspection/InspectionResult';
 import { ReviewForm } from '@/components/inspection/ReviewForm';
+import { CameraCaptureGuide } from '@/components/inspection/CameraCaptureGuide';
 import { ScanProgress } from '@/components/ui/scan-progress';
 import type { InspectionResultData } from '@/components/inspection/InspectionResult';
 import { server } from './server';
@@ -71,6 +72,25 @@ const SUCCESS_RESPONSE = {
 describe('inspection experience', () => {
   beforeEach(() => runOCRMock.mockReset());
   afterEach(() => vi.unstubAllGlobals());
+
+  it('shows a fallback when camera permission is denied', async () => {
+    const getUserMedia = vi
+      .fn()
+      .mockRejectedValue(new DOMException('Permission denied', 'NotAllowedError'));
+    vi.stubGlobal('navigator', { ...navigator, mediaDevices: { getUserMedia } });
+
+    render(<CameraCaptureGuide onCapture={() => undefined} />);
+
+    expect(
+      await screen.findByText('Camera permission denied. Allow camera access or upload an image.')
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Try camera again' })).toBeVisible();
+    expect(getUserMedia).toHaveBeenCalledWith(
+      expect.objectContaining({
+        video: expect.objectContaining({ facingMode: { ideal: 'environment' } }),
+      })
+    );
+  });
 
   it('changes capture guidance when screenshot mode is selected', async () => {
     render(<InspectionCapture onComplete={() => undefined} />);

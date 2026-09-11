@@ -600,6 +600,10 @@ export function InspectionCapture({ onComplete }: Props) {
         return;
       }
 
+      if (!file) {
+        throw new Error('Please select or capture a primary evidence image.');
+      }
+
       const rawFile = secondaryFile
         ? await createCompositeEvidenceFile(file, secondaryFile)
         : file;

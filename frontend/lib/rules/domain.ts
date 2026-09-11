@@ -105,6 +105,16 @@ export interface AnalysisInput {
   placement?: Record<string, PlacementResult>;
 }
 
+export interface ScanResponse {
+  scan_id: number;
+  processing_status: 'processing' | 'complete' | 'failed';
+  quality: QualitySummary;
+  extracted_fields: Record<string, ExtractedField | null>;
+  verdicts: Verdict[];
+  overall_status: OverallStatus;
+  analysis_version: string;
+}
+
 export interface ApplicabilityDecision {
   has_required_context: boolean;
   skipped: boolean;

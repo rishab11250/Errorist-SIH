@@ -378,10 +378,10 @@ export function InspectionResult({
       {overallStatus === 'pass' && result.overallStatus === 'manual_review' ? (
         <section
           role="status"
-          className="rounded-xl border-2 border-pass/50 bg-pass/10 p-5 shadow-sm flex items-start sm:items-center gap-3.5"
+          className="rounded-xl border-2 border-pass/50 bg-pass/10 p-5 shadow-sm flex items-start sm:items-center gap-3.5 animate-fade-in-up"
           data-testid="manual-review-resolved-banner"
         >
-          <div className="rounded-full bg-pass/20 p-2 text-pass shrink-0">
+          <div className="rounded-full bg-pass/20 p-2 text-pass shrink-0 animate-pulse-subtle">
             <CheckCircle2 className="size-6" />
           </div>
           <div className="space-y-0.5 flex-1">
@@ -401,7 +401,7 @@ export function InspectionResult({
       ) : null}
 
       <section
-        className={`rounded-xl border p-5 sm:p-6 shadow-sm transition-all ${overall.className}`}
+        className={`rounded-xl border p-5 sm:p-6 shadow-sm transition-all animate-fade-in-up ${overall.className}`}
         aria-label="Overall status"
         data-testid="overall-status-banner"
       >

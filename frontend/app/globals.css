@@ -37,6 +37,36 @@
     --motion-deliberate: 300ms;
   }
 
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
+    --surface: 222 47% 11%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 10%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 176 50% 16%;
+    --secondary-foreground: 174 80% 80%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 42 80% 18%;
+    --accent-foreground: 42 90% 85%;
+    --accent-strong: 34 93% 55%;
+    --destructive: 0 65% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 217 33% 20%;
+    --input: 217 33% 25%;
+    --ring: 217 91% 60%;
+    --pass: 152 69% 45%;
+    --fail: 0 74% 56%;
+    --warn: 38 92% 50%;
+    --review: 268 70% 62%;
+    --na: 215 20% 55%;
+    --shadow-surface: 0 1px 3px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.3);
+  }
+
   * {
     @apply border-border;
   }
@@ -49,6 +79,7 @@
   body {
     @apply bg-background font-body text-body text-foreground antialiased;
     min-width: 20rem;
+    transition: background-color var(--motion-standard) ease, color var(--motion-standard) ease;
   }
 
   h1,
@@ -71,13 +102,73 @@
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 @layer utilities {
   .surface-panel {
-    @apply rounded-lg border bg-surface shadow-surface;
+    @apply rounded-lg border bg-surface shadow-surface transition-all duration-200;
   }
 
   .touch-target {
     @apply min-h-control min-w-control;
+  }
+
+  .glass-panel {
+    background: hsl(var(--surface) / 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.7);
+    box-shadow: var(--shadow-surface);
+  }
+
+  .card-hover-lift {
+    transition: transform var(--motion-standard) ease, box-shadow var(--motion-standard) ease;
+  }
+
+  .card-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.08);
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp var(--motion-standard) ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn var(--motion-standard) ease-out forwards;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulseSubtle 2s ease-in-out infinite;
   }
 }
 

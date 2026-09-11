@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Toaster } from '@/components/ui/toaster';
 import { SyncStatusIndicator } from '@/components/pwa/SyncStatusIndicator';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { cn } from '@/lib/cn';
 import { useAuth, type AuthUser } from '@/lib/auth';
 
@@ -129,15 +130,18 @@ function WorkspaceFrame({
         Skip to main content
       </a>
       <aside className="sticky top-0 hidden h-screen flex-col border-r bg-card p-4 md:flex">
-        <Link href="/" className="mb-7 flex min-h-11 items-center gap-3 rounded-md px-2">
-          <span className="grid size-9 place-items-center rounded-md bg-primary text-primary-foreground">
-            <ShieldCheck aria-hidden="true" className="size-5" />
-          </span>
-          <span>
-            <span className="block font-heading text-sm font-semibold">LMPC Inspector</span>
-            <span className="block text-xs text-muted-foreground">Evidence workspace</span>
-          </span>
-        </Link>
+        <div className="mb-7 flex items-center justify-between">
+          <Link href="/" className="flex min-h-11 items-center gap-3 rounded-md px-1">
+            <span className="grid size-9 place-items-center rounded-md bg-primary text-primary-foreground">
+              <ShieldCheck aria-hidden="true" className="size-5" />
+            </span>
+            <span>
+              <span className="block font-heading text-sm font-semibold">LMPC Inspector</span>
+              <span className="block text-xs text-muted-foreground">Evidence workspace</span>
+            </span>
+          </Link>
+          <ThemeToggle />
+        </div>
         <Navigation user={user} />
         <div className="mt-auto">
           <SyncStatusIndicator className="mb-4 w-full justify-center" />
@@ -152,6 +156,7 @@ function WorkspaceFrame({
             LMPC Inspector
           </Link>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <SyncStatusIndicator className="max-w-44" />
             <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
               <DialogTrigger asChild>

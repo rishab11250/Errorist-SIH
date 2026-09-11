@@ -112,7 +112,7 @@ export function VerdictCard({
   return (
     <article
       className={cn(
-        'surface-panel overflow-hidden transition-all duration-200 hover:shadow-md',
+        'surface-panel overflow-hidden transition-all duration-200 card-hover-lift animate-fade-in-up',
         statusBorderMap[verdict.status] ?? '',
         active
           ? 'ring-2 ring-primary shadow-md border-primary bg-primary/[0.02]'

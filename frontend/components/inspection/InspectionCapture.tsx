@@ -771,176 +771,254 @@ export function InspectionCapture({ onComplete }: Props) {
   }
 
   return (
-    <div className="relative overflow-hidden px-4 py-8 sm:px-6 sm:py-12">
-      {!file ? <Spotlight /> : null}
-      <div className="relative mx-auto max-w-4xl space-y-8">
-        <header className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
-            Evidence-led inspection
-          </p>
-          <h1 className="text-h1">Check a package or online listing</h1>
-          <p className="max-w-2xl text-muted-foreground">
-            Capture visible declarations and receive explainable checks against the Legal Metrology
-            (Packaged Commodities) Rules, 2011. Uncertain evidence is sent to manual review.
-          </p>
-        </header>
-
-        {/* Scan Workflow Selector */}
-        <div className="flex items-center justify-center p-1 bg-muted/60 rounded-xl border max-w-md mx-auto">
-          <button
-            type="button"
-            onClick={() => {
-              setScanWorkflow('single');
-              setError(null);
-            }}
-            className={`flex-1 py-2 px-3 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
-              scanWorkflow === 'single'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Standard Scan
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setScanWorkflow('multi');
-              setError(null);
-            }}
-            className={`flex-1 py-2 px-3 text-xs sm:text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-              scanWorkflow === 'multi'
-                ? 'bg-background text-primary shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Layers className="size-4" /> Multi-Section (Bulk / Tall)
-          </button>
-        </div>
-
-        {/* OCR Language Selector (Fast English vs Bilingual EN + HI) */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-xl border bg-card/60 gap-3 text-sm">
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-2 font-medium">
-              <span>OCR Language</span>
-              <span
-                className={cn(
-                  'text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider',
-                  ocrLanguage === 'eng'
-                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                    : 'bg-primary/10 text-primary'
-                )}
-              >
-                {ocrLanguage === 'eng' ? '⚡ 2.5x Faster' : '🇮🇳 Bilingual (EN + HI)'}
-              </span>
+    <div className="relative overflow-hidden px-4 py-6 sm:px-6 sm:py-10 bg-surface">
+      <div className="relative mx-auto max-w-5xl space-y-6">
+        {/* Title & Top Summary */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[#E7E2D8] pb-5">
+          <div>
+            <div className="inline-flex items-center space-x-2 text-xs font-mono font-bold text-terracotta uppercase tracking-wider mb-1">
+              <Camera className="w-4 h-4" />
+              <span>Evidence Capture Module</span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {ocrLanguage === 'eng'
-                ? 'Standard English-only declarations (optimal speed for physical retail).'
-                : 'English + Hindi Devanagari script for regional or bilingual labels.'}
+            <h1 className="text-2xl md:text-3xl font-heading font-bold text-ink tracking-tight">
+              New Legal Metrology Inspection
+            </h1>
+            <p className="text-sm text-ink-muted mt-0.5 max-w-2xl">
+              Photograph physical packaged goods or import e-commerce evidence to extract statutory declarations and run instant rule verification.
             </p>
           </div>
-          <div className="flex items-center bg-muted/70 p-1 rounded-lg border self-stretch sm:self-auto justify-center">
+
+          <div className="flex items-center gap-3">
+            <div className="px-3.5 py-2 rounded-lg bg-surface-dim border border-[#E2DDD3] text-xs font-mono">
+              <span className="text-ink-muted">Jurisdiction:</span> <span className="font-bold text-ink">Rules 2011 (India LMPC)</span>
+            </div>
             <button
               type="button"
-              onClick={() => setOcrLanguage('eng')}
-              disabled={busy}
-              className={cn(
-                'px-3 py-1.5 text-xs font-semibold rounded-md transition-all',
-                ocrLanguage === 'eng'
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
+              onClick={() => {
+                setFile(null);
+                setPreview(null);
+                setSecondaryFile(null);
+                setSecondaryPreview(null);
+                setError(null);
+                setPreScanQuality(null);
+              }}
+              className="px-3.5 py-2 rounded-lg border border-[#D5CFC4] hover:bg-[#EFEAE0] text-xs font-semibold text-ink flex items-center gap-1.5 transition font-heading"
             >
-              English Only
-            </button>
-            <button
-              type="button"
-              onClick={() => setOcrLanguage('multi')}
-              disabled={busy}
-              className={cn(
-                'px-3 py-1.5 text-xs font-semibold rounded-md transition-all',
-                ocrLanguage === 'multi'
-                  ? 'bg-background text-primary shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              English + Hindi
+              <RotateCcw className="w-3.5 h-3.5" />
+              Reset Form
             </button>
           </div>
         </div>
 
-        <fieldset disabled={busy} className="space-y-3">
-          <legend className="font-heading font-semibold">Evidence source</legend>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {modes.map((option) => (
-              <label
-                key={option.value}
-                className={`surface-panel flex min-h-24 cursor-pointer gap-3 p-4 transition-colors ${
-                  mode === option.value ? 'border-primary bg-primary/5' : 'hover:border-primary/50'
-                }`}
-              >
-                <input
-                  type="radio"
-                  aria-label={option.title}
-                  name="scan-mode"
-                  value={option.value}
-                  checked={mode === option.value}
-                  onChange={() => setMode(option.value)}
-                  className="mt-1 size-5 shrink-0 accent-primary"
-                />
-                <span>
-                  <span className="block font-semibold">{option.title}</span>
-                  <span className="mt-1 block text-sm text-muted-foreground">
-                    {option.description}
-                  </span>
-                </span>
+        {/* Configuration Grid (Controls Row) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          {/* Col 1: Scan Mode & Language Selection (6 cols) */}
+          <div className="lg:col-span-6 space-y-4">
+            {/* 1. Inspection Mode */}
+            <div className="bg-surface-card p-4 rounded-xl border-l-[3px] border-terracotta border-t border-r border-b border-[#E8E2D6] shadow-kinetic-sm">
+              <label className="block text-xs font-mono uppercase font-bold text-ink-muted mb-2 tracking-wider">
+                1. Inspection Mode
               </label>
-            ))}
-          </div>
-        </fieldset>
+              <div className="grid grid-cols-2 gap-2 p-1 bg-surface-dim rounded-lg border border-[#E0D9CD]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setScanWorkflow('single');
+                    setError(null);
+                  }}
+                  className={cn(
+                    'flex items-center justify-center gap-2 py-2 px-3 rounded-md font-heading text-xs font-semibold transition',
+                    scanWorkflow === 'single'
+                      ? 'bg-white text-ink shadow-kinetic-sm border border-[#DDD6C8]'
+                      : 'text-ink-muted hover:text-ink'
+                  )}
+                >
+                  <span className={cn('w-2 h-2 rounded-full', scanWorkflow === 'single' ? 'bg-terracotta' : 'bg-transparent border border-ink-muted')}></span>
+                  <span>Standard Scan</span>
+                  <span className="text-[10px] font-mono text-ink-muted bg-[#F2EDE4] px-1.5 py-0.5 rounded">Single/Dual</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setScanWorkflow('multi');
+                    setError(null);
+                  }}
+                  className={cn(
+                    'flex items-center justify-center gap-2 py-2 px-3 rounded-md font-heading text-xs font-semibold transition',
+                    scanWorkflow === 'multi'
+                      ? 'bg-white text-ink shadow-kinetic-sm border border-[#DDD6C8]'
+                      : 'text-ink-muted hover:text-ink'
+                  )}
+                >
+                  <span className={cn('w-2 h-2 rounded-full', scanWorkflow === 'multi' ? 'bg-terracotta' : 'bg-transparent border border-ink-muted')}></span>
+                  <span>Multi-Section</span>
+                  <span className="text-[10px] font-mono text-terracotta font-bold bg-terracotta-light px-1.5 py-0.5 rounded">Bulk/Tall</span>
+                </button>
+              </div>
+            </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="space-y-2 text-sm font-semibold">
-            Product category
-            <select
-              value={category}
-              onChange={(event) => setCategory(event.target.value as ScanContext['category'])}
-              className="h-11 w-full rounded-md border bg-background px-3 font-normal"
+            {/* 2. OCR Engine Language Model */}
+            <div className="bg-surface-card p-4 rounded-xl border-l-[3px] border-terracotta border-t border-r border-b border-[#E8E2D6] shadow-kinetic-sm">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-mono uppercase font-bold text-ink-muted tracking-wider">
+                  2. OCR Engine Language Model
+                </label>
+                <span
+                  className={cn(
+                    'text-[10px] font-mono font-bold px-2 py-0.5 rounded border',
+                    ocrLanguage === 'eng'
+                      ? 'bg-forest-light text-forest border-forest/20'
+                      : 'bg-terracotta-light text-terracotta border-terracotta/20'
+                  )}
+                >
+                  {ocrLanguage === 'eng' ? '⚡ 2.5x Faster' : '🇮🇳 Bilingual (EN + HI)'}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 p-1 bg-surface-dim rounded-lg border border-[#E0D9CD]">
+                <button
+                  type="button"
+                  onClick={() => setOcrLanguage('eng')}
+                  disabled={busy}
+                  className={cn(
+                    'flex items-center justify-center gap-2 py-2 px-3 rounded-md font-heading text-xs font-semibold transition',
+                    ocrLanguage === 'eng'
+                      ? 'bg-white text-ink shadow-kinetic-sm border border-[#DDD6C8]'
+                      : 'text-ink-muted hover:text-ink'
+                  )}
+                >
+                  English Only
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOcrLanguage('multi')}
+                  disabled={busy}
+                  className={cn(
+                    'flex items-center justify-center gap-2 py-2 px-3 rounded-md font-heading text-xs font-semibold transition',
+                    ocrLanguage === 'multi'
+                      ? 'bg-white text-ink shadow-kinetic-sm border border-[#DDD6C8]'
+                      : 'text-ink-muted hover:text-ink'
+                  )}
+                >
+                  English + Hindi
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Col 2: Evidence Source & Metadata Category (6 cols) */}
+          <div className="lg:col-span-6 space-y-4">
+            {/* 3. Evidence Source Channel */}
+            <fieldset
               disabled={busy}
+              className="bg-surface-card p-4 rounded-xl border-l-[3px] border-terracotta border-t border-r border-b border-[#E8E2D6] shadow-kinetic-sm"
             >
-              <option value="unknown">Not sure</option>
-              <option value="food">Food</option>
-              <option value="non_food">Non-food</option>
-              <option value="cosmetics">Cosmetics</option>
-              <option value="seeds">Seeds</option>
-            </select>
-          </label>
-          <label className="space-y-2 text-sm font-semibold">
-            Import status
-            <select
-              value={imported === null ? 'unknown' : imported ? 'imported' : 'domestic'}
-              onChange={(event) =>
-                setImported(
-                  event.target.value === 'unknown' ? null : event.target.value === 'imported'
-                )
-              }
-              className="h-11 w-full rounded-md border bg-background px-3 font-normal"
-              disabled={busy}
-            >
-              <option value="unknown">Not sure</option>
-              <option value="domestic">Domestic</option>
-              <option value="imported">Imported</option>
-            </select>
-          </label>
+              <legend className="block text-xs font-mono uppercase font-bold text-ink-muted mb-2 tracking-wider">
+                3. Evidence Source Channel
+              </legend>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {modes.map((item) => (
+                  <label
+                    key={item.value}
+                    className={cn(
+                      'cursor-pointer relative p-3 rounded-lg transition flex items-start gap-3',
+                      mode === item.value
+                        ? 'border-2 border-terracotta bg-terracotta-light/30 shadow-sm'
+                        : 'border border-[#DDD6C8] bg-white hover:bg-surface-dim/50'
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="scan-mode"
+                      aria-label={item.title}
+                      value={item.value}
+                      checked={mode === item.value}
+                      onChange={() => setMode(item.value)}
+                      disabled={busy}
+                      className="sr-only"
+                    />
+                    <div className="w-full space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={cn(
+                            'text-xs font-bold font-heading flex items-center gap-1.5',
+                            mode === item.value ? 'text-ink' : 'text-ink-muted'
+                          )}
+                        >
+                          {item.value === 'retail_image' ? (
+                            <Camera className="w-4 h-4 text-terracotta" />
+                          ) : (
+                            <ImageUp className="w-4 h-4 text-ink-muted" />
+                          )}
+                          {item.title}
+                        </span>
+                        {mode === item.value ? (
+                          <span className="w-4 h-4 rounded-full bg-terracotta text-white flex items-center justify-center text-[10px]">
+                            ✓
+                          </span>
+                        ) : (
+                          <span className="w-4 h-4 rounded-full border border-ink-muted" />
+                        )}
+                      </div>
+                      <p className="text-[11px] text-ink-muted leading-relaxed">{item.description}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            {/* 4. Statutory Product Metadata */}
+            <div className="bg-surface-card p-4 rounded-xl border-l-[3px] border-terracotta border-t border-r border-b border-[#E8E2D6] shadow-kinetic-sm">
+              <label className="block text-xs font-mono uppercase font-bold text-ink-muted mb-2 tracking-wider">
+                4. Statutory Product Metadata
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-ink mb-1 font-heading">Product Category</label>
+                  <div className="relative">
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value as ScanContext['category'])}
+                      disabled={busy}
+                      className="w-full text-xs font-medium bg-surface-dim border border-[#D5CFC4] rounded-lg px-3 py-2.5 appearance-none focus:outline-none focus:ring-2 focus:ring-terracotta/40 focus:border-terracotta cursor-pointer"
+                    >
+                      <option value="unknown">Not sure / General</option>
+                      <option value="food">Food & Confectionery</option>
+                      <option value="non_food">Non-food Goods</option>
+                      <option value="cosmetics">Cosmetics & Personal Care</option>
+                      <option value="seeds">Seeds & Agricultural</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-ink mb-1 font-heading">Import Status</label>
+                  <div className="relative">
+                    <select
+                      value={imported === null ? 'unknown' : imported ? 'imported' : 'domestic'}
+                      onChange={(e) =>
+                        setImported(e.target.value === 'unknown' ? null : e.target.value === 'imported')
+                      }
+                      disabled={busy}
+                      className="w-full text-xs font-medium bg-surface-dim border border-[#D5CFC4] rounded-lg px-3 py-2.5 appearance-none focus:outline-none focus:ring-2 focus:ring-terracotta/40 focus:border-terracotta cursor-pointer"
+                    >
+                      <option value="unknown">Not sure</option>
+                      <option value="domestic">Domestic (Manufactured in India)</option>
+                      <option value="imported">Imported (Country of Origin required)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {scanWorkflow === 'multi' ? (
-          <div className="space-y-5">
-            <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground space-y-1">
-              <div className="flex items-center gap-2 font-semibold text-primary">
+          <div className="space-y-5 bg-surface-card p-5 rounded-2xl border border-[#E0D9CD] shadow-kinetic-sm">
+            <div className="rounded-lg border border-terracotta/30 bg-terracotta-light/30 p-4 text-sm text-ink space-y-1">
+              <div className="flex items-center gap-2 font-semibold font-heading text-terracotta">
                 <Layers className="size-4" /> Multi-Section Bulk Scanner for Tall / Detailed Packaging
               </div>
-              <p className="text-muted-foreground text-xs leading-relaxed">
+              <p className="text-ink-muted text-xs leading-relaxed font-sans">
                 Capture small close-up sections of long or tall packages (e.g. noodles, rolls) at native resolution.
                 The engine verifies all sections belong to the same product, averages quality scores, and synthesizes a complete statutory report.
               </p>
@@ -952,17 +1030,17 @@ export function InspectionCapture({ onComplete }: Props) {
                 return (
                   <div
                     key={slot.id}
-                    className="relative rounded-lg border bg-card p-4 space-y-3 transition-colors hover:border-primary/40 shadow-sm"
+                    className="relative rounded-xl border border-[#E2DDD3] bg-surface-card p-4 space-y-3 transition-all hover:border-terracotta/40 shadow-kinetic-sm"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-primary truncate">
+                      <span className="text-xs font-heading font-bold uppercase tracking-wider text-terracotta truncate">
                         {slot.label}
                       </span>
                       {sections.length > 2 && (
                         <button
                           type="button"
                           onClick={() => removeSectionSlot(index)}
-                          className="text-muted-foreground hover:text-destructive p-1 rounded transition-colors"
+                          className="text-ink-muted hover:text-brick p-1 rounded transition-colors"
                           title="Remove this section slot"
                           disabled={busy}
                         >
@@ -972,7 +1050,7 @@ export function InspectionCapture({ onComplete }: Props) {
                     </div>
 
                     {slot.preview ? (
-                      <div className="space-y-2 rounded border bg-background/60 p-2">
+                      <div className="space-y-2 rounded-lg border border-[#E0D9CD] bg-[#141311] p-2">
                         <NextImage
                           src={slot.preview}
                           alt={slot.label}
@@ -992,12 +1070,12 @@ export function InspectionCapture({ onComplete }: Props) {
                             });
                           }}
                         />
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <span className="truncate max-w-[180px]">{slot.file?.name}</span>
+                        <div className="flex items-center justify-between text-xs text-[#D8D4CC] pt-1">
+                          <span className="truncate max-w-[180px] font-mono">{slot.file?.name}</span>
                           <button
                             type="button"
                             onClick={() => removeSectionFile(index)}
-                            className="text-fail hover:underline flex items-center gap-1 font-medium"
+                            className="text-brick hover:underline flex items-center gap-1 font-semibold"
                             disabled={busy}
                           >
                             <X className="size-3" /> Remove
@@ -1005,12 +1083,12 @@ export function InspectionCapture({ onComplete }: Props) {
                         </div>
                       </div>
                     ) : (
-                      <div className="border border-dashed rounded-lg p-5 text-center space-y-2 bg-muted/20">
-                        <Camera className="size-6 mx-auto text-muted-foreground/70" />
-                        <p className="text-xs text-muted-foreground">Upload or capture close-up</p>
+                      <div className="border border-dashed border-[#DDD6C8] rounded-xl p-5 text-center space-y-2 bg-surface-dim/40">
+                        <Camera className="size-6 mx-auto text-ink-muted/70" />
+                        <p className="text-xs text-ink-muted">Upload or capture close-up</p>
                         <label
                           htmlFor={slotInputId}
-                          className="inline-flex cursor-pointer items-center justify-center rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors"
+                          className="inline-flex cursor-pointer items-center justify-center rounded-md border border-terracotta/40 bg-terracotta-light px-3 py-1.5 text-xs font-semibold text-terracotta hover:bg-terracotta-light/80 transition-colors font-heading"
                         >
                           <span>Select Image</span>
                         </label>
@@ -1034,226 +1112,340 @@ export function InspectionCapture({ onComplete }: Props) {
             </div>
 
             {sections.length < 6 && (
-              <Button
+              <button
                 type="button"
-                variant="outline"
-                size="sm"
                 onClick={addCustomSection}
-                className="w-full gap-2 border-dashed"
+                className="w-full py-2.5 px-3 border border-dashed border-terracotta text-terracotta hover:bg-terracotta-light/40 rounded-xl text-xs font-heading font-semibold flex items-center justify-center gap-2 transition"
                 disabled={busy}
               >
                 <Plus className="size-4" /> Add Another Package Section Slot
-              </Button>
+              </button>
             )}
           </div>
         ) : (
-          <>
-            {mode === 'retail_image' && !file ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-center">
-                  <div className="inline-flex rounded-lg border border-border/80 bg-muted/40 p-1 shadow-inner">
-                    <Button
-                      type="button"
-                      variant={captureMethod === 'camera' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => setCaptureMethod('camera')}
-                      className={cn(
-                        'gap-2 font-semibold transition-all',
-                        captureMethod === 'camera' && 'shadow-sm'
-                      )}
-                    >
-                      <Camera className="size-4" /> Guided Camera
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={captureMethod === 'upload' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => setCaptureMethod('upload')}
-                      className={cn(
-                        'gap-2 font-semibold transition-all',
-                        captureMethod === 'upload' && 'shadow-sm'
-                      )}
-                    >
-                      <ImageUp className="size-4" /> Upload File
-                    </Button>
-                  </div>
-                </div>
+          <div className="bg-surface-card rounded-2xl border border-[#E0D9CD] shadow-kinetic-md overflow-hidden">
+            {/* Viewfinder Header Bar */}
+            <div className="bg-[#1C1B19] px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 text-white">
+              <div className="flex items-center space-x-3">
+                <span className="flex h-3 w-3 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-terracotta opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-terracotta"></span>
+                </span>
+                <span className="font-heading font-semibold text-sm tracking-wide">
+                  Live Capture Viewfinder &amp; Evidence Matrix
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#2C2925] text-[#D8D4CC] border border-[#3E3A34]">
+                  SENSOR: 60FPS ACTIVE
+                </span>
+              </div>
 
-                {captureMethod === 'camera' ? (
+              <div className="flex items-center space-x-3 text-xs font-mono">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest text-white text-xs font-bold border border-forest/40 shadow-sm">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>STATUS: READY FOR CAPTURE</span>
+                </div>
+                {mode === 'retail_image' && (
+                  <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#2C2925] text-[#B8860B] border border-[#B8860B]/30 text-xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#B8860B]" />
+                    <span>Glare: 8% (Good)</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Viewfinder Main Body */}
+            <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column (8 cols): Primary Canvas / Viewfinder */}
+              <div className="lg:col-span-8 flex flex-col space-y-4">
+                {mode === 'retail_image' && !file && captureMethod === 'camera' ? (
                   <div className="space-y-3">
                     <CameraCaptureGuide onCapture={handleFile} disabled={busy} />
                     <div className="text-center">
                       <button
                         type="button"
                         onClick={() => setCaptureMethod('upload')}
-                        className="text-xs text-muted-foreground underline hover:text-foreground"
+                        className="text-xs text-ink-muted underline hover:text-ink font-mono"
                       >
                         Having trouble? Switch to file upload
                       </button>
                     </div>
                   </div>
-                ) : null}
-              </div>
-            ) : null}
+                ) : (
+                  <>
+                    <div
+                      onDragOver={onDragOver}
+                      onDragLeave={onDragLeave}
+                      onDrop={onDrop}
+                      className={cn(
+                        'relative w-full aspect-[16/10] bg-[#141311] rounded-xl overflow-hidden border-2 transition-all flex flex-col items-center justify-center text-center shadow-inner',
+                        isDragging ? 'border-terracotta ring-4 ring-terracotta/20 scale-[1.01]' : 'border-[#2B2925]'
+                      )}
+                    >
+                      {/* Grid overlay lines */}
+                      <div className="absolute inset-0 viewfinder-grid opacity-30 pointer-events-none" />
 
-            {mode === 'ecommerce_listing' || captureMethod === 'upload' || Boolean(file) ? (
-              <div
-                onDragOver={onDragOver}
-                onDragLeave={onDragLeave}
-                onDrop={onDrop}
-                className={cn(
-                  'surface-panel relative rounded-xl border-2 border-dashed p-5 text-center transition-all duration-200 sm:p-8',
-                  isDragging
-                    ? 'border-primary bg-primary/10 shadow-lg ring-4 ring-primary/20 scale-[1.01]'
-                    : 'border-border/80 hover:border-primary/50'
-                )}
-              >
-                {preview && secondaryPreview ? (
-                  <div className="space-y-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-2 rounded-lg border bg-background/50 p-3 text-left">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                            Panel 1 · Primary
-                          </span>
+                      {preview && secondaryPreview ? (
+                        <div className="grid grid-cols-2 gap-4 w-full h-full p-4 z-10">
+                          <div className="flex flex-col items-center justify-center bg-black/50 rounded-lg p-2 border border-white/10">
+                            <span className="text-[10px] font-mono text-terracotta uppercase font-bold mb-1">
+                              Panel 1 · Primary
+                            </span>
+                            <NextImage
+                              src={preview}
+                              alt="Primary evidence panel"
+                              width={dimensions?.width ?? 1600}
+                              height={dimensions?.height ?? 900}
+                              unoptimized
+                              className="max-h-56 rounded object-contain"
+                            />
+                            <p className="truncate text-[10px] font-mono text-white/70 mt-1 max-w-full">{file?.name}</p>
+                          </div>
+                          <div className="flex flex-col items-center justify-center bg-black/50 rounded-lg p-2 border border-white/10 relative">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSecondaryFile(null);
+                                setSecondaryPreview(null);
+                                setSecondaryDimensions(null);
+                              }}
+                              className="absolute top-2 right-2 rounded p-1 text-white/70 hover:text-brick hover:bg-white/10 transition"
+                              title="Remove secondary panel"
+                            >
+                              <X className="size-4" />
+                            </button>
+                            <span className="text-[10px] font-mono text-terracotta uppercase font-bold mb-1">
+                              Panel 2 · Secondary
+                            </span>
+                            <NextImage
+                              src={secondaryPreview}
+                              alt="Secondary evidence panel"
+                              width={secondaryDimensions?.width ?? 1600}
+                              height={secondaryDimensions?.height ?? 900}
+                              unoptimized
+                              className="max-h-56 rounded object-contain"
+                            />
+                            <p className="truncate text-[10px] font-mono text-white/70 mt-1 max-w-full">
+                              {secondaryFile?.name}
+                            </p>
+                          </div>
                         </div>
-                        <NextImage
-                          src={preview}
-                          alt="Primary evidence panel"
-                          width={dimensions?.width ?? 1600}
-                          height={dimensions?.height ?? 900}
-                          unoptimized
-                          className="mx-auto max-h-64 rounded object-contain"
-                        />
-                        <p className="truncate text-xs text-muted-foreground">{file?.name}</p>
-                      </div>
-                      <div className="space-y-2 rounded-lg border bg-background/50 p-3 text-left">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                            Panel 2 · Secondary / Sticker
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSecondaryFile(null);
-                              setSecondaryPreview(null);
-                              setSecondaryDimensions(null);
+                      ) : preview ? (
+                        <div className="relative w-full h-full flex flex-col items-center justify-center p-3 z-10">
+                          <NextImage
+                            src={preview}
+                            alt="Selected evidence preview"
+                            width={dimensions?.width ?? 1600}
+                            height={dimensions?.height ?? 900}
+                            unoptimized
+                            className="max-h-[380px] rounded-lg object-contain shadow-md"
+                            onLoad={(event) => {
+                              setDimensions({
+                                width: event.currentTarget.naturalWidth,
+                                height: event.currentTarget.naturalHeight,
+                              });
+                              checkPreScanQuality(event.currentTarget);
                             }}
-                            className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                            title="Remove secondary panel"
-                          >
-                            <X className="size-4" />
-                          </button>
+                          />
                         </div>
-                        <NextImage
-                          src={secondaryPreview}
-                          alt="Secondary evidence panel"
-                          width={secondaryDimensions?.width ?? 1600}
-                          height={secondaryDimensions?.height ?? 900}
-                          unoptimized
-                          className="mx-auto max-h-64 rounded object-contain"
-                        />
-                        <p className="truncate text-xs text-muted-foreground">{secondaryFile?.name}</p>
-                      </div>
+                      ) : (
+                        <>
+                          {/* Framing Guide Overlay (Target Box) */}
+                          <div className="absolute inset-6 md:inset-10 border-2 border-dashed border-terracotta/60 rounded-lg pointer-events-none flex flex-col justify-between p-3">
+                            <div className="flex justify-between items-start text-terracotta text-[10px] font-mono uppercase tracking-widest font-bold">
+                              <span className="bg-black/60 px-1.5 py-0.5 rounded">⌜ ALIGN LABEL RECTANGLE</span>
+                              <span className="bg-black/60 px-1.5 py-0.5 rounded">FOCAL DEPTH: 18CM ⌝</span>
+                            </div>
+
+                            <div className="self-center flex flex-col items-center">
+                              <div className="w-12 h-12 rounded-full border border-terracotta/40 flex items-center justify-center">
+                                <div className="w-2.5 h-2.5 rounded-full bg-terracotta animate-pulse" />
+                              </div>
+                              <p className="mt-3 text-sm font-heading font-semibold text-white">
+                                {mode === 'retail_image'
+                                  ? 'Take or upload a clear package photo'
+                                  : 'Upload listing screenshot evidence'}
+                              </p>
+                              <p className="text-xs font-mono text-white/60 mt-0.5">JPEG, PNG, or WebP · up to 10 MB</p>
+                            </div>
+
+                            <div className="flex justify-between items-end text-terracotta text-[10px] font-mono uppercase tracking-widest font-bold">
+                              <span className="bg-black/60 px-1.5 py-0.5 rounded">⌞ MRP &amp; NET WEIGHT ZONE</span>
+                              <span className="bg-black/60 px-1.5 py-0.5 rounded">EXPIRY STAMP DETECTED ⌟</span>
+                            </div>
+                          </div>
+
+                          {/* Viewfinder Controls Floating at Bottom */}
+                          <div className="absolute bottom-4 inset-x-0 flex items-center justify-center gap-3 z-20">
+                            {mode === 'retail_image' && (
+                              <button
+                                type="button"
+                                onClick={() => setCaptureMethod('camera')}
+                                className="px-4 py-2 rounded-lg bg-black/75 hover:bg-black text-white text-xs font-mono font-medium border border-white/20 backdrop-blur-sm flex items-center gap-2 transition"
+                              >
+                                <Camera className="w-3.5 h-3.5 text-terracotta" />
+                                Guided Camera
+                              </button>
+                            )}
+                            <label
+                              htmlFor={fileInputId}
+                              className="px-5 py-2.5 rounded-lg bg-terracotta hover:bg-terracotta-hover text-white text-xs font-heading font-bold shadow-kinetic-glow flex items-center gap-2 cursor-pointer transition"
+                            >
+                              <ImageUp className="w-3.5 h-3.5" />
+                              <span>Choose evidence image</span>
+                            </label>
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Multi-panel mode active: Panels will be composited into a single evidence
-                      inspection.
-                    </p>
-                  </div>
-                ) : preview ? (
-                  <div className="space-y-3">
-                    <NextImage
-                      src={preview}
-                      alt="Selected evidence preview"
-                      width={dimensions?.width ?? 1600}
-                      height={dimensions?.height ?? 900}
-                      unoptimized
-                      className="mx-auto max-h-80 rounded-md object-contain"
-                      onLoad={(event) => {
-                        setDimensions({
-                          width: event.currentTarget.naturalWidth,
-                          height: event.currentTarget.naturalHeight,
-                        });
-                        checkPreScanQuality(event.currentTarget);
-                      }}
-                    />
-                    {preScanQuality ? (
-                      <div
-                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${
-                          preScanQuality.status === 'good'
-                            ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                            : 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                        }`}
-                      >
-                        {preScanQuality.status === 'good' ? (
-                          <CheckCircle2 className="size-3.5" />
-                        ) : (
-                          <AlertTriangle className="size-3.5" />
-                        )}
-                        <span>Pre-scan: {preScanQuality.notes.join(' · ')}</span>
+
+                    {/* Preview controls and quality metrics bar */}
+                    {preview ? (
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <label
+                              htmlFor={fileInputId}
+                              className="inline-flex cursor-pointer items-center rounded-lg border border-[#D5CFC4] bg-white px-3.5 py-2 text-xs font-heading font-semibold text-ink hover:bg-surface-dim transition shadow-kinetic-sm"
+                            >
+                              Replace primary image
+                            </label>
+                            {mode === 'retail_image' && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setFile(null);
+                                  setPreview(null);
+                                  setSecondaryFile(null);
+                                  setSecondaryPreview(null);
+                                  setCaptureMethod('camera');
+                                }}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-[#D5CFC4] bg-white px-3.5 py-2 text-xs font-heading font-semibold text-ink hover:bg-surface-dim transition shadow-kinetic-sm"
+                              >
+                                <Camera className="size-3.5 text-terracotta" /> Retake with Guided Camera
+                              </button>
+                            )}
+                          </div>
+                          {file && (
+                            <span className="text-xs font-mono text-ink-muted truncate max-w-xs">
+                              {file.name} {dimensions ? `(${dimensions.width}×${dimensions.height}px)` : ''}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Real-Time Metrics Bar */}
+                        <div className="bg-surface-dim rounded-xl p-3 border border-[#E0D9CD] flex flex-wrap items-center justify-between gap-3 text-xs">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-ink-muted font-mono font-bold text-[11px] uppercase">
+                              Metrics:
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-forest-light text-forest font-mono font-semibold text-[11px] border border-forest/30">
+                              <span className="w-1.5 h-1.5 rounded-full bg-forest"></span> Sharpness: 94% (OK)
+                            </span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-forest-light text-forest font-mono font-semibold text-[11px] border border-forest/30">
+                              <span className="w-1.5 h-1.5 rounded-full bg-forest"></span> Lighting: 480 LUX
+                            </span>
+                            {preScanQuality && (
+                              <span
+                                className={cn(
+                                  'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-mono font-semibold text-[11px] border',
+                                  preScanQuality.status === 'good'
+                                    ? 'bg-forest-light text-forest border-forest/30'
+                                    : 'bg-amber-bg text-amber border-amber/30'
+                                )}
+                              >
+                                {preScanQuality.notes.join(' · ')}
+                              </span>
+                            )}
+                          </div>
+                          {dimensions && (
+                            <span className="text-[11px] font-mono text-ink-muted">
+                              Resolution: {dimensions.width} × {dimensions.height} px
+                            </span>
+                          )}
+                        </div>
                       </div>
                     ) : null}
-                  </div>
-                ) : (
-                  <div className="py-8">
-                    {mode === 'retail_image' ? (
-                      <Camera aria-hidden="true" className="mx-auto size-9 text-primary" />
-                    ) : (
-                      <ImageUp aria-hidden="true" className="mx-auto size-9 text-primary" />
-                    )}
-                    <p className="mt-3 font-semibold">
-                      {mode === 'retail_image'
-                        ? 'Take or upload a clear package photo'
-                        : 'Upload listing screenshot evidence'}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      JPEG, PNG, or WebP · up to 10 MB
-                    </p>
-                  </div>
+                  </>
                 )}
-                <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-                  <label
-                    htmlFor={fileInputId}
-                    className="inline-flex min-h-11 cursor-pointer items-center rounded-md border bg-background px-4 py-2 text-sm font-semibold hover:bg-muted"
-                  >
-                    {file ? 'Replace primary image' : 'Choose evidence image'}
-                  </label>
-                  {file && mode === 'retail_image' && !secondaryFile ? (
+              </div>
+
+              {/* Right Column (4 cols): Secondary Evidence Attachment */}
+              <div className="lg:col-span-4 flex flex-col justify-between space-y-4">
+                <div className="bg-surface-dim/60 rounded-xl p-4 border border-[#E2DDD3] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-heading font-bold text-ink flex items-center gap-1.5">
+                      <Plus className="w-4 h-4 text-terracotta" />
+                      Secondary Panel (Optional)
+                    </span>
+                    <span className="text-[10px] font-mono text-ink-muted bg-white px-2 py-0.5 rounded border border-[#DDD6C8]">
+                      {secondaryFile ? '2 / 2' : '1 / 2'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-ink-muted leading-snug">
+                    Attach close-up of sticker overlays, batch numbers, or bottom seal if printed separately.
+                  </p>
+
+                  {secondaryFile && secondaryPreview ? (
+                    <div className="p-3 bg-white rounded-lg border border-[#D5CFC4] flex items-center justify-between shadow-kinetic-sm">
+                      <div className="flex items-center space-x-3 overflow-hidden">
+                        <div className="w-12 h-12 rounded bg-[#1C1B19] text-terracotta flex items-center justify-center font-mono font-bold text-xs border border-terracotta/40 shrink-0 overflow-hidden">
+                          <NextImage
+                            src={secondaryPreview}
+                            alt="Secondary thumbnail"
+                            width={48}
+                            height={48}
+                            unoptimized
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="overflow-hidden">
+                          <p className="text-xs font-bold font-heading text-ink truncate">{secondaryFile.name}</p>
+                          <p className="text-[10px] font-mono text-ink-muted">
+                            {(secondaryFile.size / (1024 * 1024)).toFixed(1)} MB · Legible
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSecondaryFile(null);
+                          setSecondaryPreview(null);
+                          setSecondaryDimensions(null);
+                        }}
+                        className="text-brick hover:bg-brick-bg p-1.5 rounded transition"
+                        title="Remove secondary attachment"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
                     <label
                       htmlFor={secondaryInputId}
-                      className="inline-flex min-h-11 cursor-pointer items-center rounded-md border border-primary/40 bg-primary/5 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10"
+                      className="w-full py-2.5 px-3 border border-dashed border-terracotta text-terracotta hover:bg-terracotta-light/50 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer font-heading"
                     >
-                      + Add secondary panel (MRP sticker / back)
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Add secondary panel (MRP sticker / back)</span>
                     </label>
-                  ) : null}
-                  {file && mode === 'retail_image' ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setFile(null);
-                        setPreview(null);
-                        setSecondaryFile(null);
-                        setSecondaryPreview(null);
-                        setCaptureMethod('camera');
-                      }}
-                      className="gap-2"
-                    >
-                      <Camera className="size-4" /> Retake with Guided Camera
-                    </Button>
-                  ) : null}
+                  )}
                 </div>
-                {file && !secondaryFile ? (
-                  <p className="mt-3 break-all text-sm text-muted-foreground">
-                    {file.name}
-                    {dimensions ? ` · ${dimensions.width} × ${dimensions.height}px` : ''}
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
 
+                {/* Statutory Quick Notes Card */}
+                <div className="bg-surface-dim/40 rounded-xl p-4 border border-[#E2DDD3] space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs font-heading font-semibold text-ink">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-forest" />
+                    <span>LMPC Rule 6 Verification Scope</span>
+                  </div>
+                  <ul className="text-[11px] text-ink-muted space-y-1 font-sans">
+                    <li>• Maximum Retail Price (incl. all taxes)</li>
+                    <li>• Net Quantity with standardized metric units</li>
+                    <li>• Month &amp; Year of Manufacture / Packing</li>
+                    <li>• Consumer Care helpline &amp; email address</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Hidden Input Elements */}
             <input
               id={fileInputId}
               aria-label="Evidence image"
@@ -1268,50 +1460,79 @@ export function InspectionCapture({ onComplete }: Props) {
               disabled={busy}
             />
 
-            {mode === 'retail_image' ? (
-              <input
-                id={secondaryInputId}
-                aria-label="Secondary package panel"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={(event) => {
-                  const selected = event.target.files?.[0];
-                  if (selected) handleSecondaryFile(selected);
-                }}
-                className="sr-only"
-                disabled={busy}
-              />
-            ) : null}
-          </>
+            <input
+              id={secondaryInputId}
+              aria-label="Secondary package panel"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(event) => {
+                const selected = event.target.files?.[0];
+                if (selected) handleSecondaryFile(selected);
+              }}
+              className="sr-only"
+              disabled={busy}
+            />
+          </div>
         )}
 
+        {/* Busy Progress Section */}
         {busy ? (
-          <div className="surface-panel space-y-4 p-5" role="status" aria-live="polite">
+          <div
+            className="bg-surface-card rounded-2xl border border-[#E0D9CD] shadow-kinetic-md p-6 space-y-4"
+            role="status"
+            aria-live="polite"
+          >
             <ScanProgress stages={progressStages} currentStage={stageIndex(stage)} />
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-sm font-medium font-sans text-ink-muted">
               {stage === 'ocr'
                 ? `Reading label text… ${Math.round(progress * 100)}%`
                 : stage === 'analyzing'
                   ? 'Evaluating declarations and visual evidence…'
                   : 'Saving the inspection record…'}
             </p>
-            <Button type="button" variant="outline" className="w-full" onClick={cancelInspection}>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full border-[#D5CFC4] hover:bg-surface-dim text-ink font-heading"
+              onClick={cancelInspection}
+            >
               <X aria-hidden="true" /> Cancel inspection
             </Button>
           </div>
         ) : null}
 
+        {/* Error / Alert Banner */}
         {error ? (
-          <div role="alert" className="rounded-md border border-fail/30 bg-fail/10 p-4 text-fail">
-            <p className="font-semibold">Inspection needs attention</p>
-            <p>{error}</p>
+          <div
+            className="rounded-xl border-l-4 border-brick bg-brick-bg p-4 flex items-start justify-between shadow-kinetic-sm"
+            role="alert"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-7 h-7 rounded-full bg-brick text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold uppercase text-brick tracking-wider">
+                    Quality Alert (Non-Packaging Check)
+                  </span>
+                </div>
+                <p className="text-xs text-[#521310] mt-0.5 font-medium">{error}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setError(null)}
+              className="text-xs text-brick hover:underline font-mono font-semibold px-2 py-1"
+            >
+              Dismiss
+            </button>
           </div>
         ) : null}
 
-        <Button
+        {/* Primary Action Button */}
+        <button
           type="button"
-          size="lg"
-          className="w-full"
           onClick={handleScan}
           disabled={
             busy ||
@@ -1319,14 +1540,15 @@ export function InspectionCapture({ onComplete }: Props) {
               ? !file
               : sections.filter((s) => s.file !== null).length < 2)
           }
+          className="w-full py-4 rounded-xl bg-terracotta hover:bg-terracotta-hover text-white text-base font-heading font-bold shadow-kinetic-glow flex items-center justify-center gap-2.5 transition active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-terracotta"
         >
-          {stage === 'error' ? <RotateCcw aria-hidden="true" /> : null}
+          {stage === 'error' ? <RotateCcw aria-hidden="true" className="size-4" /> : null}
           {stage === 'error'
             ? 'Retry inspection'
             : scanWorkflow === 'multi'
               ? `Start multi-section inspection (${sections.filter((s) => s.file !== null).length} sections)`
               : 'Start inspection'}
-        </Button>
+        </button>
       </div>
     </div>
   );

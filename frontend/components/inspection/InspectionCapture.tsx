@@ -815,7 +815,7 @@ export function InspectionCapture({ onComplete }: Props) {
           {/* Col 1: Scan Mode & Language Selection (6 cols) */}
           <div className="lg:col-span-6 space-y-4">
             {/* 1. Inspection Mode */}
-            <div className="bg-surface-card p-4 rounded-xl border-l-[3px] border-terracotta border-t border-r border-b border-[#E8E2D6] shadow-kinetic-sm">
+            <div className="bg-surface-card p-4 rounded-xl border border-[#E8E2D6] shadow-kinetic-sm">
               <label className="block text-xs font-mono uppercase font-bold text-ink-muted mb-2 tracking-wider">
                 1. Inspection Mode
               </label>
@@ -858,7 +858,7 @@ export function InspectionCapture({ onComplete }: Props) {
             </div>
 
             {/* 2. OCR Engine Language Model */}
-            <div className="bg-surface-card p-4 rounded-xl border-l-[3px] border-terracotta border-t border-r border-b border-[#E8E2D6] shadow-kinetic-sm">
+            <div className="bg-surface-card p-4 rounded-xl border border-[#E8E2D6] shadow-kinetic-sm">
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-xs font-mono uppercase font-bold text-ink-muted tracking-wider">
                   2. OCR Engine Language Model
@@ -910,7 +910,7 @@ export function InspectionCapture({ onComplete }: Props) {
             {/* 3. Evidence Source Channel */}
             <fieldset
               disabled={busy}
-              className="bg-surface-card p-4 rounded-xl border-l-[3px] border-terracotta border-t border-r border-b border-[#E8E2D6] shadow-kinetic-sm"
+              className="bg-surface-card p-4 rounded-xl border border-[#E8E2D6] shadow-kinetic-sm"
             >
               <legend className="block text-xs font-mono uppercase font-bold text-ink-muted mb-2 tracking-wider">
                 3. Evidence Source Channel
@@ -967,7 +967,7 @@ export function InspectionCapture({ onComplete }: Props) {
             </fieldset>
 
             {/* 4. Statutory Product Metadata */}
-            <div className="bg-surface-card p-4 rounded-xl border-l-[3px] border-terracotta border-t border-r border-b border-[#E8E2D6] shadow-kinetic-sm">
+            <div className="bg-surface-card p-4 rounded-xl border border-[#E8E2D6] shadow-kinetic-sm">
               <label className="block text-xs font-mono uppercase font-bold text-ink-muted mb-2 tracking-wider">
                 4. Statutory Product Metadata
               </label>

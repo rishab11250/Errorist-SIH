@@ -128,11 +128,11 @@ export function RepositoryPage({
         <div className="flex items-center gap-3">
           <Button
             asChild
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 h-auto rounded-kinetic bg-kinetic-charcoal hover:bg-kinetic-charcoalLight text-white text-xs font-mono font-semibold tracking-wide transition shadow-sm group"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 h-10 rounded-lg bg-[#1C1B19] hover:bg-[#2D2C29] text-white text-xs font-mono font-semibold tracking-wide transition shadow-sm border border-[#1C1B19] group cursor-pointer"
           >
-            <a href={`/api/exports/scans.csv?${query}`}>
+            <a href={`/api/exports/scans.csv?${query}`} className="inline-flex items-center gap-2 text-white">
               <Download aria-hidden="true" className="w-4 h-4 text-[#F7A678] group-hover:translate-y-0.5 transition-transform" />
-              <span>Download Filtered CSV</span>
+              <span className="text-white font-semibold">Download Filtered CSV</span>
             </a>
           </Button>
         </div>
@@ -140,25 +140,25 @@ export function RepositoryPage({
 
       {/* Quick Stat Chips */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white border-l-4 border-kinetic-terracotta p-3.5 rounded-r-kinetic border-y border-r border-[#EBE5DB] shadow-sm">
+        <div className="bg-white rounded-kinetic border border-[#EBE5DB] p-3.5 shadow-sm">
           <div className="text-[11px] font-mono text-kinetic-textMuted uppercase tracking-wider">Total Stored Scans</div>
           <div className="text-xl font-bold font-display text-kinetic-charcoal mt-1">
             {result ? result.total : 0}
           </div>
         </div>
-        <div className="bg-white border-l-4 border-kinetic-forest p-3.5 rounded-r-kinetic border-y border-r border-[#EBE5DB] shadow-sm">
+        <div className="bg-white rounded-kinetic border border-[#EBE5DB] p-3.5 shadow-sm">
           <div className="text-[11px] font-mono text-kinetic-textMuted uppercase tracking-wider">Statutory Pass</div>
           <div className="text-xl font-bold font-display text-kinetic-forest mt-1">
             {stats.pass}
           </div>
         </div>
-        <div className="bg-white border-l-4 border-kinetic-review p-3.5 rounded-r-kinetic border-y border-r border-[#EBE5DB] shadow-sm">
+        <div className="bg-white rounded-kinetic border border-[#EBE5DB] p-3.5 shadow-sm">
           <div className="text-[11px] font-mono text-kinetic-textMuted uppercase tracking-wider">Manual Review Req.</div>
           <div className="text-xl font-bold font-display text-kinetic-review mt-1">
             {stats.review}
           </div>
         </div>
-        <div className="bg-white border-l-4 border-kinetic-fail p-3.5 rounded-r-kinetic border-y border-r border-[#EBE5DB] shadow-sm">
+        <div className="bg-white rounded-kinetic border border-[#EBE5DB] p-3.5 shadow-sm">
           <div className="text-[11px] font-mono text-kinetic-textMuted uppercase tracking-wider">Definitive Breaches</div>
           <div className="text-xl font-bold font-display text-kinetic-fail mt-1">
             {stats.fail}

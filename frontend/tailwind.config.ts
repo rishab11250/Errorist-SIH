@@ -6,6 +6,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        kinetic: {
+          surface: '#FAF8F3',
+          surfaceCard: '#FFFFFF',
+          charcoal: '#1C1B19',
+          charcoalLight: '#2D2C29',
+          terracotta: '#C1550C',
+          terracottaHover: '#A84809',
+          terracottaLight: '#FFF2EB',
+          forest: '#1F4B3F',
+          forestLight: '#E8F3EE',
+          fail: '#B3261E',
+          failLight: '#FDECEB',
+          warn: '#B8860B',
+          warnLight: '#FEF8EA',
+          review: '#9C4221',
+          reviewLight: '#FBEFEA',
+          border: '#EBE5DB',
+          borderSubtle: '#F2EDE4',
+          textMuted: '#6B6862',
+        },
         surface: '#FAF8F3',
         'surface-dim': '#F1ECE4',
         'surface-card': '#FFFFFF',

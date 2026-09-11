@@ -908,13 +908,14 @@ export function InspectionCapture({ onComplete }: Props) {
           {/* Col 2: Evidence Source & Metadata Category (6 cols) */}
           <div className="lg:col-span-6 space-y-4">
             {/* 3. Evidence Source Channel */}
-            <fieldset
-              disabled={busy}
+            <div
+              role="group"
+              aria-labelledby="evidence-source-heading"
               className="bg-surface-card p-4 rounded-xl border border-[#E8E2D6] shadow-kinetic-sm"
             >
-              <legend className="block text-xs font-mono uppercase font-bold text-ink-muted mb-2 tracking-wider">
+              <span id="evidence-source-heading" className="block text-xs font-mono uppercase font-bold text-ink-muted mb-2 tracking-wider">
                 3. Evidence Source Channel
-              </legend>
+              </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {modes.map((item) => (
                   <label
@@ -964,7 +965,7 @@ export function InspectionCapture({ onComplete }: Props) {
                   </label>
                 ))}
               </div>
-            </fieldset>
+            </div>
 
             {/* 4. Statutory Product Metadata */}
             <div className="bg-surface-card p-4 rounded-xl border border-[#E8E2D6] shadow-kinetic-sm">

@@ -443,7 +443,12 @@ export function InspectionCapture({ onComplete }: Props) {
           const ocr = await runOCR(
             scanFile,
             (p) => setProgress((i + p) / activeSections.length),
-            controller.signal
+            controller.signal,
+            {
+              scanContext: { mode, category, imported },
+              rules: loadDefaultRules(),
+              enableDualPass: true,
+            }
           );
           if (operation !== operationRef.current) return;
           if (ocr.words.length === 0 || !ocr.words.some((w) => w.text.trim())) {
@@ -608,8 +613,14 @@ export function InspectionCapture({ onComplete }: Props) {
         ? await createCompositeEvidenceFile(file, secondaryFile)
         : file;
       const scanFile = await downscaleImageFile(rawFile, 1600);
+      const rules = loadDefaultRules();
+      const scanContext: ScanContext = { mode, category, imported };
       setStage('ocr');
-      const ocr = await runOCR(scanFile, setProgress, controller.signal);
+      const ocr = await runOCR(scanFile, setProgress, controller.signal, {
+        scanContext,
+        rules,
+        enableDualPass: true,
+      });
       if (operation !== operationRef.current) return;
       if (ocr.words.length === 0 || !ocr.words.some((word) => word.text.trim())) {
         throw new Error('No readable text was found. Retake or upload a clearer label image.');
@@ -622,15 +633,13 @@ export function InspectionCapture({ onComplete }: Props) {
       }
       setStage('analyzing');
 
-      const rules = loadDefaultRules();
       const imageMeta = {
         width: ocr.imageWidth,
         height: ocr.imageHeight,
         orientation: 1,
       };
-      const scanContext: ScanContext = { mode, category, imported };
       const localQuality = assessQuality(ocr.words);
-      const localExtracted = extractAll(ocr.words, imageMeta, scanContext, rules);
+      const localExtracted = ocr.extractedFields ?? extractAll(ocr.words, imageMeta, scanContext, rules);
       const localVerdicts = runEngine(
         { extracted: localExtracted, quality: localQuality },
         rules,

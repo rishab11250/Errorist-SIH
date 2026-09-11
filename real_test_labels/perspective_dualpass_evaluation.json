@@ -1,0 +1,380 @@
+[
+  {
+    "file": "good_day_1.jpg",
+    "desc": "Britannia Good Day (severe perspective roll -8.8°)",
+    "perspectiveWarpApplied": true,
+    "skewAngle": 8.81,
+    "baseline": {
+      "wordCount": 95,
+      "meanConfidence": 51.7,
+      "medianConfidence": 49.8,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": ": sre. hak Bows Se) > Bt No. ’ Po Por Serv. MA ¢ 4 protein ris lf Dr ateied ro, Added Sasa 2030\" CEVE. re -— eR a ~ \\ JSHERIANED WHEAT FLOUR (MAIDA), REFINED PA"
+    },
+    "newPipeline": {
+      "wordCount": 80,
+      "meanConfidence": 43.9,
+      "medianConfidence": 48.5,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "a. _ : i e : g Fy any - : gir “Abou, of Si eld MAREE, ES El — > Be ~ SIRENED WHEAT FLOUR (MAD) REFINED PALM GAR, CASHEW NUTS (1.8%) INVERT SAR SYR p BNE AGENTS",
+      "disagreements": []
+    },
+    "deltas": {
+      "wordDelta": -15,
+      "confDelta": -7.8
+    }
+  },
+  {
+    "file": "good_day_2.jpg",
+    "desc": "Britannia Good Day (flat strip)",
+    "perspectiveWarpApplied": false,
+    "skewAngle": 0.82,
+    "baseline": {
+      "wordCount": 0,
+      "meanConfidence": 0,
+      "medianConfidence": 0,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": ""
+    },
+    "newPipeline": {
+      "wordCount": 0,
+      "meanConfidence": 0,
+      "medianConfidence": 0,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "",
+      "disagreements": []
+    },
+    "deltas": {
+      "wordDelta": 0,
+      "confDelta": 0
+    }
+  },
+  {
+    "file": "balaji_1.jpg",
+    "desc": "Balaji Wafers back panel",
+    "perspectiveWarpApplied": false,
+    "skewAngle": 1.21,
+    "baseline": {
+      "wordCount": 121,
+      "meanConfidence": 37.7,
+      "medianConfidence": 35.6,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "EN g 9 2° v 1 aS \\ . PERV mre R —— pee = a # pa ge : - * 3 > ——— a AN).CO | by LL / INGREDIENTS. Va: Tf he AY t f SOWDER (ONION GARLIC) / Bim HE er CANE (PN RRA"
+    },
+    "newPipeline": {
+      "wordCount": 121,
+      "meanConfidence": 37.7,
+      "medianConfidence": 35.6,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "EN g 9 2° v 1 aS \\ . PERV mre R —— pee = a # pa ge : - * 3 > ——— a AN).CO | by LL / INGREDIENTS. Va: Tf he AY t f SOWDER (ONION GARLIC) / Bim HE er CANE (PN RRA",
+      "disagreements": []
+    },
+    "deltas": {
+      "wordDelta": 0,
+      "confDelta": 0
+    }
+  },
+  {
+    "file": "bourbon_1.jpg",
+    "desc": "Britannia Bourbon (perspective angle)",
+    "perspectiveWarpApplied": true,
+    "skewAngle": 5.87,
+    "baseline": {
+      "wordCount": 44,
+      "meanConfidence": 48.2,
+      "medianConfidence": 46.9,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "™ 330 A —————— 4 ~x Nutrition Information 2.7%), per 100g product (approx.) fee Sl Carbohydrate 7260 8 5 a RS Protein BE (VOURS, go 203g E MIE Saturated fatt"
+    },
+    "newPipeline": {
+      "wordCount": 54,
+      "meanConfidence": 48.7,
+      "medianConfidence": 51.9,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": ". Nutrition Information 27 Per 100g product (approx) FIERS Bl Carbohydrate 72.64 ot S07 “tv, 38 ) ETIC pe >g \"URS WF C3 LK ads | ! rated fatty a Ca A va Jreatra",
+      "disagreements": []
+    },
+    "deltas": {
+      "wordDelta": 10,
+      "confDelta": 0.5
+    }
+  },
+  {
+    "file": "bourbon_2.jpg",
+    "desc": "Britannia Bourbon (foil wrapper, glare & angle)",
+    "perspectiveWarpApplied": true,
+    "skewAngle": 13.84,
+    "baseline": {
+      "wordCount": 63,
+      "meanConfidence": 40,
+      "medianConfidence": 37.6,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "bh i g = - i, hy i Pos - \\ OIL ED: beds v : wd B a a8 an a N 5 vq ver | ws K SOU is 503(ii)], = oo cAlANDICOSEDSLT. . A : ATHOAL 15 — re Pa a BD aman Frote . 1"
+    },
+    "newPipeline": {
+      "wordCount": 155,
+      "meanConfidence": 32.2,
+      "medianConfidence": 31.2,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "Croft p I Ww i oy v : Sh k | aAW IH TT DIY + : 4 FO 4 , - iY / v » g > k \" , FD ywwncat ’ | Loves : = r 16 (15: REFINED WHEL oe sor i: 1 : JENS © 0 0) f MAIZE D",
+      "disagreements": []
+    },
+    "deltas": {
+      "wordDelta": 92,
+      "confDelta": -7.8
+    }
+  },
+  {
+    "file": "lays_1.jpg",
+    "desc": "Lays Spanish Tomato Tango",
+    "perspectiveWarpApplied": true,
+    "skewAngle": 1.09,
+    "baseline": {
+      "wordCount": 2,
+      "meanConfidence": 39.3,
+      "medianConfidence": 48.2,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "4 a "
+    },
+    "newPipeline": {
+      "wordCount": 4,
+      "meanConfidence": 32.8,
+      "medianConfidence": 45.4,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "oo alte = 2%) ",
+      "disagreements": []
+    },
+    "deltas": {
+      "wordDelta": 2,
+      "confDelta": -6.5
+    }
+  },
+  {
+    "file": "maggi_1.jpg",
+    "desc": "Maggi 2-Minute Noodles",
+    "perspectiveWarpApplied": true,
+    "skewAngle": 4.99,
+    "baseline": {
+      "wordCount": 220,
+      "meanConfidence": 28.9,
+      "medianConfidence": 27.3,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "PVT PES CT 0 AL A : Po TRC AS ga fs 8 50 TL RCE ; SW YN ele be yy REE a RE E “ = ph ) ® [24 iB » PEE ALT Se Ra - PM RE v py p pro go SAN WP g < ¢ RPS HI OE Se a"
+    },
+    "newPipeline": {
+      "wordCount": 164,
+      "meanConfidence": 27.3,
+      "medianConfidence": 26.5,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "IS ¥ iT - § al) a Fl 0 ri FP 0g Lak < NSN TAY : - SLE NEN &% Ta é hr SV SPE XT et 2 ” jim TROON pA) Br ord ATR . 0 of VRE af, 0 ER £5 hay vi - 3 Ais Rd = —— = a",
+      "disagreements": []
+    },
+    "deltas": {
+      "wordDelta": -56,
+      "confDelta": -1.6
+    }
+  },
+  {
+    "file": "maggi_2.jpg",
+    "desc": "Maggi side panel (angled)",
+    "perspectiveWarpApplied": true,
+    "skewAngle": 12.59,
+    "baseline": {
+      "wordCount": 126,
+      "meanConfidence": 55.8,
+      "medianConfidence": 60.5,
+      "fields": {
+        "mrp": "508",
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "DE, AL KNOW YOUR PORTION l§ NUTRITIONAL INFORMATION : Pack contains serve. =, (Ifa serveis 70 LL INUTRITION® Per | Per | 4a Per serve contributi INFORMATION "
+    },
+    "newPipeline": {
+      "wordCount": 197,
+      "meanConfidence": 50.2,
+      "medianConfidence": 54.2,
+      "fields": {
+        "mrp": "9",
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "KNOW YOUR PORTIONT NUTRITIONAL INFORMA OUR PORT Pack con ONENUT Mnpgd Taney, swe. NITATINAL WEREATI Per serve contribution 3) NUTRITION® ] to RDA - 13% energy 2",
+      "disagreements": [
+        {
+          "field": "mrp",
+          "pass1": "9",
+          "pass2": null,
+          "chosen": "Pass 1 (Adaptive)",
+          "resolved": "9"
+        }
+      ]
+    },
+    "deltas": {
+      "wordDelta": 71,
+      "confDelta": -5.7
+    }
+  },
+  {
+    "file": "parle_g_1.jpg",
+    "desc": "Parle-G wrapper",
+    "perspectiveWarpApplied": true,
+    "skewAngle": 9.67,
+    "baseline": {
+      "wordCount": 63,
+      "meanConfidence": 41.7,
+      "medianConfidence": 36,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": ". TN \\ a ’ — 5 J . » f | a 4 5 : ) 2 ~ g— 3 — 2\" : \\ a HH tmnt, 4 | | | Eg = 5 o¢ _ \\ 8 : : 3 LV = RS HEE SE | : : LE ‘0 \\ = PREZ = NA 2 552° TL - )/ i "
+    },
+    "newPipeline": {
+      "wordCount": 62,
+      "meanConfidence": 28.1,
+      "medianConfidence": 26.1,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "FO X. ; « . } E ) sd { / a /- re : . ¢ sd © 9 | . BY YR i a | NT IEEE y Por 7 LT = AT EEE iT $iEiciEa on FE gSgoc=ae il caslfgEiEE2:l LE TE 4 £T= EE Fir g gEje",
+      "disagreements": []
+    },
+    "deltas": {
+      "wordDelta": -1,
+      "confDelta": -13.6
+    }
+  },
+  {
+    "file": "tata_salt_1.jpg",
+    "desc": "Tata Salt vacuum evaporated",
+    "perspectiveWarpApplied": true,
+    "skewAngle": 1.39,
+    "baseline": {
+      "wordCount": 67,
+      "meanConfidence": 36.5,
+      "medianConfidence": 30.1,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": "= i \" § 2 3 fi C | | i palanced \\Q | i; Taste Gl Bias TATA TH % Rigel ge i %o ¥ eR nH 3 y a ¥ oH SEED a Tt Vacuum® Evaporated SE ST . fa Fon 08 i lodised hi "
+    },
+    "newPipeline": {
+      "wordCount": 65,
+      "meanConfidence": 36,
+      "medianConfidence": 32.2,
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null,
+        "fssai": null
+      },
+      "textPreview": ": he } : 3 : 3 o EY palanced g Taste > N yp ; TATA 2 nN > % i 2 : wi a ; iL <E at : fo Vacuum® Evaporated K A 5 lodised ® RECYCLABLE’ f° PACK £ < 5 LJ | caine |",
+      "disagreements": []
+    },
+    "deltas": {
+      "wordDelta": -2,
+      "confDelta": -0.5
+    }
+  }
+]

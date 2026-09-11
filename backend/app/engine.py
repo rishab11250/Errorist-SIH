@@ -601,7 +601,10 @@ def _verdict_for_check(
     if check.rule_id == "r6_1_e_mrp" and has_value and extracted is not None:
         conflicting = getattr(extracted, "conflicting_values", None) or []
         if len(conflicting) > 1:
-            prices_str = ", ".join(f"Rs {p}" if not p.startswith(("Rs", "₹")) else p for p in conflicting)
+            prices_str = ", ".join(
+                f"Rs {p}" if not p.startswith(("Rs", "₹")) else p
+                for p in conflicting
+            )
             mrp_conflict_note = (
                 f"Multiple conflicting MRP declarations detected ({prices_str}). "
                 "Potential Rule 18(2) violation (dual MRP / price tampering / over-stickering)."

@@ -80,8 +80,12 @@ def test_usp_exemption_in_engine(rules):
     extracted = {
         "mrp": ExtractedField("mrp", "MRP Rs 10 Inclusive of all taxes", (0, 0, 10, 10), 0.9),
         "net_quantity": ExtractedField("net_quantity", "5 g", (0, 0, 10, 10), 0.9),
-        "manufacturer_address": ExtractedField("manufacturer_address", "ACME Plot 12 Mumbai 400001", (0, 0, 10, 10), 0.9),
-        "consumer_care": ExtractedField("consumer_care", "ACME care@acme.com +91 9876543210", (0, 0, 10, 10), 0.9),
+        "manufacturer_address": ExtractedField(
+            "manufacturer_address", "ACME Plot 12 Mumbai 400001", (0, 0, 10, 10), 0.9,
+        ),
+        "consumer_care": ExtractedField(
+            "consumer_care", "ACME care@acme.com +91 9876543210", (0, 0, 10, 10), 0.9,
+        ),
         "mfg_date": ExtractedField("mfg_date", "Mfg: 03/2026", (0, 0, 10, 10), 0.9),
     }
     verdicts = {v.rule_id: v for v in run_engine(extracted, rules, ScanContext())}
@@ -137,8 +141,12 @@ def test_dual_mrp_warning_in_engine(rules):
     extracted = {
         "mrp": mrp_field,
         "net_quantity": ExtractedField("net_quantity", "500 g", (0, 0, 10, 10), 0.9),
-        "manufacturer_address": ExtractedField("manufacturer_address", "ACME Plot 12 Mumbai 400001", (0, 0, 10, 10), 0.9),
-        "consumer_care": ExtractedField("consumer_care", "ACME care@acme.com +91 9876543210", (0, 0, 10, 10), 0.9),
+        "manufacturer_address": ExtractedField(
+            "manufacturer_address", "ACME Plot 12 Mumbai 400001", (0, 0, 10, 10), 0.9,
+        ),
+        "consumer_care": ExtractedField(
+            "consumer_care", "ACME care@acme.com +91 9876543210", (0, 0, 10, 10), 0.9,
+        ),
         "mfg_date": ExtractedField("mfg_date", "Mfg: 03/2026", (0, 0, 10, 10), 0.9),
         "unit_price": ExtractedField("unit_price", "Rs 0.20/g", (0, 0, 10, 10), 0.9),
     }

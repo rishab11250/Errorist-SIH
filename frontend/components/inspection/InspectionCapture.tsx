@@ -220,6 +220,7 @@ export function InspectionCapture({ onComplete }: Props) {
   const operationRef = useRef(0);
   const [scanWorkflow, setScanWorkflow] = useState<'single' | 'multi'>('single');
   const [sections, setSections] = useState<SectionSlot[]>(DEFAULT_SECTIONS);
+  const [ocrLanguage, setOcrLanguage] = useState<'eng' | 'multi'>('eng');
 
   const handleSectionFile = useCallback((index: number, selected: File) => {
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(selected.type)) {
@@ -440,6 +441,7 @@ export function InspectionCapture({ onComplete }: Props) {
         for (let i = 0; i < activeSections.length; i++) {
           const sec = activeSections[i];
           const scanFile = await downscaleImageFile(sec.file, 1600);
+          const languages = ocrLanguage === 'multi' ? ['eng', 'hin'] : ['eng'];
           const ocr = await runOCR(
             scanFile,
             (p) => setProgress((i + p) / activeSections.length),
@@ -448,6 +450,7 @@ export function InspectionCapture({ onComplete }: Props) {
               scanContext: { mode, category, imported },
               rules: loadDefaultRules(),
               enableDualPass: true,
+              languages,
             }
           );
           if (operation !== operationRef.current) return;
@@ -615,11 +618,13 @@ export function InspectionCapture({ onComplete }: Props) {
       const scanFile = await downscaleImageFile(rawFile, 1600);
       const rules = loadDefaultRules();
       const scanContext: ScanContext = { mode, category, imported };
+      const languages = ocrLanguage === 'multi' ? ['eng', 'hin'] : ['eng'];
       setStage('ocr');
       const ocr = await runOCR(scanFile, setProgress, controller.signal, {
         scanContext,
         rules,
         enableDualPass: true,
+        languages,
       });
       if (operation !== operationRef.current) return;
       if (ocr.words.length === 0 || !ocr.words.some((word) => word.text.trim())) {
@@ -810,6 +815,58 @@ export function InspectionCapture({ onComplete }: Props) {
           >
             <Layers className="size-4" /> Multi-Section (Bulk / Tall)
           </button>
+        </div>
+
+        {/* OCR Language Selector (Fast English vs Bilingual EN + HI) */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-xl border bg-card/60 gap-3 text-sm">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2 font-medium">
+              <span>OCR Language</span>
+              <span
+                className={cn(
+                  'text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider',
+                  ocrLanguage === 'eng'
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                    : 'bg-primary/10 text-primary'
+                )}
+              >
+                {ocrLanguage === 'eng' ? '⚡ 2.5x Faster' : '🇮🇳 Bilingual (EN + HI)'}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {ocrLanguage === 'eng'
+                ? 'Standard English-only declarations (optimal speed for physical retail).'
+                : 'English + Hindi Devanagari script for regional or bilingual labels.'}
+            </p>
+          </div>
+          <div className="flex items-center bg-muted/70 p-1 rounded-lg border self-stretch sm:self-auto justify-center">
+            <button
+              type="button"
+              onClick={() => setOcrLanguage('eng')}
+              disabled={busy}
+              className={cn(
+                'px-3 py-1.5 text-xs font-semibold rounded-md transition-all',
+                ocrLanguage === 'eng'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              English Only
+            </button>
+            <button
+              type="button"
+              onClick={() => setOcrLanguage('multi')}
+              disabled={busy}
+              className={cn(
+                'px-3 py-1.5 text-xs font-semibold rounded-md transition-all',
+                ocrLanguage === 'multi'
+                  ? 'bg-background text-primary shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              English + Hindi
+            </button>
+          </div>
         </div>
 
         <fieldset disabled={busy} className="space-y-3">

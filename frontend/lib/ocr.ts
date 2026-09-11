@@ -26,14 +26,44 @@ export const OCR_ASSET_PATHS = {
 } as const;
 
 let _workerBusy = false;
+let _workerLanguagesKey: string | null = null;
+
+export async function terminateWorker(): Promise<void> {
+  if (worker) {
+    try {
+      await worker.terminate();
+    } catch {
+      // ignore termination error
+    }
+    worker = null;
+    _workerLanguagesKey = null;
+    _workerBusy = false;
+    _progressListener = undefined;
+  }
+}
 
 async function getWorker(
   onProgress?: (progress: number) => void,
-  languages: string | string[] = ['eng', 'hin']
+  languages: string | string[] = ['eng']
 ): Promise<Worker> {
+  const langArray = Array.isArray(languages) ? languages : [languages];
+  const langKey = langArray.slice().sort().join('+');
+
   if (_workerBusy) {
     throw new Error('An OCR operation is already in progress. Please wait.');
   }
+
+  // If worker exists but languages changed, recreate it
+  if (worker && _workerLanguagesKey !== langKey) {
+    try {
+      await worker.terminate();
+    } catch {
+      // ignore termination error
+    }
+    worker = null;
+    _workerLanguagesKey = null;
+  }
+
   _progressListener = onProgress;
   _workerBusy = true;
   if (worker) return worker;
@@ -47,10 +77,12 @@ async function getWorker(
         }
       },
     });
+    _workerLanguagesKey = langKey;
     return worker;
   } catch (err) {
     _workerBusy = false;
     worker = null;
+    _workerLanguagesKey = null;
     throw err;
   }
 }
@@ -358,7 +390,7 @@ export async function runOCR(
   }
 
   const isDualPass = Boolean(recognizeTarget2);
-  const languages = options?.languages ?? ['eng', 'hin'];
+  const languages = options?.languages ?? ['eng'];
   const activeWorker = await getWorker((p) => {
     if (isDualPass) {
       onProgress?.(p * 0.5);

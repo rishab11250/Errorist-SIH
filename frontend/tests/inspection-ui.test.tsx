@@ -441,4 +441,22 @@ describe('inspection experience', () => {
     const callArg = onComplete.mock.calls[0][0];
     expect(callArg.response).toBeDefined();
   });
+
+  it('toggles OCR language between English Only and English + Hindi', async () => {
+    render(<InspectionCapture onComplete={vi.fn()} />);
+    const user = userEvent.setup();
+
+    const englishBtn = screen.getByRole('button', { name: 'English Only' });
+    const multiBtn = screen.getByRole('button', { name: 'English + Hindi' });
+
+    expect(englishBtn).toBeVisible();
+    expect(multiBtn).toBeVisible();
+    expect(screen.getByText('⚡ 2.5x Faster')).toBeInTheDocument();
+
+    await user.click(multiBtn);
+    expect(screen.getByText('🇮🇳 Bilingual (EN + HI)')).toBeInTheDocument();
+
+    await user.click(englishBtn);
+    expect(screen.getByText('⚡ 2.5x Faster')).toBeInTheDocument();
+  });
 });

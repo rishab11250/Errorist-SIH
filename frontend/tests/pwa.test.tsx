@@ -49,6 +49,14 @@ describe('PWA shell', () => {
     ]);
   });
 
+  it('verifies Hindi and English traineddata files exist in local assets for offline PWA precache', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const langDir = path.resolve(__dirname, '../public/tesseract/lang');
+    expect(fs.existsSync(path.join(langDir, 'eng.traineddata.gz'))).toBe(true);
+    expect(fs.existsSync(path.join(langDir, 'hin.traineddata.gz'))).toBe(true);
+  });
+
   it('renders a non-privileged inspector identity when auth is unreachable', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
 

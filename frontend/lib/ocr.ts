@@ -27,7 +27,10 @@ export const OCR_ASSET_PATHS = {
 
 let _workerBusy = false;
 
-async function getWorker(onProgress?: (progress: number) => void): Promise<Worker> {
+async function getWorker(
+  onProgress?: (progress: number) => void,
+  languages: string | string[] = ['eng', 'hin']
+): Promise<Worker> {
   if (_workerBusy) {
     throw new Error('An OCR operation is already in progress. Please wait.');
   }
@@ -35,7 +38,7 @@ async function getWorker(onProgress?: (progress: number) => void): Promise<Worke
   _workerBusy = true;
   if (worker) return worker;
   try {
-    worker = await createWorker('eng', undefined, {
+    worker = await createWorker(languages, undefined, {
       ...OCR_ASSET_PATHS,
       workerBlobURL: false,
       logger: (message) => {
@@ -71,6 +74,7 @@ export interface OCRDisagreement {
 export interface OCRRunOptions {
   enablePerspectiveWarp?: boolean;
   enableDualPass?: boolean;
+  languages?: string | string[];
   scanContext?: ScanContext;
   rules?: RulesConfig;
 }
@@ -354,13 +358,14 @@ export async function runOCR(
   }
 
   const isDualPass = Boolean(recognizeTarget2);
+  const languages = options?.languages ?? ['eng', 'hin'];
   const activeWorker = await getWorker((p) => {
     if (isDualPass) {
       onProgress?.(p * 0.5);
     } else {
       onProgress?.(p);
     }
-  });
+  }, languages);
 
   try {
     // --- PASS 1 RECOGNITION ---

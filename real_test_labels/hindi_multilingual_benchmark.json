@@ -1,0 +1,148 @@
+[
+  {
+    "file": "tata_salt_1.jpg",
+    "product": "Tata Salt (Vacuum Evaporated)",
+    "expectedHindi": [
+      "देश का नमक",
+      "नमक",
+      "टाटा"
+    ],
+    "eng": {
+      "latencyMs": 949,
+      "wordCount": 81,
+      "meanConf": 33.7,
+      "hasDevanagari": false,
+      "sampleText": "~ } ) i galanced R Shs Taste HEIR She 4 Te EES 5 TATA at . oy JR 4 4 2 i SRE SNR GEE WRT Psy BE. RC FRE A Asay \\ Vacuum® Evaporated SH e",
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null
+      }
+    },
+    "multi": {
+      "latencyMs": 2557,
+      "wordCount": 97,
+      "meanConf": 38.3,
+      "hasDevanagari": true,
+      "devanagariTokens": [
+        "मम",
+        "पु",
+        "भर",
+        "है",
+        "हद",
+        "कक",
+        "जद",
+        "कक"
+      ],
+      "matchedExpected": [],
+      "sampleText": "~ © “< A । | मम Cl | N | galanced पु Taste | {ga Sh / en TA T 3 Nag भर a5 i 3: fe a C5 Gt So eo Ea है pd 3 ee Hy 2 Vacuum® Evaporated bw) se",
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null
+      }
+    },
+    "latencyMultiplier": 2.69
+  },
+  {
+    "file": "parle_g_1.jpg",
+    "product": "Parle-G Glucose Biscuits",
+    "expectedHindi": [
+      "पारले-जी",
+      "ग्लूकोज बिस्कुट",
+      "बिस्कुट"
+    ],
+    "eng": {
+      "latencyMs": 1947,
+      "wordCount": 180,
+      "meanConf": 38.8,
+      "hasDevanagari": false,
+      "sampleText": ". Ne \\ i | pe ry i # r 4 | J i ¥ od : he he _— & + fi [% : - h ! ay AHA & — E Fit .. \" F | TERR RATERS a je p— AL EARS ATR jo - \"5% * \"yt i ",
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null
+      }
+    },
+    "multi": {
+      "latencyMs": 5717,
+      "wordCount": 182,
+      "meanConf": 45.8,
+      "hasDevanagari": true,
+      "devanagariTokens": [
+        "की",
+        "कक",
+        "दे",
+        "कै",
+        "हि",
+        "बा",
+        "है",
+        "थे",
+        "कै",
+        "३८"
+      ],
+      "matchedExpected": [],
+      "sampleText": "Ne % > A की - कक a ; |: a ; दे 3 . , pt a : : ik % | 1 कै » - 2 FP & r x ) Pag SEES i . go .. हि बा है ६ क थे, कै NPR TaN 3३८ iy oh Ek 4 -_ ",
+      "fields": {
+        "mrp": null,
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null
+      }
+    },
+    "latencyMultiplier": 2.94
+  },
+  {
+    "file": "marie_gold_roll.jpg",
+    "product": "Britannia Marie Gold Biscuit Roll",
+    "expectedHindi": [
+      "मैरी गोल्ड",
+      "बिस्कुट"
+    ],
+    "eng": {
+      "latencyMs": 17761,
+      "wordCount": 1211,
+      "meanConf": 24.6,
+      "hasDevanagari": false,
+      "sampleText": "AER BO Mes A E150 20 Sy ES RY 2 RA La Sa 2 5, SY SERIRFR Sep am SRE Sn RI I Se | Caos an ud Cl Bi or Ae GE a YG SAO Re RE be PRR gi 3 WT a a",
+      "fields": {
+        "mrp": "2",
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null
+      }
+    },
+    "multi": {
+      "latencyMs": 39382,
+      "wordCount": 1269,
+      "meanConf": 27.2,
+      "hasDevanagari": true,
+      "devanagariTokens": [
+        "सता",
+        "कर",
+        "दि",
+        "पा",
+        "हि",
+        "है",
+        "पक",
+        "नल",
+        "है",
+        "इक"
+      ],
+      "matchedExpected": [
+        "बिस्कुट"
+      ],
+      "sampleText": "RT Ee ; = BE Ci Eo ; fol SIS सता “न ER RR HE Fo UR es Te कर = on 78 5 ae os 5 दि... 2.“ | Lael BRR Sy he पा ae i हि. 3 Be als pr aa Se न है ",
+      "fields": {
+        "mrp": "2",
+        "net_quantity": null,
+        "mfg_date": null,
+        "consumer_care": null
+      }
+    },
+    "latencyMultiplier": 2.22
+  }
+]

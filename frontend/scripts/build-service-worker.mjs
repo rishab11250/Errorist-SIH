@@ -18,6 +18,7 @@ const requiredOcrAssets = [
   'tesseract/core/tesseract-core-lstm.wasm',
   'tesseract/core/tesseract-core-simd-lstm.wasm',
   'tesseract/lang/eng.traineddata.gz',
+  'tesseract/lang/hin.traineddata.gz',
 ];
 
 function toUrlPath(path) {

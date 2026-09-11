@@ -10,6 +10,7 @@ const packageRoot = join(workerRoot, '..');
 const packageRequire = createRequire(join(packageRoot, 'package.json'));
 const coreRoot = dirname(packageRequire.resolve('tesseract.js-core'));
 const languageRoot = dirname(require.resolve('@tesseract.js-data/eng'));
+const hindiLanguageRoot = dirname(require.resolve('@tesseract.js-data/hin'));
 const publicRoot = join(projectRoot, 'public', 'tesseract');
 const coreDestination = join(publicRoot, 'core');
 const languageDestination = join(publicRoot, 'lang');
@@ -40,6 +41,10 @@ await Promise.all(
 await copyFile(
   join(languageRoot, '4.0.0_best_int', 'eng.traineddata.gz'),
   join(languageDestination, 'eng.traineddata.gz')
+);
+await copyFile(
+  join(hindiLanguageRoot, '4.0.0_best_int', 'hin.traineddata.gz'),
+  join(languageDestination, 'hin.traineddata.gz')
 );
 const licenseFiles = [
   [join(packageRoot, 'LICENSE.md'), 'tesseract-js.txt'],

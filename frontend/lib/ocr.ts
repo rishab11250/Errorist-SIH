@@ -21,11 +21,22 @@ async function getWorker(onProgress?: (progress: number) => void): Promise<Worke
   _progressListener = onProgress;
   _workerBusy = true;
   if (worker) return worker;
-  worker = await createWorker('eng', undefined, {
-    ...OCR_ASSET_PATHS,
-    logger: (message) => _progressListener?.(message.progress),
-  });
-  return worker;
+  try {
+    worker = await createWorker('eng', undefined, {
+      ...OCR_ASSET_PATHS,
+      workerBlobURL: false,
+      logger: (message) => {
+        if (typeof message.progress === 'number') {
+          _progressListener?.(message.progress);
+        }
+      },
+    });
+    return worker;
+  } catch (err) {
+    _workerBusy = false;
+    worker = null;
+    throw err;
+  }
 }
 
 function releaseWorker() {
@@ -248,7 +259,7 @@ export async function runOCR(
         ocrCanvas.height
       );
       applyAdaptiveContrast(ocrCtx, ocrCanvas.width, ocrCanvas.height);
-      recognizeTarget = ocrCanvas.toDataURL('image/png');
+      recognizeTarget = ocrCanvas.toDataURL('image/jpeg', 0.90);
     }
   }
 

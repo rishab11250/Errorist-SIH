@@ -147,7 +147,7 @@ async function downscaleImageFile(file: File, maxDimension = 1600): Promise<File
   try {
     const img = await Promise.race([
       loadImage(file),
-      new Promise<null>((r) => setTimeout(() => r(null), 1500)),
+      new Promise<null>((r) => setTimeout(() => r(null), 8000)),
     ]);
     if (!img) return file;
 

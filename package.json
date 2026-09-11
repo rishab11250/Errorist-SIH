@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm -C frontend dev",
+    "dev": "node scripts/dev-all.mjs",
     "dev:backend": "pnpm -C backend dev",
     "dev:frontend": "pnpm -C frontend dev",
     "dev:all": "node scripts/dev-all.mjs"

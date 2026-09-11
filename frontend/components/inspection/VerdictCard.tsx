@@ -25,11 +25,11 @@ const methods: Record<Verdict['measurement_method'], string> = {
 };
 
 const statusBorderMap: Record<Verdict['status'], string> = {
-  pass: 'border-l-4 border-l-pass hover:border-pass/80',
-  fail: 'border-l-4 border-l-fail hover:border-fail/80',
-  warn: 'border-l-4 border-l-warn hover:border-warn/80',
-  manual_review: 'border-l-4 border-l-review hover:border-review/80',
-  na: 'border-l-4 border-l-muted-foreground/30 hover:border-muted-foreground/60',
+  pass: 'border-l-[4px] border-l-forest hover:border-l-forest/80',
+  fail: 'border-l-[4px] border-l-brick hover:border-l-brick/80',
+  warn: 'border-l-[4px] border-l-amber hover:border-l-amber/80',
+  manual_review: 'border-l-[4px] border-l-terracotta hover:border-l-terracotta/80',
+  na: 'border-l-[4px] border-l-[#A8A49D] hover:border-l-[#A8A49D]/80',
 };
 
 export interface VerdictCardProps {
@@ -112,11 +112,11 @@ export function VerdictCard({
   return (
     <article
       className={cn(
-        'surface-panel overflow-hidden transition-all duration-200 card-hover-lift animate-fade-in-up',
+        'card-lift rounded-xl bg-surface-card border border-[#E0D9CD] shadow-kinetic-sm overflow-hidden transition-all duration-200 animate-fade-in-up',
         statusBorderMap[verdict.status] ?? '',
         active
-          ? 'ring-2 ring-primary shadow-md border-primary bg-primary/[0.02]'
-          : 'hover:border-border'
+          ? 'ring-2 ring-terracotta/40 shadow-kinetic-md border-terracotta bg-terracotta/[0.02]'
+          : 'hover:border-[#D5CFC4]'
       )}
       data-testid={`verdict-card-${verdict.rule_id}`}
     >
@@ -125,40 +125,40 @@ export function VerdictCard({
         type="button"
         aria-pressed={active}
         aria-label={`${verdict.citation}: ${verdict.status}`}
-        className="w-full space-y-3 p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="w-full space-y-3 p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta"
         onClick={onSelect}
         onFocus={onSelect}
       >
         <div className="flex flex-wrap items-start justify-between gap-2.5">
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
-              <h3 className="font-mono text-xs font-bold tracking-wider text-muted-foreground uppercase">
+              <h3 className="font-mono text-xs font-bold tracking-wider text-ink-muted uppercase">
                 {verdict.rule_id}
               </h3>
               {verdict.severity === 'critical' ? (
-                <span className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-destructive">
+                <span className="rounded bg-brick-bg border border-brick/30 px-1.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider text-brick">
                   Critical
                 </span>
               ) : null}
             </div>
-            <p className="font-heading text-sm font-semibold text-foreground">
+            <p className="font-heading text-sm font-semibold text-ink">
               {verdict.citation}
             </p>
           </div>
           <VerdictBadge status={verdict.status} />
         </div>
 
-        <p className="text-sm leading-relaxed text-muted-foreground">
+        <p className="text-sm leading-relaxed text-ink-muted">
           {verdict.reasoning}
         </p>
 
         {/* Show detected evidence pill if not currently showing manual review editor */}
         {verdict.evidence && !isManualReview && !isEditing ? (
-          <div className="flex items-start gap-2 rounded-md bg-muted/60 px-3 py-2 text-xs">
-            <FileSearch className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+          <div className="flex items-start gap-2 rounded-lg bg-surface-dim px-3 py-2 text-xs border border-[#E0D9CD]">
+            <FileSearch className="mt-0.5 size-3.5 shrink-0 text-ink-muted" />
             <div className="min-w-0 flex-1">
-              <span className="font-semibold text-foreground">Detected evidence: </span>
-              <code className="break-words font-mono font-medium text-foreground bg-background/80 px-1.5 py-0.5 rounded border border-border/40">
+              <span className="font-semibold text-ink">Detected evidence: </span>
+              <code className="break-words font-mono font-medium text-ink bg-white px-1.5 py-0.5 rounded border border-[#DDD6C8]">
                 {verdict.evidence}
               </code>
             </div>
@@ -166,8 +166,8 @@ export function VerdictCard({
         ) : null}
 
         {verdict.failure_message && !isReviewed ? (
-          <div className="flex items-start gap-2 rounded-md border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200">
-            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+          <div className="flex items-start gap-2 rounded-lg border border-amber/30 bg-amber-bg p-3 text-xs text-[#523e00]">
+            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-amber" />
             <div>
               <span className="font-semibold">Next step: </span>
               <span>{verdict.failure_message}</span>
@@ -179,19 +179,19 @@ export function VerdictCard({
       {/* Interactive Confirm/Edit flow for manual review or reviewed items */}
       {(isManualReview || isEditing || (isReviewed && onReviewSubmit)) ? (
         <div
-          className="border-t border-border/60 bg-muted/20 px-4 pb-4 pt-3.5"
+          className="border-t border-[#E8E2D6] bg-surface-dim/40 px-4 pb-4 pt-3.5"
           onClick={(e) => e.stopPropagation()}
         >
           {isReviewed && !isEditing ? (
-            <div className="flex items-center justify-between gap-3 rounded-lg border border-pass/30 bg-pass/10 p-3 text-xs text-foreground">
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-forest/30 bg-forest-light p-3 text-xs text-ink">
               <div className="flex items-center gap-2 min-w-0">
-                <CheckCircle2 className="size-4 shrink-0 text-pass" />
+                <CheckCircle2 className="size-4 shrink-0 text-forest" />
                 <div className="truncate">
-                  <span className="font-semibold text-foreground">Verified by reviewer: </span>
-                  <code className="font-mono font-medium text-foreground bg-background/80 px-1.5 py-0.5 rounded border border-border/40">
+                  <span className="font-semibold text-ink">Verified by reviewer: </span>
+                  <code className="font-mono font-medium text-ink bg-white px-1.5 py-0.5 rounded border border-forest/30">
                     {verdict.evidence || 'Confirmed'}
                   </code>
-                  <span className="text-muted-foreground ml-1.5 capitalize">
+                  <span className="text-ink-muted ml-1.5 capitalize font-mono text-[11px]">
                     ({(verdict.review_state ?? 'confirmed').replaceAll('_', ' ')})
                   </span>
                 </div>
@@ -201,7 +201,7 @@ export function VerdictCard({
                 size="sm"
                 variant="outline"
                 onClick={() => setIsEditing(true)}
-                className="h-7 shrink-0 gap-1 text-xs"
+                className="h-7 shrink-0 gap-1 text-xs border-[#D5CFC4] hover:bg-white"
                 data-testid={`edit-review-btn-${verdict.rule_id}`}
               >
                 <Edit3 className="size-3" /> Edit
@@ -210,14 +210,14 @@ export function VerdictCard({
           ) : (
             <section
               aria-label={`Confirm or correct declaration for ${verdict.citation}`}
-              className="space-y-3 rounded-lg border border-review/30 bg-review/5 p-3.5 shadow-xs"
+              className="space-y-3 rounded-xl border-2 border-terracotta/40 bg-terracotta-light/30 p-3.5 shadow-sm"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-review">
+                <div className="flex items-center gap-1.5 text-xs font-semibold font-heading text-terracotta">
                   <Sparkles className="size-3.5 shrink-0" />
                   <span>Human-in-the-Loop Verification</span>
                 </div>
-                <span className="rounded-full bg-review/10 px-2 py-0.5 text-[11px] font-medium text-review">
+                <span className="rounded-full bg-white border border-terracotta/30 px-2 py-0.5 text-[11px] font-mono font-bold text-terracotta">
                   Confidence: {Math.round(verdict.confidence * 100)}%
                 </span>
               </div>
@@ -238,11 +238,11 @@ export function VerdictCard({
                   <div className="space-y-1">
                     <label
                       htmlFor={`edit-field-${verdict.rule_id}`}
-                      className="block text-xs font-semibold text-foreground"
+                      className="block text-xs font-semibold font-heading text-ink"
                     >
                       Extracted Value (Best Guess)
                     </label>
-                    <p className="text-[11px] text-muted-foreground">
+                    <p className="text-[11px] text-ink-muted">
                       {hasCrop
                         ? 'Compare against the packaging snippet on the left.'
                         : 'Review best-guess text and confirm or correct.'}
@@ -254,7 +254,7 @@ export function VerdictCard({
                       onChange={(e) => setEditedValue(e.target.value)}
                       placeholder="e.g. ₹20.00 incl. of all taxes"
                       disabled={submitting}
-                      className="h-9 w-full rounded-md border border-input bg-background px-2.5 py-1 text-xs font-medium text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      className="h-9 w-full rounded-lg border border-[#D5CFC4] bg-white px-2.5 py-1 text-xs font-medium text-ink shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta"
                     />
                   </div>
 
@@ -266,7 +266,7 @@ export function VerdictCard({
                         size="sm"
                         onClick={handleSaveUpdate}
                         disabled={submitting}
-                        className="h-8 gap-1.5 text-xs font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs"
+                        className="h-8 gap-1.5 text-xs font-heading font-semibold bg-terracotta hover:bg-terracotta-hover text-white shadow-xs rounded-lg"
                         data-testid={`update-review-btn-${verdict.rule_id}`}
                       >
                         <Edit3 className="size-3" />
@@ -278,7 +278,7 @@ export function VerdictCard({
                         size="sm"
                         onClick={handleConfirm}
                         disabled={submitting}
-                        className="h-8 gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                        className="h-8 gap-1.5 text-xs font-heading font-semibold bg-forest hover:bg-forest/90 text-white shadow-xs rounded-lg"
                         data-testid={`confirm-review-btn-${verdict.rule_id}`}
                       >
                         <CheckCircle2 className="size-3" />
@@ -292,7 +292,7 @@ export function VerdictCard({
                       variant="outline"
                       onClick={handleFlagMissing}
                       disabled={submitting}
-                      className="h-8 gap-1 text-xs text-destructive hover:bg-destructive/10 border-destructive/30"
+                      className="h-8 gap-1 text-xs font-heading font-semibold text-brick hover:bg-brick-bg border-brick/30 rounded-lg"
                       data-testid={`flag-missing-btn-${verdict.rule_id}`}
                     >
                       <XCircle className="size-3" /> Flag Missing
@@ -304,7 +304,7 @@ export function VerdictCard({
                         size="sm"
                         variant="ghost"
                         onClick={() => setIsEditing(false)}
-                        className="h-8 text-xs text-muted-foreground hover:text-foreground"
+                        className="h-8 text-xs text-ink-muted hover:text-ink font-heading"
                       >
                         Cancel
                       </Button>
@@ -318,25 +318,25 @@ export function VerdictCard({
       ) : null}
 
       <div className="px-4 pb-4">
-        <dl className="grid grid-cols-3 gap-2 border-t border-border/50 pt-3 text-xs">
-          <div className="rounded bg-muted/40 p-2">
-            <dt className="text-[11px] font-medium text-muted-foreground">Confidence</dt>
-            <dd className="mt-0.5 font-semibold text-foreground">
+        <dl className="grid grid-cols-3 gap-2 border-t border-[#E8E2D6] pt-3 text-xs">
+          <div className="rounded-lg bg-surface-dim p-2">
+            <dt className="text-[11px] font-mono font-medium text-ink-muted">Confidence</dt>
+            <dd className="mt-0.5 font-mono font-bold text-ink">
               {Math.round(verdict.confidence * 100)}%
             </dd>
           </div>
-          <div className="rounded bg-muted/40 p-2">
-            <dt className="text-[11px] font-medium text-muted-foreground">Method</dt>
+          <div className="rounded-lg bg-surface-dim p-2">
+            <dt className="text-[11px] font-mono font-medium text-ink-muted">Method</dt>
             <dd
-              className="mt-0.5 truncate font-semibold text-foreground"
+              className="mt-0.5 truncate font-mono font-semibold text-ink"
               title={methods[verdict.measurement_method]}
             >
               {methods[verdict.measurement_method]}
             </dd>
           </div>
-          <div className="rounded bg-muted/40 p-2">
-            <dt className="text-[11px] font-medium text-muted-foreground">Review state</dt>
-            <dd className="mt-0.5 font-semibold capitalize text-foreground">
+          <div className="rounded-lg bg-surface-dim p-2">
+            <dt className="text-[11px] font-mono font-medium text-ink-muted">Review state</dt>
+            <dd className="mt-0.5 font-mono font-semibold capitalize text-ink">
               {(verdict.review_state ?? 'unreviewed').replaceAll('_', ' ')}
             </dd>
           </div>

@@ -29,7 +29,7 @@ export function VerdictBadge({ status }: { status: VerdictStatus }) {
   const Icon = presentation[status].icon;
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(status)}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-mono font-bold ${statusClass(status)}`}
     >
       <Icon aria-hidden="true" className="size-3.5" />
       {statusLabel(status)}

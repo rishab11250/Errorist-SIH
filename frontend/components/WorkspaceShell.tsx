@@ -123,28 +123,16 @@ function WorkspaceFrame({
 
   return (
     <div className="min-h-screen bg-surface text-ink antialiased flex flex-col selection:bg-terracotta selection:text-white">
-      {/* Top System Telemetry Bar (Kinetic Specification) */}
-      <header className="w-full bg-[#1C1B19] text-white px-4 sm:px-6 py-2.5 flex items-center justify-between border-b border-[#2D2A26] sticky top-0 z-50 text-xs font-mono">
-        <div className="flex items-center space-x-3">
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-mono font-bold tracking-wider uppercase bg-terracotta text-white">
-            DESIGN A: KINETIC
-          </span>
-          <span className="hidden sm:inline text-xs text-[#A8A49D] font-mono tracking-wide">
-            EVIDENCE-LED LEGAL METROLOGY TERMINAL
-          </span>
+      {/* Top System Telemetry Bar */}
+      <div className="w-full bg-surface text-ink-muted px-4 sm:px-6 py-2 flex items-center justify-between border-b border-border text-xs font-mono">
+        <div className="flex items-center space-x-2 text-[11px] sm:text-xs">
+          <span className="w-2 h-2 rounded-full bg-forest animate-pulse"></span>
+          <span className="text-ink font-mono">Analysis Engine Active // Rules 2011</span>
         </div>
-        <div className="flex items-center space-x-3 sm:space-x-5 text-[11px] sm:text-xs">
-          <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-forest animate-pulse"></span>
-            <span className="text-[#D6D2CA] font-mono hidden md:inline">Analysis Engine Active // Rules 2011</span>
-            <span className="text-[#D6D2CA] font-mono md:hidden">Engine Active</span>
-          </div>
-          <div className="h-3.5 w-px bg-[#3E3A34]"></div>
-          <span className="text-[#A8A49D] font-mono">
-            Terminal: <strong className="text-white uppercase">{user.username || 'INSP-KA-0941'}</strong>
-          </span>
+        <div className="text-[11px] sm:text-xs text-ink-muted font-mono">
+          Terminal: <strong className="text-ink uppercase">{user.username || 'admin'}</strong>
         </div>
-      </header>
+      </div>
 
       <div className="flex-1 md:grid md:grid-cols-[16rem_minmax(0,1fr)]">
         <a
@@ -155,7 +143,7 @@ function WorkspaceFrame({
         </a>
 
         {/* Desktop Sidebar */}
-        <aside className="sticky top-[41px] hidden h-[calc(100vh-41px)] flex-col border-r border-[#EBE5DB] bg-white p-4 md:flex shadow-sm">
+        <aside className="sticky top-0 hidden h-screen flex-col border-r border-[#EBE5DB] bg-white p-4 md:flex shadow-sm">
           <div className="mb-6 flex items-center justify-between">
             <Link href="/" className="flex min-h-11 items-center gap-3 rounded-md px-1 group">
               <span className="grid size-9 place-items-center rounded-[8px] bg-charcoal text-white shadow-sm transition-transform group-hover:scale-105">
@@ -179,7 +167,7 @@ function WorkspaceFrame({
 
         {/* Main Content Area & Mobile Bar */}
         <div className="min-w-0 flex flex-col">
-          <div className="sticky top-[41px] z-40 flex min-h-14 items-center justify-between border-b border-[#EBE5DB] bg-surface/95 px-4 backdrop-blur md:hidden">
+          <div className="sticky top-0 z-40 flex min-h-14 items-center justify-between border-b border-[#EBE5DB] bg-surface/95 px-4 backdrop-blur md:hidden">
             <Link href="/" className="flex min-h-11 items-center gap-2 font-heading font-bold text-sm text-ink">
               <ShieldCheck aria-hidden="true" className="size-5 text-terracotta" />
               LMPC Inspector

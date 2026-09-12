@@ -122,64 +122,83 @@ function WorkspaceFrame({
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen md:grid md:grid-cols-[16rem_minmax(0,1fr)]">
-      <a
-        href="#main-content"
-        className="sr-only z-[100] rounded-md bg-primary px-4 py-3 text-primary-foreground focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
-      >
-        Skip to main content
-      </a>
-      <aside className="sticky top-0 hidden h-screen flex-col border-r bg-card p-4 md:flex">
-        <div className="mb-7 flex items-center justify-between">
-          <Link href="/" className="flex min-h-11 items-center gap-3 rounded-md px-1">
-            <span className="grid size-9 place-items-center rounded-md bg-primary text-primary-foreground">
-              <ShieldCheck aria-hidden="true" className="size-5" />
-            </span>
-            <span>
-              <span className="block font-heading text-sm font-semibold">LMPC Inspector</span>
-              <span className="block text-xs text-muted-foreground">Evidence workspace</span>
-            </span>
-          </Link>
-          <ThemeToggle />
+    <div className="min-h-screen bg-surface text-ink antialiased flex flex-col selection:bg-terracotta selection:text-white">
+      {/* Top System Telemetry Bar */}
+      <div className="w-full bg-surface text-ink-muted px-4 sm:px-6 py-2 flex items-center justify-between border-b border-border text-xs font-mono">
+        <div className="flex items-center space-x-2 text-[11px] sm:text-xs">
+          <span className="w-2 h-2 rounded-full bg-forest animate-pulse"></span>
+          <span className="text-ink font-mono">Analysis Engine Active // Rules 2011</span>
         </div>
-        <Navigation user={user} />
-        <div className="mt-auto">
-          <SyncStatusIndicator className="mb-4 w-full justify-center" />
-          <Account user={user} onSignOut={onSignOut} />
+        <div className="text-[11px] sm:text-xs text-ink-muted font-mono">
+          Terminal: <strong className="text-ink uppercase">{user.username || 'admin'}</strong>
         </div>
-      </aside>
+      </div>
 
-      <div className="min-w-0">
-        <header className="sticky top-0 z-40 flex min-h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur md:hidden">
-          <Link href="/" className="flex min-h-11 items-center gap-2 font-heading font-semibold">
-            <ShieldCheck aria-hidden="true" className="size-5 text-primary" />
-            LMPC Inspector
-          </Link>
-          <div className="flex items-center gap-2">
+      <div className="flex-1 md:grid md:grid-cols-[16rem_minmax(0,1fr)]">
+        <a
+          href="#main-content"
+          className="sr-only z-[100] rounded-md bg-terracotta px-4 py-3 text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-14"
+        >
+          Skip to main content
+        </a>
+
+        {/* Desktop Sidebar */}
+        <aside className="sticky top-0 hidden h-screen flex-col border-r border-[#EBE5DB] bg-white p-4 md:flex shadow-sm">
+          <div className="mb-6 flex items-center justify-between">
+            <Link href="/" className="flex min-h-11 items-center gap-3 rounded-md px-1 group">
+              <span className="grid size-9 place-items-center rounded-[8px] bg-charcoal text-white shadow-sm transition-transform group-hover:scale-105">
+                <ShieldCheck aria-hidden="true" className="size-5 text-terracotta" />
+              </span>
+              <span>
+                <span className="block font-heading text-sm font-bold tracking-tight text-ink">LMPC Inspector</span>
+                <span className="block text-[11px] font-mono text-ink-muted">Evidence workspace</span>
+              </span>
+            </Link>
             <ThemeToggle />
-            <SyncStatusIndicator className="max-w-44" />
-            <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Open navigation">
-                  <Menu aria-hidden="true" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="left-auto right-0 top-0 h-dvh max-w-xs translate-x-0 translate-y-0 rounded-none p-5">
-                <DialogTitle className="mb-6 flex items-center gap-2">
-                  <ShieldCheck aria-hidden="true" className="size-5 text-primary" />
-                  Inspection workspace
-                </DialogTitle>
-                <Navigation user={user} onNavigate={() => setMenuOpen(false)} />
-                <div className="mt-auto pt-8">
-                  <Account user={user} onSignOut={onSignOut} />
-                </div>
-              </DialogContent>
-            </Dialog>
           </div>
-        </header>
-        <main id="main-content" tabIndex={-1} className="min-w-0">
-          {children}
-        </main>
+
+          <Navigation user={user} />
+
+          <div className="mt-auto pt-4 border-t border-[#EBE5DB]">
+            <SyncStatusIndicator className="mb-3 w-full justify-center text-xs font-mono" />
+            <Account user={user} onSignOut={onSignOut} />
+          </div>
+        </aside>
+
+        {/* Main Content Area & Mobile Bar */}
+        <div className="min-w-0 flex flex-col">
+          <div className="sticky top-0 z-40 flex min-h-14 items-center justify-between border-b border-[#EBE5DB] bg-surface/95 px-4 backdrop-blur md:hidden">
+            <Link href="/" className="flex min-h-11 items-center gap-2 font-heading font-bold text-sm text-ink">
+              <ShieldCheck aria-hidden="true" className="size-5 text-terracotta" />
+              LMPC Inspector
+            </Link>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <SyncStatusIndicator className="max-w-40 text-xs font-mono" />
+              <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="icon" aria-label="Open navigation" className="border-[#EBE5DB] bg-white">
+                    <Menu aria-hidden="true" className="size-5 text-ink" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="left-auto right-0 top-0 h-dvh max-w-xs translate-x-0 translate-y-0 rounded-none p-5 bg-white border-l border-[#EBE5DB]">
+                  <DialogTitle className="mb-6 flex items-center gap-2 font-heading text-base font-bold text-ink">
+                    <ShieldCheck aria-hidden="true" className="size-5 text-terracotta" />
+                    Inspection Workspace
+                  </DialogTitle>
+                  <Navigation user={user} onNavigate={() => setMenuOpen(false)} />
+                  <div className="mt-auto pt-8 border-t border-[#EBE5DB]">
+                    <Account user={user} onSignOut={onSignOut} />
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+
+          <main id="main-content" tabIndex={-1} className="min-w-0 flex-1">
+            {children}
+          </main>
+        </div>
       </div>
       <Toaster position="top-right" richColors />
     </div>

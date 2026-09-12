@@ -4,66 +4,66 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 43 33% 97%;
+    --foreground: 40 6% 11%;
     --surface: 0 0% 100%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 40 6% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 221 83% 32%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 174 48% 92%;
-    --secondary-foreground: 176 72% 20%;
-    --muted: 215 25% 94%;
-    --muted-foreground: 215 19% 35%;
-    --accent: 42 100% 92%;
-    --accent-foreground: 28 78% 22%;
-    --accent-strong: 34 93% 48%;
-    --destructive: 0 72% 44%;
+    --popover-foreground: 40 6% 11%;
+    --primary: 24 88% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 164 41% 94%;
+    --secondary-foreground: 164 41% 21%;
+    --muted: 40 18% 93%;
+    --muted-foreground: 40 5% 42%;
+    --accent: 24 88% 96%;
+    --accent-foreground: 24 88% 40%;
+    --accent-strong: 24 88% 40%;
+    --destructive: 4 71% 41%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 25% 84%;
-    --input: 214 25% 78%;
-    --ring: 221 83% 45%;
-    --pass: 154 67% 31%;
-    --fail: 0 72% 44%;
-    --warn: 32 91% 38%;
-    --review: 267 58% 45%;
-    --na: 215 16% 40%;
-    --radius: 0.625rem;
-    --shadow-surface: 0 1px 2px rgb(15 23 42 / 0.06), 0 8px 24px rgb(15 23 42 / 0.06);
+    --border: 47 33% 84%;
+    --input: 47 25% 78%;
+    --ring: 24 88% 40%;
+    --pass: 164 41% 21%;
+    --fail: 4 71% 41%;
+    --warn: 43 89% 38%;
+    --review: 16 65% 37%;
+    --na: 40 5% 42%;
+    --radius: 0.5rem;
+    --shadow-surface: 0 1px 2px rgb(28 27 25 / 0.05), 0 4px 12px rgb(28 27 25 / 0.04);
     --motion-fast: 150ms;
     --motion-standard: 200ms;
     --motion-deliberate: 300ms;
   }
 
   .dark {
-    --background: 222 47% 7%;
-    --foreground: 210 40% 98%;
-    --surface: 222 47% 11%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 10%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 176 50% 16%;
-    --secondary-foreground: 174 80% 80%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 42 80% 18%;
-    --accent-foreground: 42 90% 85%;
-    --accent-strong: 34 93% 55%;
-    --destructive: 0 65% 52%;
+    --background: 40 6% 10%;
+    --foreground: 43 33% 97%;
+    --surface: 40 6% 14%;
+    --card: 40 6% 14%;
+    --card-foreground: 43 33% 97%;
+    --popover: 40 6% 13%;
+    --popover-foreground: 43 33% 97%;
+    --primary: 24 92% 52%;
+    --primary-foreground: 40 6% 10%;
+    --secondary: 164 35% 20%;
+    --secondary-foreground: 164 41% 85%;
+    --muted: 40 8% 20%;
+    --muted-foreground: 40 5% 65%;
+    --accent: 24 70% 22%;
+    --accent-foreground: 24 90% 85%;
+    --accent-strong: 24 92% 52%;
+    --destructive: 4 74% 56%;
     --destructive-foreground: 0 0% 100%;
-    --border: 217 33% 20%;
-    --input: 217 33% 25%;
-    --ring: 217 91% 60%;
-    --pass: 152 69% 45%;
-    --fail: 0 74% 56%;
-    --warn: 38 92% 50%;
-    --review: 268 70% 62%;
-    --na: 215 20% 55%;
+    --border: 40 8% 24%;
+    --input: 40 8% 28%;
+    --ring: 24 92% 52%;
+    --pass: 164 45% 45%;
+    --fail: 4 74% 56%;
+    --warn: 43 90% 50%;
+    --review: 16 70% 55%;
+    --na: 40 5% 55%;
     --shadow-surface: 0 1px 3px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.3);
   }
 
@@ -169,6 +169,37 @@
 
   .animate-pulse-subtle {
     animation: pulseSubtle 2s ease-in-out infinite;
+  }
+
+  .card-lift {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -3px rgba(28, 27, 25, 0.07), 0 3px 8px -2px rgba(28, 27, 25, 0.04);
+  }
+
+  .viewfinder-grid {
+    background-image: linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .accent-card-orange {
+    border-left: 3px solid #C1550C;
+  }
+
+  .accent-card-green {
+    border-left: 3px solid #1F4B3F;
+  }
+
+  .accent-card-amber {
+    border-left: 3px solid #B8860B;
+  }
+
+  .accent-card-red {
+    border-left: 3px solid #B3261E;
   }
 }
 

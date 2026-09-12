@@ -86,6 +86,15 @@ describe('operations workspace', () => {
     expect(screen.queryByRole('link', { name: 'Users' })).not.toBeInTheDocument();
   });
 
+  it('exposes the About CLAIR page to workspace users', () => {
+    render(
+      <WorkspaceShell user={INSPECTOR}>
+        <div>Workspace content</div>
+      </WorkspaceShell>
+    );
+    expect(screen.getByRole('link', { name: 'About CLAIR' })).toHaveAttribute('href', '/about');
+  });
+
   it('clears a password after a failed reset and displays the backend conflict', async () => {
     server.use(
       http.patch('/api/users/1', () =>

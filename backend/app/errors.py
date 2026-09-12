@@ -55,7 +55,7 @@ def is_allowed_origin(
 
 
 _REQUEST_ID = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
-_ERROR_CODE = re.compile(r"^[a-z][a-z0-9_]*$")
+_ERROR_CODE = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
 _HTTP_DETAILS = {
     "authentication_required": "Sign in to continue.",
     "forbidden": "You do not have permission to perform this action.",
@@ -65,6 +65,15 @@ _HTTP_DETAILS = {
     "scan_not_found": "Scan not found.",
     "session_expired": "Your session is no longer valid. Sign in again.",
     "too_many_attempts": "Too many failed login attempts. Please try again later.",
+    "UNAUTHORIZED": "Sign in to continue.",
+    "FORBIDDEN": "You do not have permission to perform this action.",
+    "VALIDATION_ERROR": "Request validation failed.",
+    "INSPECTION_NOT_FOUND": "Inspection not found.",
+    "INVALID_INSPECTION_STATE": "Inspection is not open for new scans.",
+    "PRODUCT_NOT_FOUND": "Product not found.",
+    "SCAN_NOT_FOUND": "Scan not found.",
+    "MATCH_CANDIDATE_INVALID": "Match candidate is invalid.",
+    "MATCH_NOT_CONFIRMED": "Match not confirmed.",
 }
 
 

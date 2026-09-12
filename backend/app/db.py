@@ -144,9 +144,7 @@ class Inspection(Base):
 
 class ProductAuditLog(Base):
     __tablename__ = "product_audit_logs"
-    __table_args__ = (
-        Index("ix_product_audit_logs_scan_created", "scan_id", "created_at"),
-    )
+    __table_args__ = (Index("ix_product_audit_logs_scan_created", "scan_id", "created_at"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     actor_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))

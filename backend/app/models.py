@@ -305,7 +305,9 @@ class ScanAnalysisResponse(BaseModel):
     analysis_version: str
     inspection_id: int | None = None
     product_id: str | None = None
-    product_match_status: Literal["unmatched", "auto_matched", "suggested", "confirmed", "rejected"] = "unmatched"
+    product_match_status: Literal[
+        "unmatched", "auto_matched", "suggested", "confirmed", "rejected"
+    ] = "unmatched"
     product: ProductSummaryOut | None = None
     product_candidates: list[ProductCandidateOut] = Field(default_factory=list)
     previous_scan: PreviousScanOut | None = None
@@ -318,4 +320,3 @@ class ErrorResponse(BaseModel):
     error: str
     detail: str
     request_id: str
-

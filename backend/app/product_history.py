@@ -96,7 +96,11 @@ def compare_verdicts(
             else:
                 direction = "unchanged"
         elif curr_status == "manual_review":
-            direction = "unchanged" if prev_status == "manual_review" else ("regressed" if prev_status == "pass" else "improved")
+            direction = (
+                "unchanged"
+                if prev_status == "manual_review"
+                else ("regressed" if prev_status == "pass" else "improved")
+            )
         else:
             direction = "unchanged" if not changed else "regressed"
 
@@ -124,7 +128,7 @@ def find_previous_inspection_scan(
     current_inspection_id: int | None,
     current_scan_id: int | None = None,
 ) -> tuple[Inspection | None, Scan | None]:
-    """Find the latest earlier valid inspection containing this product, and its latest scan snapshot.
+    """Find latest earlier inspection containing this product, and its latest scan snapshot.
 
     If current_inspection_id is provided, looks for earlier inspections.
     If no inspection exists, falls back to the latest earlier scan of this product.
@@ -163,12 +167,9 @@ def find_previous_inspection_scan(
             return previous_insp, prev_scan
 
     # Fallback when no prior inspection exists or current scan is uninspected
-    scan_query = (
-        select(Scan)
-        .where(
-            Scan.product_id == product_id,
-            Scan.processing_status == "complete",
-        )
+    scan_query = select(Scan).where(
+        Scan.product_id == product_id,
+        Scan.processing_status == "complete",
     )
     if current_inspection_id is not None:
         scan_query = scan_query.where(
@@ -223,7 +224,9 @@ def get_scan_historical_context(
     deltas_dicts = [asdict(d) for d in deltas]
 
     prev_insp_dict = {
-        "inspection_id": str(prev_insp.id) if prev_insp else str(prev_scan.inspection_id or prev_scan.id),
+        "inspection_id": str(prev_insp.id)
+        if prev_insp
+        else str(prev_scan.inspection_id or prev_scan.id),
         "scanned_at": prev_scan.created_at.isoformat(),
         "overall_status": prev_scan.overall_status,
     }
@@ -255,9 +258,7 @@ def calculate_inspection_summary(session: Session, inspection_id: int) -> dict[s
     - repeated_non_compliance_count
     """
     scans = session.scalars(
-        select(Scan)
-        .where(Scan.inspection_id == inspection_id)
-        .order_by(Scan.created_at.desc())
+        select(Scan).where(Scan.inspection_id == inspection_id).order_by(Scan.created_at.desc())
     ).all()
 
     scan_count = len(scans)

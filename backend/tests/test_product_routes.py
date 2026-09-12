@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from app import db, main
-from app.db import Inspection, Product, ProductAuditLog, Scan, VerdictRow
+from app.db import Inspection, Product, ProductAuditLog, Scan
 from app.main import app
 
 
@@ -134,7 +134,9 @@ def test_confirm_and_reject_match_workflow(product_client):
 
     # Verify audit log recorded
     with db.SessionLocal() as session:
-        audit = session.scalars(select(ProductAuditLog).where(ProductAuditLog.scan_id == scan_id)).first()
+        audit = session.scalars(
+            select(ProductAuditLog).where(ProductAuditLog.scan_id == scan_id)
+        ).first()
         assert audit is not None
         assert audit.action == "confirm_match"
         assert audit.new_product_id == p1_id
@@ -219,7 +221,11 @@ def test_admin_link_product_override(tmp_path, monkeypatch, login_client):
         assert resp.json()["scan"]["product_match_status"] == "confirmed"
 
         with db.SessionLocal() as session:
-            audit = session.scalars(select(ProductAuditLog).where(ProductAuditLog.scan_id == scan_id, ProductAuditLog.action == "admin_override")).first()
+            audit = session.scalars(
+                select(ProductAuditLog).where(
+                    ProductAuditLog.scan_id == scan_id, ProductAuditLog.action == "admin_override"
+                )
+            ).first()
             assert audit is not None
             assert audit.actor_user_id == admin_user.id
             assert audit.new_product_id == target_id

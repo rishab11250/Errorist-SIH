@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.db import Base, Product
+from app.db import Base
 from app.product_identity import (
     clean_manufacturer_name,
     compute_fingerprint,
@@ -56,8 +56,14 @@ def test_parse_net_quantity():
 
 
 def test_clean_manufacturer_name():
-    assert clean_manufacturer_name("Mfg by: Nestlé India Ltd, Plot 10, Industrial Area") == "Nestlé India Ltd"
-    assert clean_manufacturer_name("Marketed by: Britannia Industries Ltd; Village...") == "Britannia Industries Ltd"
+    assert (
+        clean_manufacturer_name("Mfg by: Nestlé India Ltd, Plot 10, Industrial Area")
+        == "Nestlé India Ltd"
+    )
+    assert (
+        clean_manufacturer_name("Marketed by: Britannia Industries Ltd; Village...")
+        == "Britannia Industries Ltd"
+    )
     assert clean_manufacturer_name("Haldiram Snacks Pvt Ltd") == "Haldiram Snacks Pvt Ltd"
 
 

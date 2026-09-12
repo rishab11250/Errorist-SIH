@@ -8,19 +8,27 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session
 
 from app.analysis_pipeline import PipelineError, analyze_scan
 from app.auth.dependencies import authorized_scan, get_auth_settings, require_user
-from app.db import ReviewAction, Scan, User, VerdictRow, get_session
+from app.db import Scan, User, VerdictRow, get_session
 from app.domain import AnalysisResult, ExtractedField, QualitySummary, Verdict
 from app.errors import AppError
+from app.inspection_service import validate_inspection_for_scan
 from app.models import (
     OfflineScanSyncRequest,
     OfflineScanSyncResponse,
     ScanAnalysisResponse,
     ScanRequest,
 )
+from app.product_history import get_scan_historical_context
+from app.product_identity import (
+    clean_manufacturer_name,
+    parse_net_quantity,
+    resolve_product_identity,
+)
+from app.product_routes import _product_summary_dict, build_stored_scan_response
 from app.rules_loader import get_active_rules
 from app.settings import AuthSettings
 from app.visual_analysis.image_io import ImageDecodeError, decode_image
@@ -302,8 +310,7 @@ def sync_offline_scan(
         owner_user_id=current_user.id,
         client_local_id=local_id,
         verdicts=[
-            _sync_verdict_row(verdict, captured_at, req.rule_version)
-            for verdict in req.verdicts
+            _sync_verdict_row(verdict, captured_at, req.rule_version) for verdict in req.verdicts
         ],
     )
     session.add(scan)
@@ -333,6 +340,8 @@ def create_scan(
     current_user: Annotated[User, Depends(require_user)],
     settings: Annotated[AuthSettings, Depends(get_auth_settings)],
 ) -> ScanAnalysisResponse:
+    validate_inspection_for_scan(session, req.inspection_id, current_user)
+
     rules = get_active_rules()
     request_id = request.state.request_id
     scan = Scan(
@@ -349,6 +358,7 @@ def create_scan(
         quality_summary={},
         extracted_fields={},
         owner_user_id=current_user.id,
+        inspection_id=req.inspection_id,
     )
     session.add(scan)
     try:
@@ -366,6 +376,39 @@ def create_scan(
             max_image_pixels=settings.max_image_pixels,
         )
         _store_complete(scan, result)
+
+        # Resolve product identity per PRD Section 15 & 22
+        mfg_field = result.extracted.get("manufacturer_address")
+        raw_mfg = mfg_field.value if mfg_field else None
+        clean_mfg = clean_manufacturer_name(raw_mfg)
+
+        name_field = result.extracted.get("common_name")
+        common_name = name_field.value if name_field else scan.product_name
+
+        qty_field = result.extracted.get("net_quantity")
+        raw_qty = qty_field.value if qty_field else None
+        qty_val, qty_unit = parse_net_quantity(raw_qty)
+
+        product, match_status, candidates = resolve_product_identity(
+            session,
+            manufacturer_name=clean_mfg,
+            common_name=common_name,
+            net_quantity_value=qty_val,
+            net_quantity_unit=qty_unit,
+            category=scan.category,
+        )
+
+        if product is not None:
+            scan.product_id = product.id
+            scan.product_match_status = match_status
+            product.scan_count = (product.scan_count or 0) + 1
+            product.latest_scan_id = scan.id
+            if not product.first_scan_id:
+                product.first_scan_id = scan.id
+        else:
+            scan.product_id = None
+            scan.product_match_status = match_status
+
         session.commit()
         session.refresh(scan)
     except PipelineError as exc:
@@ -383,6 +426,15 @@ def create_scan(
         _mark_failed(session, scan.id, stage="analysis", error_code="internal_error")
         raise
 
+    hist_ctx = get_scan_historical_context(
+        session,
+        product_id=scan.product_id,
+        current_inspection_id=scan.inspection_id,
+        current_scan_id=scan.id,
+        current_verdicts=scan.verdicts,
+    )
+    product_summary = _product_summary_dict(product, session) if product else None
+
     return ScanAnalysisResponse(
         scan_id=scan.id,
         processing_status="complete",
@@ -391,6 +443,15 @@ def create_scan(
         verdicts=[_verdict_dict(verdict) for verdict in result.verdicts],
         overall_status=result.overall_status,
         analysis_version=result.analysis_version,
+        inspection_id=scan.inspection_id,
+        product_id=str(scan.product_id) if scan.product_id else None,
+        product_match_status=scan.product_match_status,
+        product=product_summary,
+        product_candidates=candidates,
+        previous_scan=hist_ctx.get("previous_scan"),
+        previous_inspection=hist_ctx.get("previous_inspection"),
+        comparison=hist_ctx.get("comparison", []),
+        historical_alert=hist_ctx.get("historical_alert"),
     )
 
 
@@ -403,65 +464,4 @@ def get_scan(
     scan = authorized_scan(session, current_user, scan_id)
     if scan is None:
         raise HTTPException(status_code=404, detail="scan_not_found")
-    session.refresh(scan, attribute_names=["verdicts"])
-    # Eagerly load review_actions with actor to avoid N+1 queries
-    scan.review_actions = (
-        session.execute(
-            select(ReviewAction)
-            .where(ReviewAction.scan_id == scan.id)
-            .options(selectinload(ReviewAction.actor))
-        )
-        .scalars()
-        .all()
-    )
-    return {
-        "scan": {
-            "id": scan.id,
-            "local_id": scan.client_local_id,
-            "created_at": scan.created_at.isoformat(),
-            "updated_at": scan.updated_at.isoformat() if scan.updated_at else None,
-            "mode": scan.mode,
-            "category": scan.category,
-            "overall_status": scan.overall_status,
-            "image_b64": scan.image_b64,
-            "image_meta": scan.image_meta,
-            "schema_version": scan.schema_version,
-            "processing_status": scan.processing_status,
-            "product_name": scan.product_name,
-            "quality_summary": scan.quality_summary,
-            "extracted_fields": scan.extracted_fields,
-            "analysis_version": scan.analysis_version,
-            "failure_stage": scan.failure_stage,
-            "request_id": scan.request_id,
-            "processing_error_code": scan.processing_error_code,
-        },
-        "verdicts": [
-            {
-                "rule_id": verdict.rule_id,
-                "status": verdict.status,
-                "severity": verdict.severity,
-                "citation": verdict.citation,
-                "evidence": verdict.evidence,
-                "evidence_bboxes": verdict.evidence_bboxes,
-                "confidence": verdict.confidence,
-                "reasoning": verdict.reasoning,
-                "measurement_method": verdict.measurement_method,
-                "failure_message": verdict.failure_message,
-                "rule_version": verdict.rule_version,
-                "review_state": verdict.review_state,
-            }
-            for verdict in scan.verdicts
-        ],
-        "review_actions": [
-            {
-                "id": action.id,
-                "verdict_id": action.verdict_id,
-                "action": action.action,
-                "note": action.note,
-                "actor_user_id": action.actor_user_id,
-                "actor_display_name": action.actor.display_name,
-                "created_at": action.created_at.isoformat(),
-            }
-            for action in sorted(scan.review_actions, key=lambda item: (item.created_at, item.id))
-        ],
-    }
+    return build_stored_scan_response(session, scan)

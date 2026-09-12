@@ -54,7 +54,9 @@ def complete_inspection(session: Session, inspection_id: int, user: User) -> Ins
     return inspection
 
 
-def validate_inspection_for_scan(session: Session, inspection_id: int | None, user: User) -> Inspection | None:
+def validate_inspection_for_scan(
+    session: Session, inspection_id: int | None, user: User
+) -> Inspection | None:
     """Ensure inspection is open and can accept new scans per PRD Section 17 & 20."""
     if inspection_id is None:
         return None
@@ -85,24 +87,24 @@ def list_inspections(
 
     total = len(session.scalars(query).all())
     inspections = session.scalars(
-        query.order_by(Inspection.started_at.desc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
+        query.order_by(Inspection.started_at.desc()).offset((page - 1) * page_size).limit(page_size)
     ).all()
 
     items = []
     for insp in inspections:
         summary = calculate_inspection_summary(session, insp.id)
-        items.append({
-            "id": insp.id,
-            "owner_id": insp.owner_id,
-            "company_name": insp.company_name,
-            "location": insp.location,
-            "status": insp.status,
-            "started_at": insp.started_at,
-            "completed_at": insp.completed_at,
-            "notes": insp.notes,
-            "summary": summary,
-        })
+        items.append(
+            {
+                "id": insp.id,
+                "owner_id": insp.owner_id,
+                "company_name": insp.company_name,
+                "location": insp.location,
+                "status": insp.status,
+                "started_at": insp.started_at,
+                "completed_at": insp.completed_at,
+                "notes": insp.notes,
+                "summary": summary,
+            }
+        )
 
     return items, total

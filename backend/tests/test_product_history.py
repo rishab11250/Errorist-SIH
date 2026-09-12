@@ -65,14 +65,21 @@ def test_compare_verdicts_semantics():
     assert deltas[0].repeated_non_compliance is False
     assert alert is None
 
-    deltas, alert = compare_verdicts(prev, [{"rule_id": "r6_2_consumer_care", "status": "manual_review"}])
+    deltas, alert = compare_verdicts(
+        prev, [{"rule_id": "r6_2_consumer_care", "status": "manual_review"}]
+    )
     assert deltas[0].repeated_non_compliance is False
     assert alert is None
 
 
 def test_previous_inspection_lookup_and_same_inspection_duplicates(db_session: Session):
     # Setup Inspector user
-    user = User(username_normalized="inspector1", display_name="Inspector 1", password_hash="x", role="inspector")
+    user = User(
+        username_normalized="inspector1",
+        display_name="Inspector 1",
+        password_hash="x",
+        role="inspector",
+    )
     db_session.add(user)
     db_session.flush()
 
@@ -202,7 +209,12 @@ def test_previous_inspection_lookup_and_same_inspection_duplicates(db_session: S
 
 
 def test_inspection_summary_no_repeated_when_first_inspection(db_session: Session):
-    user = User(username_normalized="inspector2", display_name="Inspector 2", password_hash="x", role="inspector")
+    user = User(
+        username_normalized="inspector2",
+        display_name="Inspector 2",
+        password_hash="x",
+        role="inspector",
+    )
     db_session.add(user)
     db_session.flush()
 

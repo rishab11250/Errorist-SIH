@@ -112,7 +112,9 @@ def compute_fingerprint(
     fingerprint_exact = hashlib.sha256(canonical_repr.encode("utf-8")).hexdigest()
 
     # Search key for fuzzy token matching
-    tokens = [part for part in (norm_mfg, norm_name, f"{norm_val}{norm_unit}".strip(), norm_cat) if part]
+    tokens = [
+        part for part in (norm_mfg, norm_name, f"{norm_val}{norm_unit}".strip(), norm_cat) if part
+    ]
     search_key = " ".join(tokens)
 
     return fingerprint_exact, search_key
@@ -157,7 +159,7 @@ def resolve_product_identity(
     if exact_product is not None:
         return exact_product, "auto_matched", []
 
-    # Step 2 — Candidate filtering (filter by quantity or category or manufacturer to avoid table scans)
+    # Step 2 — Candidate filtering (filter by quantity or category to avoid table scans)
     candidate_query = select(Product)
     filters = []
     if net_quantity_value is not None and net_quantity_unit:
@@ -199,7 +201,9 @@ def resolve_product_identity(
                 "id": str(item.product.id),
                 "manufacturer": item.product.manufacturer_name,
                 "common_name": item.product.common_name,
-                "quantity": f"{item.product.net_quantity_value:g}" if item.product.net_quantity_value is not None else None,
+                "quantity": f"{item.product.net_quantity_value:g}"
+                if item.product.net_quantity_value is not None
+                else None,
                 "unit": item.product.net_quantity_unit,
                 "category": item.product.category,
                 "scan_count": item.product.scan_count,

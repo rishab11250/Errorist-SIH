@@ -16,7 +16,6 @@ from app.errors import AppError
 from app.models import ProductSummaryOut
 from app.product_history import (
     calculate_inspection_summary,
-    find_previous_inspection_scan,
     get_scan_historical_context,
 )
 from app.product_identity import compute_fingerprint
@@ -45,7 +44,9 @@ def _product_summary_dict(product: Product | None, session: Session) -> dict | N
         "id": str(product.id),
         "manufacturer": product.manufacturer_name,
         "common_name": product.common_name,
-        "quantity": f"{product.net_quantity_value:g}" if product.net_quantity_value is not None else None,
+        "quantity": f"{product.net_quantity_value:g}"
+        if product.net_quantity_value is not None
+        else None,
         "unit": product.net_quantity_unit,
         "category": product.category,
         "scan_count": product.scan_count,
@@ -150,7 +151,7 @@ def get_product_detail(
     try:
         pid = int(product_id)
     except ValueError:
-        raise AppError(404, "PRODUCT_NOT_FOUND", "Invalid product ID.")
+        raise AppError(404, "PRODUCT_NOT_FOUND", "Invalid product ID.") from None
     product = session.get(Product, pid)
     if product is None:
         raise AppError(404, "PRODUCT_NOT_FOUND", f"Product #{product_id} not found.")
@@ -173,7 +174,7 @@ def get_product_inspections(
     try:
         pid = int(product_id)
     except ValueError:
-        raise AppError(404, "PRODUCT_NOT_FOUND", "Invalid product ID.")
+        raise AppError(404, "PRODUCT_NOT_FOUND", "Invalid product ID.") from None
     product = session.get(Product, pid)
     if product is None:
         raise AppError(404, "PRODUCT_NOT_FOUND", f"Product #{product_id} not found.")
@@ -184,7 +185,9 @@ def get_product_inspections(
         .where(Scan.product_id == pid, Scan.inspection_id.isnot(None))
         .distinct()
     )
-    insp_query = select(Inspection).where(Inspection.id.in_(subq)).order_by(Inspection.started_at.desc())
+    insp_query = (
+        select(Inspection).where(Inspection.id.in_(subq)).order_by(Inspection.started_at.desc())
+    )
     all_insps = session.scalars(insp_query).all()
     total = len(all_insps)
 
@@ -199,12 +202,14 @@ def get_product_inspections(
 
         overall = latest_scan.overall_status if latest_scan else "unknown"
         summary = calculate_inspection_summary(session, insp.id)
-        items.append({
-            "inspection_id": str(insp.id),
-            "inspection_date": insp.started_at.isoformat(),
-            "overall_status": overall,
-            "repeated_non_compliance_count": summary["repeated_non_compliance_count"],
-        })
+        items.append(
+            {
+                "inspection_id": str(insp.id),
+                "inspection_date": insp.started_at.isoformat(),
+                "overall_status": overall,
+                "repeated_non_compliance_count": summary["repeated_non_compliance_count"],
+            }
+        )
 
     return {
         "items": items,
@@ -228,7 +233,7 @@ def get_product_scans(
     try:
         pid = int(product_id)
     except ValueError:
-        raise AppError(404, "PRODUCT_NOT_FOUND", "Invalid product ID.")
+        raise AppError(404, "PRODUCT_NOT_FOUND", "Invalid product ID.") from None
     product = session.get(Product, pid)
     if product is None:
         raise AppError(404, "PRODUCT_NOT_FOUND", f"Product #{product_id} not found.")
@@ -267,7 +272,7 @@ def handle_confirm_product_match(
     try:
         target_pid = int(req.product_id)
     except ValueError:
-        raise AppError(400, "MATCH_CANDIDATE_INVALID", "Invalid candidate product ID.")
+        raise AppError(400, "MATCH_CANDIDATE_INVALID", "Invalid candidate product ID.") from None
 
     target_product = session.get(Product, target_pid)
     if target_product is None:
@@ -370,7 +375,7 @@ def handle_admin_link_product(
     try:
         target_pid = int(req.product_id)
     except ValueError:
-        raise AppError(400, "PRODUCT_NOT_FOUND", "Invalid target product ID.")
+        raise AppError(400, "PRODUCT_NOT_FOUND", "Invalid target product ID.") from None
 
     target_product = session.get(Product, target_pid)
     if target_product is None:

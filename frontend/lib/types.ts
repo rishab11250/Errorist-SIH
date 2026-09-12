@@ -118,6 +118,7 @@ export interface StoredScanResponse {
     overall_status: OverallStatus;
     image_b64: string;
     image_meta: ImageMeta;
+    ocr_payload: OCRWord[];
     schema_version: number;
     processing_status: ScanAnalysisResponse['processing_status'];
     quality_summary: QualitySummary;

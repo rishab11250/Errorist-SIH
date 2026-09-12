@@ -1,5 +1,5 @@
 import type { ExtractedField, ImageMeta, OCRWord } from '../domain';
-import { extractLabeledField } from './base';
+import { avgConfidence, extractLabeledField } from './base';
 import { groupWordsIntoSpatialRows } from '../../spatial-layout';
 
 export const PATTERN =
@@ -17,7 +17,7 @@ export function extractBestBefore(
     name: 'best_before',
     pattern: PATTERN,
   });
-  if (res.value) {
+  if (res.value && (BROAD_DATE_PATTERN.test(res.value) || /\b\d+\s*(?:days?|weeks?|months?|years?)\b/i.test(res.value))) {
     console.log(`[extractBestBefore] Matched: "${res.value}"`);
     return res;
   }
@@ -34,12 +34,12 @@ export function extractBestBefore(
           name: 'best_before',
           value: val,
           bbox: row.bbox,
-          confidence: res.confidence > 0 ? res.confidence : 0.85,
+          confidence: avgConfidence(row.words),
           evidence_spans: row.words.map((w) => w.bbox),
         };
       }
     }
   }
 
-  return res;
+  return { ...res, value: null, confidence: 0 };
 }

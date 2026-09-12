@@ -1,6 +1,5 @@
 import { PENDING_SCAN_QUEUED_EVENT, PENDING_SCANS_CHANGED_EVENT } from './offline-scans';
 import {
-  deletePendingScan,
   getPendingOrFailedScans,
   updateSyncStatus,
   type PendingScanRecord,
@@ -105,6 +104,9 @@ export async function requestPendingScanSync(
 
 export function installPendingScanSyncTriggers(registration: ServiceWorkerRegistration) {
   const requestSync = () => void requestPendingScanSync(registration);
+  const onVisible = () => {
+    if (document.visibilityState === 'visible' && navigator.onLine) requestSync();
+  };
   const relayWorkerChange = (event: MessageEvent) => {
     if (event.data?.type === PENDING_SCANS_CHANGED_MESSAGE) {
       window.dispatchEvent(new Event(PENDING_SCANS_CHANGED_EVENT));
@@ -112,12 +114,14 @@ export function installPendingScanSyncTriggers(registration: ServiceWorkerRegist
   };
 
   window.addEventListener('online', requestSync);
+  document.addEventListener('visibilitychange', onVisible);
   window.addEventListener(PENDING_SCAN_QUEUED_EVENT, requestSync);
   navigator.serviceWorker.addEventListener('message', relayWorkerChange);
   if (navigator.onLine) requestSync();
 
   return () => {
     window.removeEventListener('online', requestSync);
+    document.removeEventListener('visibilitychange', onVisible);
     window.removeEventListener(PENDING_SCAN_QUEUED_EVENT, requestSync);
     navigator.serviceWorker.removeEventListener('message', relayWorkerChange);
   };

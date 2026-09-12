@@ -53,20 +53,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 8_000);
     try {
-      const response = await apiFetch<UserEnvelope>('/api/auth/me');
+      const response = await apiFetch<UserEnvelope>('/api/auth/me', {
+        signal: controller.signal,
+      });
       setUser(response.user);
       return response.user;
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
+        // The middleware can only see that a cookie exists, not whether its
+        // server-side session is still valid. Clear stale/expired cookies here
+        // before the workspace redirects to /login, otherwise middleware can
+        // bounce the browser back to / indefinitely.
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+        }).catch(() => undefined);
         setUser(null);
         return null;
       }
-      if (error instanceof TypeError) {
+      if (
+        error instanceof TypeError ||
+        (error instanceof DOMException && error.name === 'AbortError')
+      ) {
         setUser(OFFLINE_INSPECTOR);
         return OFFLINE_INSPECTOR;
       }
       throw error;
+    } finally {
+      window.clearTimeout(timeout);
     }
   }, []);
 

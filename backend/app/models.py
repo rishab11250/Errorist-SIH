@@ -175,6 +175,8 @@ class OfflineScanSyncRequest(BaseModel):
     ocr_payload: list[OCRWordIn]
     scan_context: ScanContextIn = Field(default_factory=ScanContextIn)
     verdicts: list[VerdictOut] = Field(min_length=1)
+    quality: QualitySummaryOut | None = None
+    extracted_fields: dict[str, ExtractedFieldOut | None] | None = None
 
     @field_validator("captured_at")
     @classmethod

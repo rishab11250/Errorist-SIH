@@ -113,6 +113,18 @@ describe('inspection experience', () => {
     expect(screen.getByLabelText(/evidence image/i)).not.toHaveAttribute('capture');
   });
 
+  it('stops a camera granted after the capture screen has already unmounted', async () => {
+    const stop = vi.fn();
+    let grant!: (stream: MediaStream) => void;
+    const getUserMedia = vi.fn(() => new Promise<MediaStream>((resolve) => { grant = resolve; }));
+    vi.stubGlobal('navigator', { ...navigator, mediaDevices: { getUserMedia } });
+    const { unmount } = render(<CameraCaptureGuide onCapture={() => undefined} />);
+    await waitFor(() => expect(getUserMedia).toHaveBeenCalledOnce());
+    unmount();
+    grant({ getTracks: () => [{ stop }] } as unknown as MediaStream);
+    await waitFor(() => expect(stop).toHaveBeenCalledOnce());
+  });
+
   it('selecting a verdict highlights its evidence and announces details', async () => {
     render(<InspectionResult result={MANUAL_REVIEW_RESULT} />);
     await userEvent.click(screen.getByRole('button', { name: /Rule 7/i }));
@@ -122,6 +134,12 @@ describe('inspection experience', () => {
     );
     expect(screen.getByRole('status')).toHaveTextContent('Physical scale cannot be established');
     expect(screen.getByText(/straight-on image/i)).toBeVisible();
+  });
+
+  it('renders a synced snapshot without inventing a missing quality assessment', () => {
+    render(<InspectionResult result={{ ...MANUAL_REVIEW_RESULT, quality: null }} />);
+    expect(screen.getByText('Image assessment unavailable')).toBeVisible();
+    expect(screen.queryByText(/Quality score/)).not.toBeInTheDocument();
   });
 
   it('requires an explanatory note before submitting a false positive', async () => {
@@ -159,7 +177,7 @@ describe('inspection experience', () => {
       dispatchEvent: vi.fn(),
     }));
     server.use(
-      http.post('/api/scan', () => {
+      http.post('/api/scan/sync', () => {
         requests += 1;
         return HttpResponse.json(SUCCESS_RESPONSE);
       })
@@ -376,19 +394,12 @@ describe('inspection experience', () => {
 
   it('fuses multi-section scan for consistent product captures and invokes onComplete', async () => {
     const onComplete = vi.fn();
-    server.use(
-      http.post('/api/scan', () => {
-        return HttpResponse.json({
-          scan_id: 88,
-          processing_status: 'complete',
-          quality: { status: 'acceptable', score: 92, metrics: [], guidance: [] },
-          extracted_fields: { mrp: { name: 'mrp', value: '₹20.00', bbox: [0.1, 0.1, 0.2, 0.1], confidence: 0.95 } },
-          verdicts: [],
-          overall_status: 'compliant',
-          analysis_version: 'v2',
-        });
-      })
-    );
+    let submittedSnapshot: { local_id: string; rule_version: string; verdicts: unknown[] } | undefined;
+    vi.stubGlobal('fetch', vi.fn(async (url: string, init: RequestInit) => {
+      expect(url).toBe('/api/scan/sync');
+      submittedSnapshot = JSON.parse(String(init.body));
+      return new Response(JSON.stringify({ scan_id: 88 }), { status: 201 });
+    }));
 
     runOCRMock.mockImplementation(async (file?: File) => {
       if (file?.name?.includes('front')) {
@@ -439,7 +450,10 @@ describe('inspection experience', () => {
     });
 
     const callArg = onComplete.mock.calls[0][0];
-    expect(callArg.response).toBeDefined();
+    expect(callArg.response.scan_id).toBe(88);
+    expect(submittedSnapshot?.local_id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(submittedSnapshot?.verdicts).toEqual(callArg.response.verdicts);
+    expect(submittedSnapshot?.rule_version).toBe(callArg.response.analysis_version);
   });
 
   it('toggles OCR language between English Only and English + Hindi', async () => {

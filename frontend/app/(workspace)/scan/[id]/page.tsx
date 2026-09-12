@@ -10,6 +10,7 @@ import {
 } from '@/components/inspection/InspectionResult';
 import { getScan } from '@/lib/api';
 import { safeNextPath } from '@/lib/api-client';
+import { assessQuality } from '@/lib/rules';
 
 function cachedResult(scanId: number): InspectionResultData | null {
   const cached = sessionStorage.getItem(`scan:${scanId}`);
@@ -22,12 +23,15 @@ function cachedResult(scanId: number): InspectionResultData | null {
       imageDataUrl: value.imageDataUrl,
       imageWidth: value.imageWidth ?? 1,
       imageHeight: value.imageHeight ?? 1,
+      ocrWords: value.ocrWords ?? [],
       verdicts: value.verdicts,
       quality: value.quality,
       overallStatus: value.overallStatus ?? 'manual_review',
       processingStatus: value.processingStatus ?? 'complete',
       analysisVersion: value.analysisVersion ?? 'inspection-v2',
       reviewActions: value.reviewActions ?? [],
+      captureMode: value.captureMode,
+      category: value.category,
     };
   } catch {
     sessionStorage.removeItem(`scan:${scanId}`);
@@ -51,17 +55,32 @@ export default function ScanResultPage() {
         let mime = 'image/png';
         if (b64.startsWith('/9j/')) mime = 'image/jpeg';
         else if (b64.startsWith('UklGR')) mime = 'image/webp';
+        const measuredQuality = assessQuality(data.scan.ocr_payload ?? []);
+        const fallbackQuality = {
+          ...measuredQuality,
+          metrics: measuredQuality.metrics.map((metric) => ({
+            ...metric,
+            evidence_bboxes: metric.evidence_bboxes ?? [],
+          })),
+        };
         setResult({
           scanId,
           imageDataUrl: `data:${mime};base64,${b64}`,
           imageWidth: data.scan.image_meta.width,
           imageHeight: data.scan.image_meta.height,
+          ocrWords: data.scan.ocr_payload ?? [],
           verdicts: data.verdicts,
-          quality: data.scan.quality_summary,
+          quality: data.scan.quality_summary?.status
+            ? data.scan.quality_summary
+            : data.scan.ocr_payload?.length
+              ? fallbackQuality
+              : null,
           overallStatus: data.scan.overall_status,
           processingStatus: data.scan.processing_status,
           analysisVersion: data.scan.analysis_version,
           reviewActions: data.review_actions ?? [],
+          captureMode: data.scan.mode,
+          category: data.scan.category,
         });
       })
       .catch((reason) => {

@@ -1,9 +1,19 @@
 'use client';
 
-import { AlertTriangle, Camera, CheckCircle2, Focus, ImageUp, RefreshCw, Sun, Zap } from 'lucide-react';
+import {
+  AlertTriangle,
+  Camera,
+  CheckCircle2,
+  Focus,
+  ImageUp,
+  RefreshCw,
+  Sun,
+  Zap,
+} from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { cameraCrop } from '@/lib/camera-crop';
 
 export interface FrameQuality {
   brightness: number;
@@ -21,13 +31,22 @@ interface Props {
 
 export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const guideRef = useRef<HTMLDivElement | null>(null);
+  const autoCaptureRef = useRef(true);
+  const disabledRef = useRef(disabled);
+  disabledRef.current = disabled;
+  const grayRef = useRef<Float32Array | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const overrideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleCaptureRef = useRef<() => void>(() => undefined);
   const isCapturingRef = useRef(false);
   const readyStreakRef = useRef(0);
+  const cameraGenerationRef = useRef(0);
+  const captureSequenceRef = useRef(0);
+  const captureTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [capturing, setCapturing] = useState(false);
+  const [captureError, setCaptureError] = useState<string | null>(null);
 
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -40,17 +59,18 @@ export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Pr
     status: 'blurry',
     message: 'Starting camera…',
   });
-  const [canOverride, setCanOverride] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
 
   const stopCamera = useCallback(() => {
+    cameraGenerationRef.current += 1;
+    captureSequenceRef.current += 1;
+    if (captureTimeoutRef.current) clearTimeout(captureTimeoutRef.current);
+    captureTimeoutRef.current = null;
+    isCapturingRef.current = false;
+    setCapturing(false);
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
-    }
-    if (overrideTimeoutRef.current) {
-      clearTimeout(overrideTimeoutRef.current);
-      overrideTimeoutRef.current = null;
     }
     if (streamRef.current) {
       for (const track of streamRef.current.getTracks()) {
@@ -58,12 +78,19 @@ export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Pr
       }
       streamRef.current = null;
     }
+    if (videoRef.current) videoRef.current.srcObject = null;
     setCameraActive(false);
   }, []);
 
   const analyzeCurrentFrame = useCallback(() => {
     const video = videoRef.current;
-    if (!video || video.readyState < 2) return;
+    if (
+      !video ||
+      video.readyState < 2 ||
+      disabledRef.current ||
+      document.visibilityState === 'hidden'
+    )
+      return;
 
     const width = 320;
     const height = 180;
@@ -79,22 +106,23 @@ export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Pr
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return;
 
-    // Sample the central 70% region corresponding to the guide frame
-    const vWidth = video.videoWidth || 640;
-    const vHeight = video.videoHeight || 480;
-    const cropW = vWidth * 0.75;
-    const cropH = cropW * (9 / 16);
-    const cropX = (vWidth - cropW) / 2;
-    const cropY = (vHeight - cropH) / 2;
-
-    ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, width, height);
+    const guide = guideRef.current;
+    if (!guide) return;
+    const crop = cameraCrop(
+      video.videoWidth,
+      video.videoHeight,
+      video.getBoundingClientRect(),
+      guide.getBoundingClientRect()
+    );
+    if (!crop) return;
+    ctx.drawImage(video, crop.x, crop.y, crop.width, crop.height, 0, 0, width, height);
     const imageData = ctx.getImageData(0, 0, width, height);
     const data = imageData.data;
     const totalPixels = width * height;
 
     let totalLuminance = 0;
     let glareCount = 0;
-    const gray = new Float32Array(totalPixels);
+    const gray = (grayRef.current ??= new Float32Array(totalPixels));
 
     for (let i = 0, p = 0; p < totalPixels; p++, i += 4) {
       const r = data[i];
@@ -149,13 +177,13 @@ export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Pr
     }
 
     if (status === 'ready') {
+      const autoCapture = autoCaptureRef.current;
       readyStreakRef.current += 1;
       const streak = readyStreakRef.current;
       setReadyStreak(streak);
       if (streak >= 3) {
         message = autoCapture ? 'Auto-capturing steady frame…' : 'Steady — ready to snap';
         if (autoCapture && !isCapturingRef.current) {
-          isCapturingRef.current = true;
           handleCaptureRef.current();
         }
       } else {
@@ -173,21 +201,28 @@ export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Pr
       status,
       message,
     });
-  }, [autoCapture]);
+  }, []);
 
   const startCamera = useCallback(async () => {
     stopCamera();
     setCameraError(null);
-    setCanOverride(false);
+    setCaptureError(null);
     isCapturingRef.current = false;
     readyStreakRef.current = 0;
     setReadyStreak(0);
 
+    if (window.isSecureContext === false) {
+      setCameraError(
+        'Camera access requires HTTPS. Open the secure app link in Chrome or Safari, not an in-app browser.'
+      );
+      return;
+    }
     if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
       setCameraError('Live camera not supported in this browser. Please use file upload.');
       return;
     }
 
+    const generation = cameraGenerationRef.current;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -198,20 +233,17 @@ export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Pr
         audio: false,
       });
 
+      if (generation !== cameraGenerationRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().catch(() => undefined);
-          setCameraActive(true);
-        };
+        await videoRef.current.play();
       }
-
-      // Allow override after 3 seconds
-      overrideTimeoutRef.current = setTimeout(() => {
-        setCanOverride(true);
-        overrideTimeoutRef.current = null;
-      }, 3000);
+      if (generation !== cameraGenerationRef.current) return;
 
       // Start quality check interval (~450ms)
       const interval = setInterval(() => {
@@ -220,6 +252,8 @@ export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Pr
 
       timerRef.current = interval;
     } catch (err) {
+      if (generation !== cameraGenerationRef.current) return;
+      stopCamera();
       const msg =
         err instanceof DOMException && err.name === 'NotAllowedError'
           ? 'Camera permission denied. Allow camera access or upload an image.'
@@ -238,39 +272,90 @@ export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Pr
 
   const handleCapture = useCallback(() => {
     const video = videoRef.current;
-    if (!video || disabled || isCapturingRef.current) return;
+    const guide = guideRef.current;
+    if (disabled || isCapturingRef.current) return;
+    if (!video || !guide || video.readyState < 2 || !video.videoWidth || !video.videoHeight) {
+      setCaptureError(
+        'No camera frame is available yet. Wait for the live preview, then tap Capture photo again.'
+      );
+      return;
+    }
+    const crop = cameraCrop(
+      video.videoWidth,
+      video.videoHeight,
+      video.getBoundingClientRect(),
+      guide.getBoundingClientRect()
+    );
+    if (!crop) {
+      setCaptureError(
+        'The camera guide is not visible. Bring the app to the foreground and try again.'
+      );
+      return;
+    }
     isCapturingRef.current = true;
-
-    const vWidth = video.videoWidth || 1920;
-    const vHeight = video.videoHeight || 1080;
-
-    // Crop specifically to the primary declaration panel frame (75% width, 16:9 ratio)
-    const cropW = Math.round(vWidth * 0.75);
-    const cropH = Math.round(cropW * (9 / 16));
-    const cropX = Math.round((vWidth - cropW) / 2);
-    const cropY = Math.round((vHeight - cropH) / 2);
+    setCapturing(true);
+    setCaptureError(null);
+    const sequence = ++captureSequenceRef.current;
+    const failCapture = (message: string) => {
+      if (sequence !== captureSequenceRef.current) return;
+      captureSequenceRef.current += 1;
+      if (captureTimeoutRef.current) clearTimeout(captureTimeoutRef.current);
+      captureTimeoutRef.current = null;
+      isCapturingRef.current = false;
+      setCapturing(false);
+      setCaptureError(message);
+    };
+    const generation = cameraGenerationRef.current;
+    const scale = Math.min(1, 1600 / Math.max(crop.width, crop.height));
 
     const snapshotCanvas = document.createElement('canvas');
-    snapshotCanvas.width = cropW;
-    snapshotCanvas.height = cropH;
+    snapshotCanvas.width = Math.max(1, Math.round(crop.width * scale));
+    snapshotCanvas.height = Math.max(1, Math.round(crop.height * scale));
     const ctx = snapshotCanvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      failCapture('Chrome could not prepare the photo. Close other camera apps and retry.');
+      return;
+    }
 
-    ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+    try {
+      ctx.drawImage(
+        video,
+        crop.x,
+        crop.y,
+        crop.width,
+        crop.height,
+        0,
+        0,
+        snapshotCanvas.width,
+        snapshotCanvas.height
+      );
 
-    snapshotCanvas.toBlob(
-      (blob) => {
-        if (!blob) return;
-        const file = new File([blob], `guided-capture-${Date.now()}.jpg`, {
-          type: 'image/jpeg',
-          lastModified: Date.now(),
-        });
-        stopCamera();
-        onCapture(file);
-      },
-      'image/jpeg',
-      0.92
-    );
+      captureTimeoutRef.current = setTimeout(() => {
+        failCapture(
+          'Saving the camera frame timed out. Tap Capture photo to retry, or use Upload photo.'
+        );
+      }, 5000);
+      snapshotCanvas.toBlob(
+        (blob) => {
+          if (generation !== cameraGenerationRef.current || sequence !== captureSequenceRef.current)
+            return;
+          if (!blob) {
+            failCapture('Chrome could not encode this photo. Tap Capture photo to retry.');
+            return;
+          }
+          const file = new File([blob], `guided-capture-${Date.now()}.jpg`, {
+            type: 'image/jpeg',
+            lastModified: Date.now(),
+          });
+          stopCamera();
+          onCapture(file);
+        },
+        'image/jpeg',
+        0.92
+      );
+    } catch {
+      failCapture('Could not capture this camera frame. Please try again.');
+    }
   }, [disabled, onCapture, stopCamera]);
 
   useEffect(() => {
@@ -295,183 +380,225 @@ export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Pr
         ? 'border-rose-400/90 shadow-[0_0_15px_rgba(244,63,94,0.3)]'
         : 'border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.6)] ring-2 ring-amber-400/40';
 
-  if (cameraError) {
-    return (
-      <div className="surface-panel rounded-2xl border-2 border-dashed p-8 text-center shadow-lg">
-        <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-amber-500/15 text-amber-500">
-          <AlertTriangle className="size-7" />
-        </div>
-        <p className="mt-4 text-base font-semibold text-foreground">{cameraError}</p>
-        <p className="mt-1.5 text-sm text-muted-foreground max-w-md mx-auto">
-          You can retry opening the camera or switch to file upload below.
-        </p>
-        <div className="mt-5 flex justify-center gap-3">
-          <Button type="button" variant="outline" onClick={startCamera} className="gap-2 font-semibold">
-            <RefreshCw className="size-4" /> Try camera again
-          </Button>
-        </div>
+  const errorPanel = cameraError ? (
+    <div className="surface-panel rounded-2xl border-2 border-dashed p-8 text-center shadow-lg">
+      <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-amber-500/15 text-amber-500">
+        <AlertTriangle className="size-7" />
       </div>
-    );
-  }
+      <p className="mt-4 text-base font-semibold text-foreground">{cameraError}</p>
+      <p className="mt-1.5 text-sm text-muted-foreground max-w-md mx-auto">
+        You can retry opening the camera or switch to file upload below.
+      </p>
+      <div className="mt-5 flex justify-center gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={startCamera}
+          className="gap-2 font-semibold"
+        >
+          <RefreshCw className="size-4" /> Try camera again
+        </Button>
+        {onSwitchToUpload && (
+          <Button type="button" variant="outline" onClick={onSwitchToUpload}>
+            Upload photo
+          </Button>
+        )}
+      </div>
+    </div>
+  ) : null;
 
   return (
-    <div className="relative mx-auto flex flex-col items-center overflow-hidden rounded-2xl bg-neutral-950 shadow-2xl border border-neutral-800">
-      {/* Video Viewport */}
-      <div className="relative aspect-[3/4] xs:aspect-[4/3] w-full max-w-2xl overflow-hidden sm:aspect-[16/10] bg-black">
-        <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
+    <>
+      {errorPanel}
+      {captureError && (
+        <p role="alert" className="rounded-lg border border-amber-500 p-3 text-sm">
+          {captureError}
+        </p>
+      )}
+      <div
+        hidden={Boolean(cameraError)}
+        className="relative mx-auto flex flex-col items-center overflow-hidden rounded-2xl bg-neutral-950 shadow-2xl border border-neutral-800"
+        style={cameraError ? { display: 'none' } : undefined}
+      >
+        {/* Video Viewport */}
+        <div className="relative aspect-[3/4] xs:aspect-[4/3] w-full max-w-2xl overflow-hidden sm:aspect-[16/10] bg-black">
+          <video
+            ref={videoRef}
+            onPlaying={() => setCameraActive(true)}
+            onWaiting={() => setCameraActive(false)}
+            autoPlay
+            playsInline
+            muted
+            className="h-full w-full object-cover"
+          />
 
-        {/* Ambient Dark Mask with Cutout Effect */}
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-between p-3 sm:p-6 bg-gradient-to-b from-black/60 via-transparent to-black/70">
-          {/* Top Header Label */}
-          <div className="flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/15 bg-black/75 px-2.5 sm:px-3.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-200 backdrop-blur-md shadow-md">
-            <span className="size-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-            <span>Declaration Panel Guide</span>
-          </div>
-
-          {/* Target Declaration Panel Frame */}
-          <div
-            className={`relative aspect-[16/9] w-[92%] sm:w-[88%] max-w-[500px] rounded-xl border-2 transition-all duration-300 backdrop-brightness-105 ${frameBorderColor}`}
-          >
-            {/* High-Tech Corner Reticles */}
-            <div className="absolute -left-1.5 -top-1.5 size-5 sm:size-6 border-l-[3.5px] border-t-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
-            <div className="absolute -right-1.5 -top-1.5 size-5 sm:size-6 border-r-[3.5px] border-t-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
-            <div className="absolute -bottom-1.5 -left-1.5 size-5 sm:size-6 border-b-[3.5px] border-l-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
-            <div className="absolute -bottom-1.5 -right-1.5 size-5 sm:size-6 border-b-[3.5px] border-r-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
-
-            {/* Subtle Crosshairs */}
-            <div className="absolute left-1/2 top-2 h-2 w-px -translate-x-1/2 bg-white/40" />
-            <div className="absolute bottom-2 left-1/2 h-2 w-px -translate-x-1/2 bg-white/40" />
-            <div className="absolute left-2 top-1/2 h-px w-2 -translate-y-1/2 bg-white/40" />
-            <div className="absolute right-2 top-1/2 h-px w-2 -translate-y-1/2 bg-white/40" />
-
-            {/* Central Helper Pill */}
-            <div className="flex h-full flex-col items-center justify-center p-2 text-center">
-              <p className="rounded-full border border-white/10 bg-black/60 px-2.5 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-medium text-white/95 backdrop-blur-md shadow-sm">
-                Frame MRP, Net Qty &amp; Mfg Info Here
-              </p>
+          {/* Ambient Dark Mask with Cutout Effect */}
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-between p-3 sm:p-6 bg-gradient-to-b from-black/60 via-transparent to-black/70">
+            {/* Top Header Label */}
+            <div className="flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/15 bg-black/75 px-2.5 sm:px-3.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-200 backdrop-blur-md shadow-md">
+              <span className="size-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span>Declaration Panel Guide</span>
             </div>
-          </div>
 
-          {/* Dynamic Real-Time Status & Readiness Bar */}
-          <div className="flex flex-col items-center gap-1.5">
+            {/* Target Declaration Panel Frame */}
             <div
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold backdrop-blur-md transition-all duration-200 ${statusColor}`}
+              ref={guideRef}
+              className={`relative aspect-[16/9] w-[92%] sm:w-[88%] max-w-[500px] rounded-xl border-2 transition-all duration-300 backdrop-brightness-105 ${frameBorderColor}`}
             >
-              {quality.status === 'ready' ? (
-                <CheckCircle2 className="size-4 sm:size-4.5 text-emerald-300 shrink-0" />
-              ) : quality.status === 'too_dark' || quality.status === 'too_bright' ? (
-                <Sun className="size-4 sm:size-4.5 text-amber-300 shrink-0" />
-              ) : quality.status === 'glare' ? (
-                <Zap className="size-4 sm:size-4.5 text-amber-300 shrink-0" />
-              ) : (
-                <Focus className="size-4 sm:size-4.5 text-rose-300 shrink-0" />
-              )}
-              <span className="!text-white font-bold tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
-                {quality.message}
-              </span>
+              {/* High-Tech Corner Reticles */}
+              <div className="absolute -left-1.5 -top-1.5 size-5 sm:size-6 border-l-[3.5px] border-t-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+              <div className="absolute -right-1.5 -top-1.5 size-5 sm:size-6 border-r-[3.5px] border-t-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+              <div className="absolute -bottom-1.5 -left-1.5 size-5 sm:size-6 border-b-[3.5px] border-l-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+              <div className="absolute -bottom-1.5 -right-1.5 size-5 sm:size-6 border-b-[3.5px] border-r-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+
+              {/* Subtle Crosshairs */}
+              <div className="absolute left-1/2 top-2 h-2 w-px -translate-x-1/2 bg-white/40" />
+              <div className="absolute bottom-2 left-1/2 h-2 w-px -translate-x-1/2 bg-white/40" />
+              <div className="absolute left-2 top-1/2 h-px w-2 -translate-y-1/2 bg-white/40" />
+              <div className="absolute right-2 top-1/2 h-px w-2 -translate-y-1/2 bg-white/40" />
+
+              {/* Central Helper Pill */}
+              <div className="flex h-full flex-col items-center justify-center p-2 text-center">
+                <p className="rounded-full border border-white/10 bg-black/60 px-2.5 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-medium text-white/95 backdrop-blur-md shadow-sm">
+                  Frame MRP, Net Qty &amp; Mfg Info Here
+                </p>
+              </div>
             </div>
 
-            {/* Auto-Snap Streak Indicator */}
-            {autoCapture && quality.status === 'ready' ? (
-              <div className="flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-medium text-emerald-300/90 backdrop-blur-sm">
-                <span>Auto-snap lock:</span>
-                <div className="flex gap-1">
-                  {[0, 1, 2].map((idx) => (
-                    <span
-                      key={idx}
-                      className={`size-2 rounded-full transition-all duration-200 ${
-                        readyStreak > idx
-                          ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)] scale-110'
-                          : 'bg-neutral-600/70'
-                      }`}
-                    />
-                  ))}
-                </div>
+            {/* Dynamic Real-Time Status & Readiness Bar */}
+            <div className="flex flex-col items-center gap-1.5">
+              <div
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold backdrop-blur-md transition-all duration-200 ${statusColor}`}
+              >
+                {quality.status === 'ready' ? (
+                  <CheckCircle2 className="size-4 sm:size-4.5 text-emerald-300 shrink-0" />
+                ) : quality.status === 'too_dark' || quality.status === 'too_bright' ? (
+                  <Sun className="size-4 sm:size-4.5 text-amber-300 shrink-0" />
+                ) : quality.status === 'glare' ? (
+                  <Zap className="size-4 sm:size-4.5 text-amber-300 shrink-0" />
+                ) : (
+                  <Focus className="size-4 sm:size-4.5 text-rose-300 shrink-0" />
+                )}
+                <span className="!text-white font-bold tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                  {quality.message}
+                </span>
               </div>
-            ) : null}
+
+              {/* Auto-Snap Streak Indicator */}
+              {autoCapture && quality.status === 'ready' ? (
+                <div className="flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-medium text-emerald-300/90 backdrop-blur-sm">
+                  <span>Auto-snap lock:</span>
+                  <div className="flex gap-1">
+                    {[0, 1, 2].map((idx) => (
+                      <span
+                        key={idx}
+                        className={`size-2 rounded-full transition-all duration-200 ${
+                          readyStreak > idx
+                            ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)] scale-110'
+                            : 'bg-neutral-600/70'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Camera Controls Bar */}
-      <div className="flex w-full items-center justify-between gap-2 bg-neutral-950/95 px-2.5 sm:px-4 py-3 text-white border-t border-neutral-800/80 backdrop-blur-sm">
-        <div className="flex items-center gap-1.5 shrink-0">
+        {/* Camera Controls Bar */}
+        <div className="flex w-full items-center justify-between gap-2 bg-neutral-950/95 px-2.5 sm:px-4 py-3 text-white border-t border-neutral-800/80 backdrop-blur-sm">
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() =>
+                setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'))
+              }
+              className="rounded-full bg-neutral-900 border border-neutral-800 p-2.5 text-neutral-300 transition-all hover:bg-neutral-800 hover:text-white active:scale-95 shrink-0"
+              title="Switch camera front/back"
+              aria-label="Switch camera front/back"
+            >
+              <RefreshCw className="size-4 sm:size-4.5" />
+            </button>
+            {onSwitchToUpload && (
+              <button
+                type="button"
+                onClick={onSwitchToUpload}
+                className="rounded-full bg-neutral-900 border border-neutral-800 p-2.5 text-neutral-300 transition-all hover:bg-neutral-800 hover:text-white active:scale-95 shrink-0"
+                title="Upload from Gallery / Files"
+                aria-label="Upload photo from gallery"
+              >
+                <ImageUp className="size-4 sm:size-4.5 text-terracotta" />
+              </button>
+            )}
+          </div>
+
+          {/* Primary Capture Action */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Button
+              type="button"
+              size="lg"
+              disabled={disabled || capturing}
+              onClick={handleCapture}
+              className={`min-w-32 sm:min-w-44 rounded-full px-3 sm:px-6 py-4 sm:py-6 text-xs sm:text-base font-bold shadow-lg transition-all active:scale-98 ${
+                quality.status === 'ready'
+                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/60 ring-2 ring-emerald-400/40'
+                  : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+              }`}
+            >
+              <Camera className="mr-1.5 sm:mr-2 size-4 sm:size-5 shrink-0" />
+              <span className="truncate">
+                {capturing
+                  ? 'Saving photo…'
+                  : quality.status === 'ready'
+                    ? 'Snap Declaration'
+                    : 'Capture photo'}
+              </span>
+            </Button>
+          </div>
+
+          {/* Auto-Snap Toggle */}
           <button
             type="button"
-            onClick={() => setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'))}
-            className="rounded-full bg-neutral-900 border border-neutral-800 p-2.5 text-neutral-300 transition-all hover:bg-neutral-800 hover:text-white active:scale-95 shrink-0"
-            title="Switch camera front/back"
-            aria-label="Switch camera front/back"
+            onClick={() => {
+              autoCaptureRef.current = !autoCaptureRef.current;
+              setAutoCapture(autoCaptureRef.current);
+            }}
+            className={`inline-flex items-center gap-1 sm:gap-1.5 rounded-full px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-semibold transition-all active:scale-95 shrink-0 ${
+              autoCapture
+                ? 'border border-emerald-500/60 bg-emerald-500/20 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
+                : 'border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-300'
+            }`}
+            title="Auto-snap after 3 steady frames (~1.3s)"
+            aria-label={`Toggle auto-snap (currently ${autoCapture ? 'on' : 'off'})`}
           >
-            <RefreshCw className="size-4 sm:size-4.5" />
+            <Zap className="size-3 sm:size-3.5" />
+            <span className="hidden xs:inline">Auto:</span>
+            <span>{autoCapture ? 'ON' : 'OFF'}</span>
           </button>
-          {onSwitchToUpload && (
+        </div>
+
+        <p role="status" className="px-4 py-2 text-xs text-neutral-300">
+          {capturing
+            ? 'Capturing on this device—no upload yet.'
+            : cameraActive
+              ? 'Camera ready. Capture a photo, then select Start inspection.'
+              : 'Waiting for a live camera frame…'}
+        </p>
+
+        {onSwitchToUpload && (
+          <div className="flex items-center justify-between gap-3 px-4 py-2.5 bg-neutral-900 border-t border-neutral-800 w-full text-xs font-mono">
+            <span className="text-neutral-400 text-[11px] sm:text-xs">Have a saved photo?</span>
             <button
               type="button"
               onClick={onSwitchToUpload}
-              className="rounded-full bg-neutral-900 border border-neutral-800 p-2.5 text-neutral-300 transition-all hover:bg-neutral-800 hover:text-white active:scale-95 shrink-0"
-              title="Upload from Gallery / Files"
-              aria-label="Upload photo from gallery"
+              className="text-terracotta hover:underline font-semibold flex items-center gap-1 text-[11px] sm:text-xs"
             >
-              <ImageUp className="size-4 sm:size-4.5 text-terracotta" />
+              <ImageUp className="size-3.5" /> Choose from Gallery
             </button>
-          )}
-        </div>
-
-        {/* Primary Capture Action */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <Button
-            type="button"
-            size="lg"
-            disabled={(!cameraActive || quality.status !== 'ready') && !canOverride}
-            onClick={handleCapture}
-            className={`min-w-32 sm:min-w-44 rounded-full px-3 sm:px-6 py-4 sm:py-6 text-xs sm:text-base font-bold shadow-lg transition-all active:scale-98 ${
-              quality.status === 'ready'
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/60 ring-2 ring-emerald-400/40'
-                : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-            }`}
-          >
-            <Camera className="mr-1.5 sm:mr-2 size-4 sm:size-5 shrink-0" />
-            <span className="truncate">
-              {quality.status === 'ready'
-                ? 'Snap Declaration'
-                : canOverride
-                  ? 'Capture anyway'
-                  : 'Hold still…'}
-            </span>
-          </Button>
-        </div>
-
-        {/* Auto-Snap Toggle */}
-        <button
-          type="button"
-          onClick={() => setAutoCapture((prev) => !prev)}
-          className={`inline-flex items-center gap-1 sm:gap-1.5 rounded-full px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-semibold transition-all active:scale-95 shrink-0 ${
-            autoCapture
-              ? 'border border-emerald-500/60 bg-emerald-500/20 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
-              : 'border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-300'
-          }`}
-          title="Auto-snap after 3 steady frames (~1.3s)"
-          aria-label={`Toggle auto-snap (currently ${autoCapture ? 'on' : 'off'})`}
-        >
-          <Zap className="size-3 sm:size-3.5" />
-          <span className="hidden xs:inline">Auto:</span>
-          <span>{autoCapture ? 'ON' : 'OFF'}</span>
-        </button>
+          </div>
+        )}
       </div>
-
-      {onSwitchToUpload && (
-        <div className="flex items-center justify-between gap-3 px-4 py-2.5 bg-neutral-900 border-t border-neutral-800 w-full text-xs font-mono">
-          <span className="text-neutral-400 text-[11px] sm:text-xs">Have a saved photo?</span>
-          <button
-            type="button"
-            onClick={onSwitchToUpload}
-            className="text-terracotta hover:underline font-semibold flex items-center gap-1 text-[11px] sm:text-xs"
-          >
-            <ImageUp className="size-3.5" /> Choose from Gallery
-          </button>
-        </div>
-      )}
-    </div>
+    </>
   );
 }

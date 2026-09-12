@@ -8,9 +8,8 @@ export interface PackageAnchorCheck {
 }
 
 /**
- * Verifies whether OCR evidence corresponds to a commodity package declaration panel.
- * Rejects arbitrary non-packaging images (walls, laptops, newspapers, pets) that lack
- * any statutory packaging declarations or semantic anchors under LMPC Rules 2011.
+ * Checks for enough readable declarations to attempt a package inspection.
+ * This is an OCR evidence gate, not a visual object detector or segmentation model.
  */
 export function assessPackageContent(words: OCRWord[]): PackageAnchorCheck {
   if (!words || words.length === 0) {
@@ -22,7 +21,9 @@ export function assessPackageContent(words: OCRWord[]): PackageAnchorCheck {
     };
   }
 
-  const fullText = words.map((w) => w.text).join(' ');
+  // Low-confidence OCR noise must not manufacture a package from a shirt or wall.
+  const reliableWords = words.filter((word) => word.confidence >= 0.5 && word.text.trim());
+  const fullText = reliableWords.map((w) => w.text).join(' ');
 
   const anchorsFound: string[] = [];
 

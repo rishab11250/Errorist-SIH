@@ -69,6 +69,8 @@ describe('Packaging Lexicon Normalizer (boosting OCR accuracy)', () => {
 
   it('corrects metric unit misreadings (q -> g)', () => {
     expect(normalizePackagingLexicon('500q')).toBe('500g');
+    expect(normalizePackagingLexicon('199')).toBe('199');
+    expect(normalizePackagingLexicon('2029')).toBe('2029');
     expect(normalizePackagingLexicon('1kg')).toBe('1kg');
     expect(normalizePackagingLexicon('250ml')).toBe('250ml');
   });

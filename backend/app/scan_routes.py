@@ -297,8 +297,11 @@ def sync_offline_scan(
         analysis_version="offline-ts-engine",
         updated_at=datetime.now(UTC),
         request_id=request.state.request_id,
-        quality_summary={},
-        extracted_fields={},
+        quality_summary=req.quality.model_dump(mode="json") if req.quality else {},
+        extracted_fields={
+            name: field.model_dump(mode="json") if field else None
+            for name, field in (req.extracted_fields or {}).items()
+        },
         owner_user_id=current_user.id,
         client_local_id=local_id,
         verdicts=[
@@ -425,6 +428,7 @@ def get_scan(
             "overall_status": scan.overall_status,
             "image_b64": scan.image_b64,
             "image_meta": scan.image_meta,
+            "ocr_payload": scan.ocr_payload,
             "schema_version": scan.schema_version,
             "processing_status": scan.processing_status,
             "product_name": scan.product_name,

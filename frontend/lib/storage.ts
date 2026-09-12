@@ -100,10 +100,10 @@ export async function getPendingOrFailedScans(): Promise<PendingScanRecord[]> {
   const tx = db.transaction(STORE_NAME, 'readonly');
   const store = tx.objectStore(STORE_NAME);
 
-  const allRecords = await store.getAll();
-  return allRecords.filter(
-    (record) => record.sync_status === 'pending' || record.sync_status === 'failed'
-  );
+  const index = store.index('by-sync-status');
+  const [pending, failed] = await Promise.all([index.getAll('pending'), index.getAll('failed')]);
+  await tx.done;
+  return [...pending, ...failed];
 }
 
 export const getPendingScans = getPendingOrFailedScans;

@@ -23,6 +23,7 @@ export function extractMrp(
     value: string;
     numeric: number;
     evidenceWords?: OCRWord[];
+    columnLeft?: number;
   }> = [];
   const seenNumeric = new Set<number>();
 
@@ -84,6 +85,9 @@ export function extractMrp(
         // Find price tokens in this row
         for (let wIdx = 0; wIdx < row.words.length; wIdx++) {
           const w = row.words[wIdx];
+          const anchor = row.words.find((word) => /m\.?r\.?p\.?|maximum|max\.?/i.test(word.text));
+          // A manufacturer address in the neighbouring column is not an MRP value.
+          if (anchor && w.bbox[0] < anchor.bbox[0]) continue;
           // Skip tokens that are unit prices (e.g. 0.61/g)
           const isUnitPrice = /\/\s*(?:g|gm|kg|ml|l|unit|u|pc)\b|\bper\b|\busp\b/i.test(
             row.words.slice(Math.max(0, wIdx - 1), wIdx + 3).map((item) => item.text).join(' ')
@@ -102,6 +106,7 @@ export function extractMrp(
                 value: cleanNum,
                 numeric: num,
                 evidenceWords: row.words,
+                columnLeft: anchor ? anchor.bbox[0] - anchor.bbox[2] : undefined,
               });
               console.log(`[extractMrp] Found spatial candidate: ${cleanNum} in row "${row.text}"`);
             }
@@ -143,7 +148,8 @@ export function extractMrp(
 
   for (const cand of candidates) {
     const nearby = ocrWords.filter(
-      (w) => Math.abs(w.bbox[1] - cand.priceWord.bbox[1]) <= vertTol
+      (w) => Math.abs(w.bbox[1] - cand.priceWord.bbox[1]) <= vertTol &&
+        (cand.columnLeft === undefined || w.bbox[0] >= cand.columnLeft)
     );
     const joined = nearby.map((w) => w.text).join(' ');
     const match = phrase.exec(joined);

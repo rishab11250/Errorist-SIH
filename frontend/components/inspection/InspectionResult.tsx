@@ -18,7 +18,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import { apiFetch } from '@/lib/api-client';
-import type { OverallStatus, QualitySummary, ReviewAction, Verdict } from '@/lib/types';
+import type { OCRWord, OverallStatus, QualitySummary, ReviewAction, Verdict } from '@/lib/types';
 
 import { AnnotatedEvidence } from './AnnotatedEvidence';
 import { QualityPanel } from './QualityPanel';
@@ -30,12 +30,15 @@ export interface InspectionResultData {
   imageDataUrl: string;
   imageWidth: number;
   imageHeight: number;
+  ocrWords?: OCRWord[];
   verdicts: Verdict[];
-  quality: QualitySummary;
+  quality: QualitySummary | null;
   overallStatus: OverallStatus;
   processingStatus: 'processing' | 'complete' | 'failed';
   analysisVersion: string;
   reviewActions: ReviewAction[];
+  captureMode?: 'retail_image' | 'ecommerce_listing';
+  category?: 'food' | 'non_food' | 'cosmetics' | 'seeds' | 'unknown';
 }
 
 type ResultFilter = 'all' | 'attention' | 'pass';
@@ -91,11 +94,11 @@ export function InspectionResult({
   }, [result]);
 
   const isRetakeRecommended =
-    result.quality.status === 'retake_recommended' || result.quality.status === 'unreadable';
+    result.quality?.status === 'retake_recommended' || result.quality?.status === 'unreadable';
 
   const failedMetrics = useMemo(() => {
     const list: Array<{ label: string; current: string; expected: string }> = [];
-    for (const m of result.quality.metrics) {
+    for (const m of result.quality?.metrics ?? []) {
       if (m.name === 'ocr_confidence_distribution' && m.value < 60) {
         list.push({
           label: 'OCR Word Confidence (Median)',
@@ -135,7 +138,7 @@ export function InspectionResult({
       }
     }
     return list;
-  }, [result.quality.metrics]);
+  }, [result.quality?.metrics]);
 
   const activeVerdict = verdicts.find((verdict) => verdict.rule_id === activeRuleId);
 
@@ -171,8 +174,8 @@ export function InspectionResult({
           action === 'confirmed'
             ? `Declaration confirmed by reviewer: ${finalValue || v.evidence}`
             : action === 'resolved'
-            ? `Declaration corrected and verified by reviewer: ${finalValue}`
-            : note || 'Marked non-compliant/missing by reviewer',
+              ? `Declaration corrected and verified by reviewer: ${finalValue}`
+              : note || 'Marked non-compliant/missing by reviewer',
       };
     });
 
@@ -202,8 +205,8 @@ export function InspectionResult({
       (action === 'confirmed'
         ? `Confirmed field [${targetVerdict.rule_id}]: ${finalValue || targetVerdict.evidence}`
         : action === 'resolved'
-        ? `Corrected field [${targetVerdict.rule_id}] to: ${finalValue}`
-        : `Marked [${targetVerdict.rule_id}] as false positive / missing`);
+          ? `Corrected field [${targetVerdict.rule_id}] to: ${finalValue}`
+          : `Marked [${targetVerdict.rule_id}] as false positive / missing`);
 
     try {
       const newReview = await apiFetch<ReviewAction>(`/api/scan/${result.scanId}/reviews`, {
@@ -261,7 +264,9 @@ export function InspectionResult({
               Inspection Result
             </span>
             <span className="text-xs text-ink-muted">•</span>
-            <span className="text-xs font-mono text-ink-muted">LMPC Rule 6 (Packaged Commodities)</span>
+            <span className="text-xs font-mono text-ink-muted">
+              LMPC Rule 6 (Packaged Commodities)
+            </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-heading font-bold tracking-tight text-ink flex items-center gap-3">
             Scan #{result.scanId}
@@ -270,21 +275,47 @@ export function InspectionResult({
             </span>
           </h1>
           <p className="text-xs md:text-sm text-ink-muted mt-1">
-            Analysis version <span className="font-mono font-semibold text-ink">{result.analysisVersion}</span> • Processing Status: <span className="text-forest font-semibold capitalize">{result.processingStatus}</span>
+            Analysis version{' '}
+            <span className="font-mono font-semibold text-ink">{result.analysisVersion}</span> •
+            Processing Status:{' '}
+            <span className="text-forest font-semibold capitalize">{result.processingStatus}</span>
           </p>
+          {result.captureMode ? (
+            <p className="mt-1 text-xs text-ink-muted">
+              Evidence type:{' '}
+              <span className="font-semibold text-ink">
+                {result.captureMode === 'retail_image'
+                  ? 'Photographed package'
+                  : 'E-commerce listing screenshot'}
+              </span>
+              {result.category ? ` • Category: ${result.category.replace('_', ' ')}` : ''}
+            </p>
+          ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
-          <Button asChild variant="outline" className="border-[#D5CFC4] hover:bg-surface-dim font-mono text-xs text-ink">
+          <Button
+            asChild
+            variant="outline"
+            className="border-[#D5CFC4] hover:bg-surface-dim font-mono text-xs text-ink"
+          >
             <Link href={backHref}>
               <ArrowLeft aria-hidden="true" className="w-3.5 h-3.5 mr-1.5" /> Back to repository
             </Link>
           </Button>
-          <Button asChild variant="outline" className="border-[#D5CFC4] hover:bg-surface-dim font-mono text-xs text-terracotta font-semibold">
+          <Button
+            asChild
+            variant="outline"
+            className="border-[#D5CFC4] hover:bg-surface-dim font-mono text-xs text-terracotta font-semibold"
+          >
             <a href={`/api/exports/scans/${result.scanId}.docx`}>
               <Download aria-hidden="true" className="w-3.5 h-3.5 mr-1.5" /> DOCX
             </a>
           </Button>
-          <Button asChild variant="outline" className="border-[#D5CFC4] hover:bg-surface-dim font-mono text-xs text-brick font-semibold">
+          <Button
+            asChild
+            variant="outline"
+            className="border-[#D5CFC4] hover:bg-surface-dim font-mono text-xs text-brick font-semibold"
+          >
             <a href={`/api/exports/scans/${result.scanId}.pdf`}>
               <Download aria-hidden="true" className="w-3.5 h-3.5 mr-1.5" /> PDF
             </a>
@@ -404,7 +435,7 @@ export function InspectionResult({
             </div>
           </div>
 
-          {result.quality.guidance.length ? (
+          {result.quality?.guidance.length ? (
             <div className="rounded-xl border border-[#E0D9CD] bg-surface-dim p-4 space-y-2 shadow-xs">
               <p className="text-xs font-mono font-bold uppercase tracking-wider text-ink-muted">
                 Recommended Actions
@@ -569,6 +600,7 @@ export function InspectionResult({
                     imageHeight={result.imageHeight}
                     verdicts={verdicts}
                     activeRuleId={activeRuleId}
+                    ocrWords={result.ocrWords ?? []}
                   />
                 </div>
               </section>
@@ -661,7 +693,10 @@ export function InspectionResult({
           scanId={result.scanId}
           onSubmitted={(review) => setReviews((all) => [...all, review])}
         />
-        <section className="bg-surface-card rounded-xl border border-[#E0D9CD] shadow-kinetic-sm p-6" aria-labelledby="review-history-heading">
+        <section
+          className="bg-surface-card rounded-xl border border-[#E0D9CD] shadow-kinetic-sm p-6"
+          aria-labelledby="review-history-heading"
+        >
           <div className="flex items-center justify-between border-b border-[#E8E2D6] pb-3">
             <h2 id="review-history-heading" className="text-h2 font-heading text-ink">
               Review history
@@ -688,7 +723,9 @@ export function InspectionResult({
                       })}
                     </p>
                   </div>
-                  <p className="text-sm text-ink/90 font-sans">{review.note || 'No note recorded.'}</p>
+                  <p className="text-sm text-ink/90 font-sans">
+                    {review.note || 'No note recorded.'}
+                  </p>
                   <p className="text-xs text-ink-muted pt-0.5 font-mono">
                     {review.actor_display_name} · {new Date(review.created_at).toLocaleDateString()}
                   </p>

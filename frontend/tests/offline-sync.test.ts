@@ -138,4 +138,18 @@ describe('offline scan sync', () => {
     expect(worker).toContain("setRecordStatus(record.local_id, 'synced')");
     expect(worker).toContain("setRecordStatus(record.local_id, 'failed')");
   });
+
+  it('retries when a suspended mobile tab returns to the foreground, and cleans up', async () => {
+    const postMessage = vi.fn();
+    vi.stubGlobal('navigator', { serviceWorker: new EventTarget(), onLine: true });
+    const remove = installPendingScanSyncTriggers({ active: { postMessage } } as unknown as ServiceWorkerRegistration);
+    postMessage.mockClear();
+    vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible');
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(postMessage).toHaveBeenCalledOnce();
+    remove();
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(postMessage).toHaveBeenCalledOnce();
+    vi.restoreAllMocks();
+  });
 });

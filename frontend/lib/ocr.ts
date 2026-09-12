@@ -1,4 +1,4 @@
-import { createWorker, type Worker } from 'tesseract.js';
+import { createWorker, PSM, type Worker } from 'tesseract.js';
 
 import { normaliseBbox } from './bbox';
 import { groupWordsIntoLines } from './ocr-lines';
@@ -121,6 +121,15 @@ export interface OCRRunResult {
   perspectiveCorrected?: boolean;
   dualPassDisagreements?: OCRDisagreement[];
   extractedFields?: Record<string, ExtractedField | null>;
+  /** Upright evidence, when orientation recovery changes the source image. */
+  evidenceFile?: File;
+}
+
+/** Short, readable declaration panels do not need two extra orientation passes. */
+export function shouldCheckOcrOrientation(words: OCRWord[], anchorCount: number): boolean {
+  if (words.length === 0) return true;
+  const meanConfidence = words.reduce((sum, word) => sum + word.confidence, 0) / words.length;
+  return anchorCount === 0 || meanConfidence < 0.65;
 }
 
 /**
@@ -143,8 +152,8 @@ export function normalizePackagingLexicon(rawText: string): string {
   text = text.replace(/\bNet\s*Otv\b/i, 'Net Qty');
   text = text.replace(/\bNet\s*Ouantity\b/i, 'Net Quantity');
 
-  // Metric unit confusion: 500q -> 500g, 200q -> 200g (q or 9 mistaken for g)
-  text = text.replace(/^(\d+)[q9]$/, '$1g');
+  // A trailing digit is evidence, not a unit: never turn 199 into 19g.
+  text = text.replace(/^(\d+)q$/, '$1g');
   text = text.replace(/^(\d+)k[q9]$/i, '$1kg');
   text = text.replace(/^(\d+)m[1I|]$/i, '$1ml');
 
@@ -249,6 +258,11 @@ export async function runOCR(
   throwIfAborted(signal);
 
   let recognizeTarget1: string = imageDataUrl;
+  let evidenceDataUrl = imageDataUrl;
+  let evidenceWidth = width;
+  let evidenceHeight = height;
+  let evidenceFile: File | undefined;
+  let selectedRotation = false;
   let recognizeTarget2: string | null = null;
   let perspectiveCorrected = false;
   let mapBboxToOriginal: (bbox: [number, number, number, number]) => [number, number, number, number] = (b) => b;
@@ -264,7 +278,7 @@ export async function runOCR(
     let ocrCanvas: HTMLCanvasElement | null = null;
 
     // 1. Document-edge detection & perspective correction
-    if (options?.enablePerspectiveWarp !== false) {
+    if (options?.enablePerspectiveWarp === true) {
       const quadInfo = detectDocumentQuad(ctx, width, height);
       if (quadInfo && quadInfo.needsWarp) {
         const warped = warpPerspective(ctx, width, height, quadInfo.quad, 1600);
@@ -401,6 +415,8 @@ export async function runOCR(
   }, languages);
 
   try {
+    // Packaging has multiple columns and scattered declarations, not one text block.
+    await activeWorker.setParameters({ tessedit_pageseg_mode: PSM.AUTO });
     // --- PASS 1 RECOGNITION ---
     const res1 = await activeWorker.recognize(recognizeTarget1);
     throwIfAborted(signal);
@@ -427,57 +443,54 @@ export async function runOCR(
     console.log(`[runOCR] Packaging anchors found at 0°: [${anchorCheck1.anchorsFound.join(', ')}] (score: ${anchorCheck1.score})`);
 
     let bestAnchorScore = anchorCheck1.anchorsFound.length * 50 + Math.min(words1.length, 50);
-    const needsOrientationCheck =
-      words1.length < 25 ||
-      anchorCheck1.anchorsFound.length === 0 ||
-      (width > height * 1.15 && anchorCheck1.anchorsFound.length < 2);
+    const needsOrientationCheck = shouldCheckOcrOrientation(words1, anchorCheck1.anchorsFound.length);
 
     if (needsOrientationCheck) {
       console.log('[runOCR] Low anchor yield or landscape aspect ratio. Testing 270° CCW and 90° CW auto-orientation...');
-      for (const testAngle of [270, 90] as const) {
+      for (const testAngle of [0, 270, 90, 180] as const) {
         try {
           const rotCanvas = document.createElement('canvas');
-          rotCanvas.width = height;
-          rotCanvas.height = width;
+          rotCanvas.width = testAngle % 180 === 0 ? width : height;
+          rotCanvas.height = testAngle % 180 === 0 ? height : width;
           const rCtx = rotCanvas.getContext('2d', { willReadFrequently: true });
           if (!rCtx) continue;
           rCtx.translate(rotCanvas.width / 2, rotCanvas.height / 2);
           rCtx.rotate((testAngle * Math.PI) / 180);
           rCtx.drawImage(imageElement, -width / 2, -height / 2);
 
-          const rotTarget = rotCanvas.toDataURL('image/jpeg', 0.88);
-          const rotRes = await activeWorker.recognize(rotTarget);
+          const rotTarget = rotCanvas.toDataURL('image/jpeg', 0.95);
+          const recovery = document.createElement('canvas');
+          const recoveryScale = Math.min(2, 3200 / Math.max(rotCanvas.width, rotCanvas.height));
+          recovery.width = Math.round(rotCanvas.width * recoveryScale);
+          recovery.height = Math.round(rotCanvas.height * recoveryScale);
+          const recoveryCtx = recovery.getContext('2d', { willReadFrequently: true });
+          if (!recoveryCtx) continue;
+          recoveryCtx.drawImage(rotCanvas, 0, 0, recovery.width, recovery.height);
+          const pixels = recoveryCtx.getImageData(0, 0, recovery.width, recovery.height);
+          for (let i = 0; i < pixels.data.length; i += 4) {
+            const gray = Math.round(0.299 * pixels.data[i] + 0.587 * pixels.data[i + 1] + 0.114 * pixels.data[i + 2]);
+            pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = gray;
+          }
+          recoveryCtx.putImageData(pixels, 0, 0);
+          applyAdaptiveContrast(recoveryCtx, recovery.width, recovery.height);
+          await activeWorker.setParameters({ tessedit_pageseg_mode: PSM.SPARSE_TEXT });
+          const rotRes = await activeWorker.recognize(recovery);
           throwIfAborted(signal);
 
           const rotWords: OCRWord[] = (rotRes.data.words ?? []).map((w) => {
             const { x0, y0, x1, y1 } = w.bbox;
             const rw = x1 - x0;
             const rh = y1 - y0;
-            const nrx = x0 / rotCanvas.width;
-            const nry = y0 / rotCanvas.height;
-            const nrw = rw / rotCanvas.width;
-            const nrh = rh / rotCanvas.height;
+            const nrx = x0 / recovery.width;
+            const nry = y0 / recovery.height;
+            const nrw = rw / recovery.width;
+            const nrh = rh / recovery.height;
 
-            let nox = nrx, noy = nry, now = nrw, noh = nrh;
-            if (testAngle === 270) {
-              nox = 1 - (nry + nrh);
-              noy = nrx;
-              now = nrh;
-              noh = nrw;
-            } else if (testAngle === 90) {
-              nox = nry;
-              noy = 1 - (nrx + nrw);
-              now = nrh;
-              noh = nrw;
-            }
             return {
               text: normalizePackagingLexicon(w.text),
               confidence: w.confidence / 100,
               bbox: [
-                Math.max(0, Math.min(1, nox)),
-                Math.max(0, Math.min(1, noy)),
-                Math.max(0, Math.min(1, now)),
-                Math.max(0, Math.min(1, noh)),
+                nrx, nry, nrw, nrh,
               ] as [number, number, number, number],
             };
           });
@@ -489,17 +502,25 @@ export async function runOCR(
           if (rotScore > bestAnchorScore) {
             words1 = rotWords;
             bestAnchorScore = rotScore;
+            selectedRotation = true;
+            evidenceDataUrl = rotTarget;
+            evidenceWidth = rotCanvas.width;
+            evidenceHeight = rotCanvas.height;
             console.log(`[runOCR] ✅ Auto-orientation selected ${testAngle}° as optimal orientation!`);
+            const meanConfidence = rotWords.reduce((sum, word) => sum + word.confidence, 0) / Math.max(1, rotWords.length);
+            if (rotAnchors.isPackage && rotAnchors.anchorsFound.length >= 3 && meanConfidence >= 0.6) break;
           }
         } catch (rotErr) {
+          throwIfAborted(signal);
           console.warn(`[runOCR] Rotation test ${testAngle}° skipped:`, rotErr);
         }
       }
     }
 
     // --- OPTIONAL PASS 2 RECOGNITION ---
+    await activeWorker.setParameters({ tessedit_pageseg_mode: PSM.AUTO });
     let words2: OCRWord[] = [];
-    if (isDualPass && recognizeTarget2) {
+    if (isDualPass && recognizeTarget2 && !selectedRotation) {
       _progressListener = (p) => onProgress?.(0.5 + p * 0.5);
       const res2 = await activeWorker.recognize(recognizeTarget2);
       throwIfAborted(signal);
@@ -513,7 +534,7 @@ export async function runOCR(
       imported: false,
     };
     const rules: RulesConfig = options?.rules ?? loadDefaultRules();
-    const imageMeta: ImageMeta = { width, height, orientation: 1 };
+    const imageMeta: ImageMeta = { width: evidenceWidth, height: evidenceHeight, orientation: 1 };
 
     const fields1 = extractAll(words1, imageMeta, scanContext, rules);
     let resolvedFields = fields1;
@@ -576,18 +597,27 @@ export async function runOCR(
         }
       }
 
-      if (pass2Wins > pass1Wins || (words1.length === 0 && words2.length > 0)) {
+      const anchors1 = assessPackageContent(words1).anchorsFound.length;
+      const anchors2 = assessPackageContent(words2).anchorsFound.length;
+      if (anchors2 >= anchors1 && (pass2Wins > pass1Wins || (words1.length === 0 && words2.length > 0))) {
         finalWords = words2;
       }
+    }
+
+    if (selectedRotation) {
+      const binary = atob(evidenceDataUrl.split(',')[1]);
+      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+      evidenceFile = new File([bytes], 'upright-label.jpg', { type: 'image/jpeg' });
     }
 
     return {
       words: finalWords,
       lines: groupWordsIntoLines(finalWords),
-      imageDataUrl,
-      imageWidth: width,
-      imageHeight: height,
-      perspectiveCorrected,
+      imageDataUrl: evidenceDataUrl,
+      imageWidth: evidenceWidth,
+      imageHeight: evidenceHeight,
+      evidenceFile,
+      perspectiveCorrected: selectedRotation ? false : perspectiveCorrected,
       dualPassDisagreements: disagreements,
       extractedFields: resolvedFields,
     };

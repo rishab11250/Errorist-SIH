@@ -28,7 +28,10 @@ const qualityPresentation: Record<
   },
 };
 
-export function QualityPanel({ quality }: { quality: QualitySummary }) {
+export function QualityPanel({ quality }: { quality: QualitySummary | null }) {
+  if (!quality) {
+    return <section className="rounded-lg border p-5"><h2 className="font-semibold">Image assessment unavailable</h2><p>The synced snapshot does not include a quality assessment. Its captured verdicts are preserved.</p></section>;
+  }
   const item = qualityPresentation[quality.status];
   const Icon = item.icon;
   return (

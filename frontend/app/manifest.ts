@@ -3,9 +3,9 @@ import type { MetadataRoute } from 'next';
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
-    name: 'LMPC Compliance Inspector',
-    short_name: 'LMPC Inspector',
-    description: 'Capture package labels and run evidence-led LMPC compliance checks.',
+    name: 'CLAIR – Commodity Label Audit & Inspection Recognition',
+    short_name: 'CLAIR',
+    description: 'CLAIR – Commodity Label Audit & Inspection Recognition workspace.',
     start_url: '/',
     scope: '/',
     display: 'standalone',

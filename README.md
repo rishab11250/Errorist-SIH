@@ -1,6 +1,6 @@
-# Errorist — SIH26034 LMPC Compliance Checker
+# CLAIR — Commodity Label Audit & Inspection Recognition (SIH26034)
 
-Errorist is a local-first inspection workspace for checking packaged-commodity labels and e-commerce listing screenshots against the Legal Metrology (Packaged Commodities) Rules, 2011. It combines in-browser OCR, deterministic rule evaluation, evidence-linked findings, manual review, searchable inspection records, dashboards, and auditable exports.
+CLAIR (Commodity Label Audit & Inspection Recognition) is a local-first inspection workspace for checking packaged-commodity labels and e-commerce listing screenshots against the Legal Metrology (Packaged Commodities) Rules, 2011. It combines in-browser OCR, deterministic rule evaluation, evidence-linked findings, manual review, searchable inspection records, dashboards, and auditable exports.
 
 ## What the solution provides
 

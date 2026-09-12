@@ -28,14 +28,14 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'LMPC Compliance Checker',
-  description: 'Check packaged-commodity labels against LMPC Rules 2011',
-  applicationName: 'LMPC Inspector',
+  title: 'CLAIR – Commodity Label Audit & Inspection Recognition',
+  description: 'CLAIR – Commodity Label Audit & Inspection Recognition. Check packaged-commodity labels against LMPC Rules 2011.',
+  applicationName: 'CLAIR',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'LMPC Inspector',
+    title: 'CLAIR',
   },
   icons: {
     icon: [

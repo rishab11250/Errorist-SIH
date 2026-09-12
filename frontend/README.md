@@ -1,6 +1,6 @@
-# Errorist frontend
+# CLAIR Frontend
 
-The Next.js workspace provides guided evidence capture, local Tesseract.js OCR, explainable inspection results, review actions, repository filters, dashboard charts with table alternatives, and administrator user management.
+The CLAIR (Commodity Label Audit & Inspection Recognition) Next.js workspace provides guided evidence capture, local Tesseract.js OCR, explainable inspection results, review actions, repository filters, dashboard charts with table alternatives, and administrator user management.
 
 ## Install and run
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { ShieldCheck } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -21,12 +22,12 @@ function LoginContent() {
       {/* Top System Header */}
       <header className="w-full border-b border-[#e5ded4] bg-surface/90 backdrop-blur px-6 py-3 flex items-center justify-between z-10">
         <Link href="/" className="flex items-center gap-2.5 font-heading font-bold text-sm text-ink group">
-          <span className="grid size-8 place-items-center rounded-[7px] bg-charcoal text-white shadow-sm transition-transform group-hover:scale-105">
-            <ShieldCheck aria-hidden="true" className="size-4 text-terracotta" />
+          <span className="grid size-8 place-items-center overflow-hidden rounded-[7px] shadow-sm transition-transform group-hover:scale-105">
+            <Image src="/icons/icon.svg" alt="CLAIR logo" width={32} height={32} className="size-full object-cover" priority />
           </span>
           <span>
-            <span className="block font-heading text-sm font-bold tracking-tight text-ink">LMPC Inspector</span>
-            <span className="block text-[10px] font-mono text-ink-muted -mt-0.5">Evidence Workspace</span>
+            <span className="block font-heading text-sm font-bold tracking-tight text-ink">CLAIR</span>
+            <span className="block text-[10px] font-mono text-ink-muted -mt-0.5">Inspection Workspace</span>
           </span>
         </Link>
         <div className="flex items-center gap-2 text-xs font-medium text-amberAccent font-mono">
@@ -43,15 +44,15 @@ function LoginContent() {
 
           {/* Brand Mark & Title */}
           <div className="flex flex-col items-center text-center mb-7">
-            <div className="w-14 h-14 rounded-[10px] bg-charcoal flex items-center justify-center text-white mb-3.5 shadow-md shadow-charcoal/10 relative">
-              <ShieldCheck className="w-7 h-7 text-amberAccent" />
+            <div className="w-14 h-14 rounded-[12px] overflow-hidden flex items-center justify-center mb-3.5 shadow-md shadow-charcoal/10 relative">
+              <Image src="/icons/icon.svg" alt="CLAIR logo" width={56} height={56} className="size-full object-cover" priority />
               <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-forestConfirm rounded-full border-2 border-white"></span>
             </div>
             <h1 className="text-2xl font-bold font-heading tracking-tight text-charcoal">
-              LMPC Inspector
+              CLAIR
             </h1>
             <p className="text-xs text-charcoal/70 mt-1 font-medium">
-              Evidence-led compliance workspace
+              Inspection & Compliance Workspace
             </p>
           </div>
 
@@ -75,7 +76,7 @@ function LoginContent() {
       </main>
 
       <footer className="w-full text-center py-3 text-[11px] text-charcoal/40 z-10 font-mono">
-        LMPC Inspector v3.4.2 (Legal Metrology Packaged Commodities Rules 2011)
+        CLAIR v3.4.2 (Commodity Label Audit & Inspection Recognition · LMPC Rules 2011)
       </footer>
     </div>
   );

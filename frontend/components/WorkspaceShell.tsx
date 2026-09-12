@@ -1,6 +1,7 @@
 'use client';
 
 import { BarChart3, ClipboardCheck, History, LogOut, Menu, ShieldCheck, Users } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -146,12 +147,12 @@ function WorkspaceFrame({
         <aside className="sticky top-0 hidden h-screen flex-col border-r border-[#EBE5DB] bg-white p-4 md:flex shadow-sm">
           <div className="mb-6 flex items-center justify-between">
             <Link href="/" className="flex min-h-11 items-center gap-3 rounded-md px-1 group">
-              <span className="grid size-9 place-items-center rounded-[8px] bg-charcoal text-white shadow-sm transition-transform group-hover:scale-105">
-                <ShieldCheck aria-hidden="true" className="size-5 text-terracotta" />
+              <span className="grid size-9 place-items-center overflow-hidden rounded-[8px] shadow-sm transition-transform group-hover:scale-105">
+                <Image src="/icons/icon.svg" alt="CLAIR logo" width={36} height={36} className="size-full object-cover" priority />
               </span>
               <span>
-                <span className="block font-heading text-sm font-bold tracking-tight text-ink">LMPC Inspector</span>
-                <span className="block text-[11px] font-mono text-ink-muted">Evidence workspace</span>
+                <span className="block font-heading text-sm font-bold tracking-tight text-ink">CLAIR</span>
+                <span className="block text-[11px] font-mono text-ink-muted">Inspection Workspace</span>
               </span>
             </Link>
             <ThemeToggle />
@@ -168,9 +169,9 @@ function WorkspaceFrame({
         {/* Main Content Area & Mobile Bar */}
         <div className="min-w-0 flex flex-col">
           <div className="sticky top-0 z-40 flex min-h-14 items-center justify-between border-b border-[#EBE5DB] bg-surface/95 px-4 backdrop-blur md:hidden">
-            <Link href="/" className="flex min-h-11 items-center gap-2 font-heading font-bold text-sm text-ink">
-              <ShieldCheck aria-hidden="true" className="size-5 text-terracotta" />
-              LMPC Inspector
+            <Link href="/" className="flex min-h-11 items-center gap-2.5 font-heading font-bold text-sm text-ink">
+              <Image src="/icons/icon.svg" alt="CLAIR logo" width={26} height={26} className="size-6.5 rounded-[6px] object-cover" priority />
+              CLAIR
             </Link>
             <div className="flex items-center gap-2">
               <ThemeToggle />
@@ -183,8 +184,8 @@ function WorkspaceFrame({
                 </DialogTrigger>
                 <DialogContent className="left-auto right-0 top-0 h-dvh max-w-xs translate-x-0 translate-y-0 rounded-none p-5 bg-white border-l border-[#EBE5DB]">
                   <DialogTitle className="mb-6 flex items-center gap-2 font-heading text-base font-bold text-ink">
-                    <ShieldCheck aria-hidden="true" className="size-5 text-terracotta" />
-                    Inspection Workspace
+                    <Image src="/icons/icon.svg" alt="CLAIR logo" width={24} height={24} className="size-6 rounded-[5px] object-cover" />
+                    CLAIR Workspace
                   </DialogTitle>
                   <Navigation user={user} onNavigate={() => setMenuOpen(false)} />
                   <div className="mt-auto pt-8 border-t border-[#EBE5DB]">

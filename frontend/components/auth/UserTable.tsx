@@ -158,9 +158,11 @@ function CreateUserDialog({ onCreated }: { onCreated: (user: ManagedUser) => voi
 function ManageUserDialog({
   user,
   onUpdated,
+  triggerAriaLabel,
 }: {
   user: ManagedUser;
   onUpdated: (user: ManagedUser) => void;
+  triggerAriaLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [role, setRole] = useState(user.role);
@@ -214,7 +216,7 @@ function ManageUserDialog({
         <Button
           variant="outline"
           size="sm"
-          aria-label={`Manage ${user.display_name}`}
+          aria-label={triggerAriaLabel ?? `Manage ${user.display_name}`}
           className="inline-flex items-center gap-1 px-3 py-1.5 h-auto rounded-kinetic-sm bg-white border border-[#EBE5DB] hover:border-kinetic-terracotta hover:text-kinetic-terracotta font-mono text-xs font-medium text-kinetic-charcoal shadow-sm transition"
         >
           Manage
@@ -350,7 +352,63 @@ export function UserTable({ initialUsers }: { initialUsers: ManagedUser[] }) {
         <CreateUserDialog onCreated={upsert} />
       </div>
 
-      <div className="overflow-x-auto rounded-kinetic border border-[#EBE5DB] bg-white shadow-sm">
+      {/* Mobile Cards View */}
+      <div className="space-y-3 md:hidden">
+        {users.map((user) => (
+          <div
+            key={user.id}
+            className="rounded-kinetic border border-[#EBE5DB] bg-white p-4 shadow-sm space-y-3"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <span className="block font-semibold text-kinetic-charcoal text-sm font-sans">{user.display_name}</span>
+                <span className="font-mono text-xs text-kinetic-textMuted">{user.username}</span>
+              </div>
+              <div>
+                {user.role === 'admin' ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-kinetic-charcoal text-white font-mono text-[10px] font-semibold tracking-wider uppercase">
+                    Admin
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#FAF8F3] border border-[#EBE5DB] text-kinetic-charcoal font-mono text-[10px] font-medium tracking-wider uppercase">
+                    Inspector
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-[#F2EDE4] pt-2.5 text-xs font-mono">
+              <div className="flex items-center gap-2">
+                {user.is_active ? (
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-kinetic-forestLight text-kinetic-forest border border-kinetic-forest/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-kinetic-forest" />
+                    Active
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-kinetic-failLight text-kinetic-fail border border-kinetic-fail/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-kinetic-fail" />
+                    Inactive
+                  </span>
+                )}
+              </div>
+              <span className="text-kinetic-textMuted text-[11px]">
+                {user.last_login_at ? `Login: ${new Date(user.last_login_at).toLocaleDateString()}` : 'Never logged in'}
+              </span>
+            </div>
+
+            <div className="pt-1">
+              <ManageUserDialog
+                user={user}
+                onUpdated={upsert}
+                triggerAriaLabel={`Manage ${user.display_name} (mobile)`}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto rounded-kinetic border border-[#EBE5DB] bg-white shadow-sm">
         <table className="w-full min-w-[44rem] border-collapse text-xs font-sans text-left">
           <caption className="sr-only">Local application users</caption>
           <thead className="bg-[#FAF8F3] border-b border-[#EBE5DB] text-[11px] font-mono uppercase tracking-wider text-kinetic-textMuted">

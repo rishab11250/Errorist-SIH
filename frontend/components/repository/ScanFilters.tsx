@@ -83,7 +83,7 @@ export function ScanFilters({ value, onApply, showOwner = true }: ScanFiltersPro
             <span className="w-1.5 h-1.5 rounded-full bg-kinetic-terracotta"></span>
             Advanced filters
           </span>
-          <span className="text-[11px] font-mono text-kinetic-textMuted lowercase font-normal">click to expand / collapse</span>
+          <span className="hidden sm:inline text-[11px] font-mono text-kinetic-textMuted lowercase font-normal">click to expand / collapse</span>
         </summary>
         <div className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3 pt-3 border-t border-[#F2EDE4]">
           <div className="space-y-1">
@@ -193,10 +193,10 @@ export function ScanFilters({ value, onApply, showOwner = true }: ScanFiltersPro
         </div>
       </details>
 
-      <div className="flex flex-wrap items-center gap-2.5 pt-1">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
         <Button
           type="submit"
-          className="px-4 py-2 h-auto rounded-kinetic-sm bg-kinetic-terracotta hover:bg-kinetic-terracottaHover text-white text-xs font-semibold font-mono tracking-wide shadow-sm transition"
+          className="px-4 py-2.5 sm:py-2 h-auto rounded-kinetic-sm bg-kinetic-terracotta hover:bg-kinetic-terracottaHover text-white text-xs font-semibold font-mono tracking-wide shadow-sm transition justify-center"
         >
           Apply filters
         </Button>
@@ -207,7 +207,7 @@ export function ScanFilters({ value, onApply, showOwner = true }: ScanFiltersPro
             setDraft(emptyScanFilters);
             onApply(emptyScanFilters);
           }}
-          className="px-3 py-2 h-auto rounded-kinetic-sm bg-[#FAF8F3] border border-[#EBE5DB] hover:border-kinetic-charcoal text-xs font-mono text-kinetic-charcoal transition"
+          className="px-3 py-2.5 sm:py-2 h-auto rounded-kinetic-sm bg-[#FAF8F3] border border-[#EBE5DB] hover:border-kinetic-charcoal text-xs font-mono text-kinetic-charcoal transition justify-center"
         >
           Reset filters
         </Button>

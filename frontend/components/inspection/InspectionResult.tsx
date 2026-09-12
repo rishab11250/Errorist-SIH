@@ -354,21 +354,21 @@ export function InspectionResult({
           </div>
 
           {/* Quick Summary Counts Chips */}
-          <div className="flex items-center gap-3 md:border-l md:border-white/10 md:pl-6 shrink-0">
-            <div className="text-center px-3 py-2 rounded-lg bg-white/5 border border-white/10 min-w-[60px]">
-              <span className="block text-xl font-bold font-mono text-emerald-400">
+          <div className="flex items-center gap-2 sm:gap-3 md:border-l md:border-white/10 md:pl-6 shrink-0 justify-between md:justify-start w-full md:w-auto mt-2 md:mt-0">
+            <div className="text-center px-2.5 py-2 sm:px-3 sm:py-2 rounded-lg bg-white/5 border border-white/10 flex-1 md:flex-initial min-w-[60px]">
+              <span className="block text-lg sm:text-xl font-bold font-mono text-emerald-400">
                 {verdicts.filter((v) => v.status === 'pass').length}
               </span>
               <span className="text-[10px] font-mono uppercase text-[#FAF8F3]/60">Passing</span>
             </div>
-            <div className="text-center px-3 py-2 rounded-lg bg-white/5 border border-white/10 min-w-[60px]">
-              <span className="block text-xl font-bold font-mono text-rose-400">
+            <div className="text-center px-2.5 py-2 sm:px-3 sm:py-2 rounded-lg bg-white/5 border border-white/10 flex-1 md:flex-initial min-w-[60px]">
+              <span className="block text-lg sm:text-xl font-bold font-mono text-rose-400">
                 {verdicts.filter((v) => v.status === 'fail').length}
               </span>
               <span className="text-[10px] font-mono uppercase text-[#FAF8F3]/60">Breaches</span>
             </div>
-            <div className="text-center px-3 py-2 rounded-lg bg-white/5 border border-white/10 min-w-[60px]">
-              <span className="block text-xl font-bold font-mono text-amber-300">
+            <div className="text-center px-2.5 py-2 sm:px-3 sm:py-2 rounded-lg bg-white/5 border border-white/10 flex-1 md:flex-initial min-w-[60px]">
+              <span className="block text-lg sm:text-xl font-bold font-mono text-amber-300">
                 {verdicts.filter((v) => v.status === 'manual_review' || v.status === 'warn').length}
               </span>
               <span className="text-[10px] font-mono uppercase text-amber-200">Review</span>
@@ -445,11 +445,11 @@ export function InspectionResult({
             </div>
           ) : null}
 
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
             <Button
               asChild
               size="lg"
-              className="gap-2 font-heading font-bold shadow-kinetic-glow bg-terracotta hover:bg-terracotta-hover text-white px-6 py-5 text-sm rounded-xl"
+              className="gap-2 font-heading font-bold shadow-kinetic-glow bg-terracotta hover:bg-terracotta-hover text-white px-6 py-5 text-sm rounded-xl justify-center"
             >
               <Link href="/">
                 <RotateCcw className="size-4 mr-1" /> Retake photo (Guided camera)
@@ -460,7 +460,7 @@ export function InspectionResult({
               variant="outline"
               size="lg"
               onClick={() => setShowUnreliableReview((prev) => !prev)}
-              className="text-ink-muted hover:text-ink border-[#D5CFC4] hover:bg-surface-dim font-heading text-xs rounded-xl"
+              className="text-ink-muted hover:text-ink border-[#D5CFC4] hover:bg-surface-dim font-heading text-xs rounded-xl justify-center"
             >
               {showUnreliableReview ? 'Hide raw results' : 'Review anyway (unreliable)'}
             </Button>
@@ -578,7 +578,7 @@ export function InspectionResult({
                 <span className="text-[10px] font-bold uppercase text-ink-muted tracking-wider block">
                   Bounding Box Legend
                 </span>
-                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                   <div className="flex items-center gap-2">
                     <span className="w-3.5 h-1 bg-forest rounded-full inline-block"></span>
                     <span className="text-ink">Solid: Verified Pass (&gt;90%)</span>

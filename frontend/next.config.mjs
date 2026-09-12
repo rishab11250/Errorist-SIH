@@ -22,6 +22,18 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   outputFileTracingRoot: repositoryRoot,
+  experimental: {
+    allowedDevOrigins: [
+      '*.ngrok-free.app',
+      '*.ngrok-free.dev',
+      '*.ngrok.app',
+      '*.ngrok.dev',
+      '*.ngrok.io',
+      '*.trycloudflare.com',
+      '*.localtunnel.me',
+      '192.168.43.76:3000',
+    ],
+  },
   async rewrites() {
     return [
       {

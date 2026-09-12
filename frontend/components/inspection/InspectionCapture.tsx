@@ -788,9 +788,9 @@ export function InspectionCapture({ onComplete }: Props) {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="px-3.5 py-2 rounded-lg bg-surface-dim border border-[#E2DDD3] text-xs font-mono">
-              <span className="text-ink-muted">Jurisdiction:</span> <span className="font-bold text-ink">Rules 2011 (India LMPC)</span>
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <div className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg bg-surface-dim border border-[#E2DDD3] text-[11px] sm:text-xs font-mono">
+              <span className="text-ink-muted">Jurisdiction:</span> <span className="font-bold text-ink">Rules 2011 (LMPC)</span>
             </div>
             <button
               type="button"
@@ -802,7 +802,7 @@ export function InspectionCapture({ onComplete }: Props) {
                 setError(null);
                 setPreScanQuality(null);
               }}
-              className="px-3.5 py-2 rounded-lg border border-[#D5CFC4] hover:bg-[#EFEAE0] text-xs font-semibold text-ink flex items-center gap-1.5 transition font-heading"
+              className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg border border-[#D5CFC4] hover:bg-[#EFEAE0] text-xs font-semibold text-ink flex items-center gap-1.5 transition font-heading"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Reset Form
@@ -819,7 +819,7 @@ export function InspectionCapture({ onComplete }: Props) {
               <label className="block text-xs font-mono uppercase font-bold text-ink-muted mb-2 tracking-wider">
                 1. Inspection Mode
               </label>
-              <div className="grid grid-cols-2 gap-2 p-1 bg-surface-dim rounded-lg border border-[#E0D9CD]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-1 bg-surface-dim rounded-lg border border-[#E0D9CD]">
                 <button
                   type="button"
                   onClick={() => {
@@ -827,14 +827,16 @@ export function InspectionCapture({ onComplete }: Props) {
                     setError(null);
                   }}
                   className={cn(
-                    'flex items-center justify-center gap-2 py-2 px-3 rounded-md font-heading text-xs font-semibold transition',
+                    'flex items-center justify-between sm:justify-center gap-2 py-2.5 sm:py-2 px-3 rounded-md font-heading text-xs font-semibold transition',
                     scanWorkflow === 'single'
                       ? 'bg-white text-ink shadow-kinetic-sm border border-[#DDD6C8]'
                       : 'text-ink-muted hover:text-ink'
                   )}
                 >
-                  <span className={cn('w-2 h-2 rounded-full', scanWorkflow === 'single' ? 'bg-terracotta' : 'bg-transparent border border-ink-muted')}></span>
-                  <span>Standard Scan</span>
+                  <span className="flex items-center gap-2">
+                    <span className={cn('w-2 h-2 rounded-full shrink-0', scanWorkflow === 'single' ? 'bg-terracotta' : 'bg-transparent border border-ink-muted')}></span>
+                    <span>Standard Scan</span>
+                  </span>
                   <span className="text-[10px] font-mono text-ink-muted bg-[#F2EDE4] px-1.5 py-0.5 rounded">Single/Dual</span>
                 </button>
                 <button
@@ -844,14 +846,16 @@ export function InspectionCapture({ onComplete }: Props) {
                     setError(null);
                   }}
                   className={cn(
-                    'flex items-center justify-center gap-2 py-2 px-3 rounded-md font-heading text-xs font-semibold transition',
+                    'flex items-center justify-between sm:justify-center gap-2 py-2.5 sm:py-2 px-3 rounded-md font-heading text-xs font-semibold transition',
                     scanWorkflow === 'multi'
                       ? 'bg-white text-ink shadow-kinetic-sm border border-[#DDD6C8]'
                       : 'text-ink-muted hover:text-ink'
                   )}
                 >
-                  <span className={cn('w-2 h-2 rounded-full', scanWorkflow === 'multi' ? 'bg-terracotta' : 'bg-transparent border border-ink-muted')}></span>
-                  <span>Multi-Section</span>
+                  <span className="flex items-center gap-2">
+                    <span className={cn('w-2 h-2 rounded-full shrink-0', scanWorkflow === 'multi' ? 'bg-terracotta' : 'bg-transparent border border-ink-muted')}></span>
+                    <span>Multi-Section</span>
+                  </span>
                   <span className="text-[10px] font-mono text-terracotta font-bold bg-terracotta-light px-1.5 py-0.5 rounded">Bulk/Tall</span>
                 </button>
               </div>
@@ -859,13 +863,13 @@ export function InspectionCapture({ onComplete }: Props) {
 
             {/* 2. OCR Engine Language Model */}
             <div className="bg-surface-card p-4 rounded-xl border border-[#E8E2D6] shadow-kinetic-sm">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
                 <label className="block text-xs font-mono uppercase font-bold text-ink-muted tracking-wider">
                   2. OCR Engine Language Model
                 </label>
                 <span
                   className={cn(
-                    'text-[10px] font-mono font-bold px-2 py-0.5 rounded border',
+                    'text-[10px] font-mono font-bold px-2 py-0.5 rounded border self-start sm:self-auto',
                     ocrLanguage === 'eng'
                       ? 'bg-forest-light text-forest border-forest/20'
                       : 'bg-terracotta-light text-terracotta border-terracotta/20'
@@ -874,7 +878,7 @@ export function InspectionCapture({ onComplete }: Props) {
                   {ocrLanguage === 'eng' ? '⚡ 2.5x Faster' : '🇮🇳 Bilingual (EN + HI)'}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2 p-1 bg-surface-dim rounded-lg border border-[#E0D9CD]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-1 bg-surface-dim rounded-lg border border-[#E0D9CD]">
                 <button
                   type="button"
                   onClick={() => setOcrLanguage('eng')}
@@ -1126,27 +1130,28 @@ export function InspectionCapture({ onComplete }: Props) {
         ) : (
           <div className="bg-surface-card rounded-2xl border border-[#E0D9CD] shadow-kinetic-md overflow-hidden">
             {/* Viewfinder Header Bar */}
-            <div className="bg-[#1C1B19] px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 text-white">
-              <div className="flex items-center space-x-3">
-                <span className="flex h-3 w-3 relative">
+            <div className="bg-[#1C1B19] px-3.5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2.5 text-white">
+              <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
+                <span className="flex h-2.5 w-2.5 sm:h-3 sm:w-3 relative shrink-0">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-terracotta opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-terracotta"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-terracotta"></span>
                 </span>
-                <span className="font-heading font-semibold text-sm tracking-wide">
-                  Live Capture Viewfinder &amp; Evidence Matrix
+                <span className="font-heading font-semibold text-xs sm:text-sm tracking-wide truncate">
+                  Live Capture Viewfinder &amp; Matrix
                 </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#2C2925] text-[#D8D4CC] border border-[#3E3A34]">
+                <span className="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-mono bg-[#2C2925] text-[#D8D4CC] border border-[#3E3A34]">
                   SENSOR: 60FPS ACTIVE
                 </span>
               </div>
 
-              <div className="flex items-center space-x-3 text-xs font-mono">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest text-white text-xs font-bold border border-forest/40 shadow-sm">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>STATUS: READY FOR CAPTURE</span>
+              <div className="flex items-center space-x-2 text-xs font-mono">
+                <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-forest text-white text-[11px] sm:text-xs font-bold border border-forest/40 shadow-sm">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden xs:inline">STATUS:</span>
+                  <span>READY</span>
                 </div>
                 {mode === 'retail_image' && (
-                  <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#2C2925] text-[#B8860B] border border-[#B8860B]/30 text-xs">
+                  <div className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#2C2925] text-[#B8860B] border border-[#B8860B]/30 text-xs">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#B8860B]" />
                     <span>Glare: 8% (Good)</span>
                   </div>
@@ -1154,20 +1159,56 @@ export function InspectionCapture({ onComplete }: Props) {
               </div>
             </div>
 
+            {/* Viewfinder Mode Toggle (Live Camera vs Gallery Upload) */}
+            {mode === 'retail_image' && !file && (
+              <div className="flex items-center gap-1.5 p-1 bg-surface-dim rounded-xl border border-[#E0D9CD] mx-3 sm:mx-6 mt-3">
+                <button
+                  type="button"
+                  onClick={() => setCaptureMethod('camera')}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-heading font-semibold transition',
+                    captureMethod === 'camera'
+                      ? 'bg-white text-ink shadow-sm border border-[#DDD6C8]'
+                      : 'text-ink-muted hover:text-ink'
+                  )}
+                >
+                  <Camera className="size-3.5 text-terracotta" />
+                  <span>Live Guided Camera</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCaptureMethod('upload')}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-heading font-semibold transition',
+                    captureMethod === 'upload'
+                      ? 'bg-white text-ink shadow-sm border border-[#DDD6C8]'
+                      : 'text-ink-muted hover:text-ink'
+                  )}
+                >
+                  <ImageUp className="size-3.5 text-terracotta" />
+                  <span>Upload from Gallery / Files</span>
+                </button>
+              </div>
+            )}
+
             {/* Viewfinder Main Body */}
-            <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
               {/* Left Column (8 cols): Primary Canvas / Viewfinder */}
               <div className="lg:col-span-8 flex flex-col space-y-4">
                 {mode === 'retail_image' && !file && captureMethod === 'camera' ? (
                   <div className="space-y-3">
-                    <CameraCaptureGuide onCapture={handleFile} disabled={busy} />
+                    <CameraCaptureGuide
+                      onCapture={handleFile}
+                      disabled={busy}
+                      onSwitchToUpload={() => setCaptureMethod('upload')}
+                    />
                     <div className="text-center">
                       <button
                         type="button"
                         onClick={() => setCaptureMethod('upload')}
-                        className="text-xs text-ink-muted underline hover:text-ink font-mono"
+                        className="text-xs text-ink-muted underline hover:text-ink font-mono inline-flex items-center gap-1.5"
                       >
-                        Having trouble? Switch to file upload
+                        <ImageUp className="size-3 text-terracotta" /> Prefer uploading an existing photo from gallery? Switch to file upload
                       </button>
                     </div>
                   </div>
@@ -1178,7 +1219,7 @@ export function InspectionCapture({ onComplete }: Props) {
                       onDragLeave={onDragLeave}
                       onDrop={onDrop}
                       className={cn(
-                        'relative w-full aspect-[16/10] bg-[#141311] rounded-xl overflow-hidden border-2 transition-all flex flex-col items-center justify-center text-center shadow-inner',
+                        'relative w-full min-h-[290px] sm:min-h-[360px] sm:aspect-[16/10] bg-[#141311] rounded-xl overflow-hidden border-2 transition-all flex flex-col items-center justify-center text-center shadow-inner p-3',
                         isDragging ? 'border-terracotta ring-4 ring-terracotta/20 scale-[1.01]' : 'border-[#2B2925]'
                       )}
                     >
@@ -1186,7 +1227,7 @@ export function InspectionCapture({ onComplete }: Props) {
                       <div className="absolute inset-0 viewfinder-grid opacity-30 pointer-events-none" />
 
                       {preview && secondaryPreview ? (
-                        <div className="grid grid-cols-2 gap-4 w-full h-full p-4 z-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full h-full p-2 sm:p-4 z-10">
                           <div className="flex flex-col items-center justify-center bg-black/50 rounded-lg p-2 border border-white/10">
                             <span className="text-[10px] font-mono text-terracotta uppercase font-bold mb-1">
                               Panel 1 · Primary
@@ -1197,7 +1238,7 @@ export function InspectionCapture({ onComplete }: Props) {
                               width={dimensions?.width ?? 1600}
                               height={dimensions?.height ?? 900}
                               unoptimized
-                              className="max-h-56 rounded object-contain"
+                              className="max-h-48 sm:max-h-56 rounded object-contain"
                             />
                             <p className="truncate text-[10px] font-mono text-white/70 mt-1 max-w-full">{file?.name}</p>
                           </div>
@@ -1223,7 +1264,7 @@ export function InspectionCapture({ onComplete }: Props) {
                               width={secondaryDimensions?.width ?? 1600}
                               height={secondaryDimensions?.height ?? 900}
                               unoptimized
-                              className="max-h-56 rounded object-contain"
+                              className="max-h-48 sm:max-h-56 rounded object-contain"
                             />
                             <p className="truncate text-[10px] font-mono text-white/70 mt-1 max-w-full">
                               {secondaryFile?.name}
@@ -1231,14 +1272,14 @@ export function InspectionCapture({ onComplete }: Props) {
                           </div>
                         </div>
                       ) : preview ? (
-                        <div className="relative w-full h-full flex flex-col items-center justify-center p-3 z-10">
+                        <div className="relative w-full h-full flex flex-col items-center justify-center p-2 sm:p-3 z-10">
                           <NextImage
                             src={preview}
                             alt="Selected evidence preview"
                             width={dimensions?.width ?? 1600}
                             height={dimensions?.height ?? 900}
                             unoptimized
-                            className="max-h-[380px] rounded-lg object-contain shadow-md"
+                            className="max-h-[340px] sm:max-h-[380px] rounded-lg object-contain shadow-md"
                             onLoad={(event) => {
                               setDimensions({
                                 width: event.currentTarget.naturalWidth,
@@ -1251,48 +1292,48 @@ export function InspectionCapture({ onComplete }: Props) {
                       ) : (
                         <>
                           {/* Framing Guide Overlay (Target Box) */}
-                          <div className="absolute inset-6 md:inset-10 border-2 border-dashed border-terracotta/60 rounded-lg pointer-events-none flex flex-col justify-between p-3">
-                            <div className="flex justify-between items-start text-terracotta text-[10px] font-mono uppercase tracking-widest font-bold">
+                          <div className="absolute inset-3 sm:inset-6 md:inset-10 border-2 border-dashed border-terracotta/60 rounded-lg pointer-events-none flex flex-col justify-between p-2.5 sm:p-3">
+                            <div className="hidden sm:flex justify-between items-start text-terracotta text-[10px] font-mono uppercase tracking-widest font-bold">
                               <span className="bg-black/60 px-1.5 py-0.5 rounded">⌜ ALIGN LABEL RECTANGLE</span>
                               <span className="bg-black/60 px-1.5 py-0.5 rounded">FOCAL DEPTH: 18CM ⌝</span>
                             </div>
 
-                            <div className="self-center flex flex-col items-center">
-                              <div className="w-12 h-12 rounded-full border border-terracotta/40 flex items-center justify-center">
+                            <div className="self-center flex flex-col items-center my-auto pb-12 sm:pb-0">
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-terracotta/40 flex items-center justify-center">
                                 <div className="w-2.5 h-2.5 rounded-full bg-terracotta animate-pulse" />
                               </div>
-                              <p className="mt-3 text-sm font-heading font-semibold text-white">
+                              <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm font-heading font-semibold text-white px-2">
                                 {mode === 'retail_image'
                                   ? 'Take or upload a clear package photo'
                                   : 'Upload listing screenshot evidence'}
                               </p>
-                              <p className="text-xs font-mono text-white/60 mt-0.5">JPEG, PNG, or WebP · up to 10 MB</p>
+                              <p className="text-[11px] sm:text-xs font-mono text-white/60 mt-0.5">JPEG, PNG, or WebP · up to 10 MB</p>
                             </div>
 
-                            <div className="flex justify-between items-end text-terracotta text-[10px] font-mono uppercase tracking-widest font-bold">
+                            <div className="hidden sm:flex justify-between items-end text-terracotta text-[10px] font-mono uppercase tracking-widest font-bold">
                               <span className="bg-black/60 px-1.5 py-0.5 rounded">⌞ MRP &amp; NET WEIGHT ZONE</span>
                               <span className="bg-black/60 px-1.5 py-0.5 rounded">EXPIRY STAMP DETECTED ⌟</span>
                             </div>
                           </div>
 
                           {/* Viewfinder Controls Floating at Bottom */}
-                          <div className="absolute bottom-4 inset-x-0 flex items-center justify-center gap-3 z-20">
+                          <div className="absolute bottom-3 sm:bottom-4 inset-x-2 sm:inset-x-0 flex flex-wrap items-center justify-center gap-2 sm:gap-3 z-20">
                             {mode === 'retail_image' && (
                               <button
                                 type="button"
                                 onClick={() => setCaptureMethod('camera')}
-                                className="px-4 py-2 rounded-lg bg-black/75 hover:bg-black text-white text-xs font-mono font-medium border border-white/20 backdrop-blur-sm flex items-center gap-2 transition"
+                                className="px-3.5 sm:px-4 py-2 rounded-lg bg-black/75 hover:bg-black text-white text-xs font-mono font-medium border border-white/20 backdrop-blur-sm flex items-center gap-1.5 sm:gap-2 transition shrink-0"
                               >
                                 <Camera className="w-3.5 h-3.5 text-terracotta" />
-                                Guided Camera
+                                <span>Live Guided Camera</span>
                               </button>
                             )}
                             <label
                               htmlFor={fileInputId}
-                              className="px-5 py-2.5 rounded-lg bg-terracotta hover:bg-terracotta-hover text-white text-xs font-heading font-bold shadow-kinetic-glow flex items-center gap-2 cursor-pointer transition"
+                              className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-terracotta hover:bg-terracotta-hover text-white text-xs font-heading font-bold shadow-kinetic-glow flex items-center gap-2 cursor-pointer transition shrink-0"
                             >
                               <ImageUp className="w-3.5 h-3.5" />
-                              <span>Choose evidence image</span>
+                              <span>Choose from Gallery / Files</span>
                             </label>
                           </div>
                         </>
@@ -1328,7 +1369,7 @@ export function InspectionCapture({ onComplete }: Props) {
                           </div>
                           {file && (
                             <span className="text-xs font-mono text-ink-muted truncate max-w-xs">
-                              {file.name} {dimensions ? `(${dimensions.width}×${dimensions.height}px)` : ''}
+                              {file.name} ({(file.size / 1024).toFixed(1)} KB)
                             </span>
                           )}
                         </div>
@@ -1452,7 +1493,6 @@ export function InspectionCapture({ onComplete }: Props) {
               aria-label="Evidence image"
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              capture={mode === 'retail_image' ? 'environment' : undefined}
               onChange={(event) => {
                 const selected = event.target.files?.[0];
                 if (selected) handleFile(selected);

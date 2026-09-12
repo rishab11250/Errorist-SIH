@@ -39,6 +39,7 @@ import {
 } from '@/lib/rules/multi-section';
 import { savePendingScan, updateSyncStatus, type PendingScanRecord } from '@/lib/storage';
 import type { OCRWord, ScanContext, ScanRequest, ScanResponse, Verdict } from '@/lib/types';
+import { generateUUID } from '@/lib/uuid';
 import { CameraCaptureGuide } from './CameraCaptureGuide';
 import { LabelCrop } from './LabelCrop';
 
@@ -645,10 +646,7 @@ export function InspectionCapture({ onComplete }: Props) {
         const { compositeFile, compositeOCR } = await createMultiSectionComposite(sectionCaptures);
         if (operation !== operationRef.current) return;
 
-        const localId =
-          typeof crypto !== 'undefined' && crypto.randomUUID
-            ? crypto.randomUUID()
-            : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+        const localId = generateUUID();
 
         const offlineNumericId =
           Math.abs(
@@ -800,10 +798,7 @@ export function InspectionCapture({ onComplete }: Props) {
       );
       const localOverall = overallStatus(localVerdicts);
 
-      const localId =
-        typeof crypto !== 'undefined' && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+      const localId = generateUUID();
 
       const pendingRecord: PendingScanRecord = {
         local_id: localId,

@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, Camera, CheckCircle2, ImageUp, Layers, Plus, RotateCcw, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Camera, CheckCircle2, ImageUp, Layers, Plus, RotateCcw, RotateCw, Trash2, X } from 'lucide-react';
 import NextImage from 'next/image';
 import { useCallback, useId, useRef, useState } from 'react';
 
@@ -381,6 +381,43 @@ export function InspectionCapture({ onComplete }: Props) {
     reader.readAsDataURL(selected);
   }, []);
 
+  const handleRotateImage = useCallback(async () => {
+    if (!file || !preview) return;
+    try {
+      const img = new Image();
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = preview;
+      });
+      const rotCanvas = document.createElement('canvas');
+      rotCanvas.width = img.naturalHeight || img.height;
+      rotCanvas.height = img.naturalWidth || img.width;
+      const ctx = rotCanvas.getContext('2d');
+      if (!ctx) return;
+      ctx.translate(rotCanvas.width / 2, rotCanvas.height / 2);
+      ctx.rotate((90 * Math.PI) / 180);
+      ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+
+      const rotatedBlob = await new Promise<Blob | null>((resolve) =>
+        rotCanvas.toBlob(resolve, file.type || 'image/jpeg', 0.92)
+      );
+      if (rotatedBlob) {
+        const rotatedFile = new File([rotatedBlob], file.name, {
+          type: file.type || 'image/jpeg',
+          lastModified: Date.now(),
+        });
+        setFile(rotatedFile);
+        const newPreview = rotCanvas.toDataURL('image/jpeg', 0.92);
+        setPreview(newPreview);
+        setDimensions({ width: rotCanvas.width, height: rotCanvas.height });
+        console.log(`[InspectionCapture] Rotated image 90° clockwise: ${rotCanvas.width}x${rotCanvas.height}px`);
+      }
+    } catch (err) {
+      console.error('[InspectionCapture] Failed to rotate image:', err);
+    }
+  }, [file, preview]);
+
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setIsDragging(true);
@@ -631,10 +668,9 @@ export function InspectionCapture({ onComplete }: Props) {
         throw new Error('No readable text was found. Retake or upload a clearer label image.');
       }
       const packageCheck = assessPackageContent(ocr.words);
+      console.log(`[InspectionCapture] Package anchor check: isPackage=${packageCheck.isPackage}, score=${packageCheck.score}, anchors: [${packageCheck.anchorsFound.join(', ')}]`);
       if (!packageCheck.isPackage) {
-        throw new Error(
-          'Non-packaging image detected. No statutory product declarations (MRP, Net Quantity, Batch, or Manufacturer details) were found. Please scan a physical product label or e-commerce listing.'
-        );
+        console.warn('[InspectionCapture] Low statutory anchor count detected. Proceeding to inspection analysis with unblocked review.');
       }
       setStage('analyzing');
 
@@ -1351,6 +1387,13 @@ export function InspectionCapture({ onComplete }: Props) {
                             >
                               Replace primary image
                             </label>
+                            <button
+                              type="button"
+                              onClick={handleRotateImage}
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-[#D5CFC4] bg-white px-3.5 py-2 text-xs font-heading font-semibold text-ink hover:bg-surface-dim transition shadow-kinetic-sm"
+                            >
+                              <RotateCw className="size-3.5 text-terracotta" /> Rotate 90°
+                            </button>
                             {mode === 'retail_image' && (
                               <button
                                 type="button"

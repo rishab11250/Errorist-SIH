@@ -3,13 +3,15 @@ import { avgConfidence, compileRegex, mergeBboxes } from './base';
 import { groupWordsIntoSpatialRows } from '../../spatial-layout';
 
 export const PRICE_PATTERN =
-  /(?:(?:M\.?\s*R\.?\s*P\.?|Max(?:imum)?\.?\s*Retail\s*Price)\s*[:\-]?[₹$X\.\s]*(?:(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)?|(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)([0-9,oOlI]+(?:\.[0-9,oOlI]{1,2})?)/i;
+  /(?:(?:M\.?\s*R\.?\s*P\.?|Max(?:imum)?\.?\s*Retail\s*Price)\s*[:\-]?[₹$X\.\s]*(?:(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)?|(?:^|[\s:])(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)([0-9,oOlI]+(?:\.[0-9,oOlI]{1,2})?)/i;
 
 export const MRP_PREFIX_BRANCH =
   /^(?:M\.?\s*R\.?\s*P\.?|Max(?:imum)?\.?\s*Retail\s*Price)\s*[:\-]?/i;
 
 export const STANDALONE_PRICE =
-  /\b(?:₹|Rs\.?|INR)?\s*([0-9]{1,5}(?:\.[0-9]{1,2})?)\b/i;
+  /(?:^|[\s:])(?:₹|Rs\.?|INR)?\s*([0-9]{1,5}(?:\.[0-9]{1,2})?)(?!\d)/i;
+
+export const BARCODE_PATTERN = /\b\d{8,}\b/;
 
 export function extractMrp(
   ocrWords: OCRWord[],
@@ -44,6 +46,9 @@ export function extractMrp(
     ) {
       continue;
     }
+    if (BARCODE_PATTERN.test(sampleText)) {
+      continue;
+    }
 
     let m = PRICE_PATTERN.exec(sampleText);
     if (!m && MRP_PREFIX_BRANCH.test(sampleText) && !/\d/.test(sampleText)) {
@@ -62,9 +67,13 @@ export function extractMrp(
         .replace(/l/g, '1')
         .replace(/I/g, '1');
 
+      if (/\d{8,}/.test(cleaned)) {
+        continue;
+      }
+
       if (/\d/.test(cleaned)) {
         const numVal = parseFloat(cleaned.replace(/,/g, ''));
-        if (!isNaN(numVal) && numVal > 0 && !seenNumeric.has(numVal)) {
+        if (!isNaN(numVal) && numVal > 0 && numVal < 100000 && !seenNumeric.has(numVal)) {
           seenNumeric.add(numVal);
           candidates.push({
             priceWord: ocrWords[i],

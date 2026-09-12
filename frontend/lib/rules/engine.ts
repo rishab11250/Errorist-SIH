@@ -144,7 +144,14 @@ export function checkSubfieldsPresent(
   }
 
   if (check.rule_id === 'r6_1_c_net_quantity') {
-    const foundUnits = (text.match(/[a-zA-Z]+/g) || []).map((m) => m.toLowerCase());
+    // Rule 13 guard: Require number preceding unit to avoid false positives on 'cardamom', 'segment', 'Parle-G'
+    const numberPrefixedUnits = Array.from(
+      text.matchAll(/\b\d+(?:\.\d+)?\s*([a-zA-Z]+)\b/g)
+    ).map((m) => m[1].toLowerCase());
+    const foundUnits =
+      numberPrefixedUnits.length > 0
+        ? numberPrefixedUnits
+        : (text.match(/[a-zA-Z]+/g) || []).map((m) => m.toLowerCase());
     const hasUnit = Boolean(
       check.requires_unit_in &&
         check.requires_unit_in.some((u) => foundUnits.includes(u.toLowerCase()))

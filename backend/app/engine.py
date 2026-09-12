@@ -85,7 +85,12 @@ def _subfield_present(check: CheckConfig, extracted: ExtractedField | None) -> d
             ),
         }
     if check.rule_id == "r6_1_c_net_quantity":
-        found_units = [m.lower() for m in re.findall(r"[a-zA-Z]+", text)]
+        # Rule 13 guard: Require number preceding unit to avoid false positives on 'cardamom', 'segment', 'Parle-G'
+        matched_units = [
+            m.group(1).lower()
+            for m in re.finditer(r"\b\d+(?:\.\d+)?\s*([a-zA-Z]+)\b", text)
+        ]
+        found_units = matched_units if matched_units else [m.lower() for m in re.findall(r"[a-zA-Z]+", text)]
         return {
             "net_quantity_value": bool(re.search(r"\d", text)),
             "net_quantity_unit": bool(

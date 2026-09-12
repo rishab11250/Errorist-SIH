@@ -11,7 +11,7 @@ from typing import Any
 
 import cv2
 import numpy as np
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from app.domain import DecodedImage
 
@@ -143,6 +143,17 @@ def decode_image(image_b64: str, *, max_bytes: int, max_pixels: int) -> DecodedI
                 probe.verify()
             with Image.open(io.BytesIO(raw)) as metadata_probe:
                 metadata = _read_probe_metadata(metadata_probe, actual_type)
+                try:
+                    transposed = ImageOps.exif_transpose(metadata_probe)
+                    if transposed is not None:
+                        metadata_probe = transposed
+                except Exception:
+                    pass
+                if metadata_probe.mode != "RGB":
+                    metadata_probe = metadata_probe.convert("RGB")
+                width, height = metadata_probe.size
+                rgb_array = np.array(metadata_probe)
+                image = cv2.cvtColor(rgb_array, cv2.COLOR_RGB2BGR)
     except ImageDecodeError:
         raise
     except (
@@ -154,12 +165,8 @@ def decode_image(image_b64: str, *, max_bytes: int, max_pixels: int) -> DecodedI
     except (OSError, SyntaxError, ValueError) as exc:
         raise ImageDecodeError("invalid_image") from exc
 
-    encoded = np.frombuffer(raw, dtype=np.uint8)
-    image = cv2.imdecode(encoded, cv2.IMREAD_COLOR)
     if image is None:
         raise ImageDecodeError("image_decode_failed")
-    if image.shape[:2] != (height, width):
-        raise ImageDecodeError("invalid_image")
     return DecodedImage(
         image=image,
         width=width,

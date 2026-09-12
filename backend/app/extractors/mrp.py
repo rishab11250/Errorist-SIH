@@ -9,7 +9,7 @@ from app.extractors.base import avg_confidence, merge_bboxes
 
 PRICE_PATTERN = re.compile(
     r"(?:(?:M\.?\s*R\.?\s*P\.?|Max(?:imum)?\.?\s*Retail\s*Price)\s*[:\-]?[₹$X\.\s]*"
-    r"(?:(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)?|(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)"
+    r"(?:(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)?|(?:^|[\s:])(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)"
     r"([0-9,oOlI]+(?:\.[0-9,oOlI]{1,2})?)",
     re.I,
 )
@@ -17,6 +17,7 @@ MRP_PREFIX_BRANCH = re.compile(
     r"^(?:M\.?\s*R\.?\s*P\.?|Max(?:imum)?\.?\s*Retail\s*Price)\s*[:\-]?",
     re.I,
 )
+BARCODE_PATTERN = re.compile(r"\b\d{8,}\b")
 
 
 def extract_mrp(
@@ -39,6 +40,9 @@ def extract_mrp(
             re.I,
         ):
             continue
+        # Barcode filter: Ignore tokens with 8+ consecutive digits
+        if BARCODE_PATTERN.search(sample_text):
+            continue
 
         m = PRICE_PATTERN.match(sample_text)
         if not m and MRP_PREFIX_BRANCH.match(sample_text) and not re.search(r"\d", sample_text):
@@ -49,12 +53,15 @@ def extract_mrp(
             cleaned = (
                 raw_val.replace("o", "0").replace("O", "0").replace("l", "1").replace("I", "1")
             )
+            # Filter out barcode/long digit noise
+            if re.search(r"\d{8,}", cleaned):
+                continue
             if re.search(r"\d", cleaned):
                 try:
                     num_val = float(cleaned.replace(",", ""))
                 except ValueError:
                     num_val = None
-                if num_val is not None and num_val > 0 and num_val not in seen_numeric:
+                if num_val is not None and 0 < num_val < 100_000 and num_val not in seen_numeric:
                     seen_numeric.add(num_val)
                     candidates.append({
                         "price_word": ocr_words[i],

@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart3, ClipboardCheck, History, LogOut, Menu, ShieldCheck, Users } from 'lucide-react';
+import { BarChart3, ClipboardCheck, History, Info, LogOut, Menu, ShieldCheck, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -17,6 +17,7 @@ const navigation = [
   { href: '/', label: 'New inspection', icon: ClipboardCheck },
   { href: '/history', label: 'Repository', icon: History },
   { href: '/dashboard', label: 'Dashboard', icon: BarChart3 },
+  { href: '/about', label: 'About CLAIR', icon: Info },
 ] as const;
 
 function Navigation({ user, onNavigate }: { user: AuthUser; onNavigate?: () => void }) {

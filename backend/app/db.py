@@ -60,6 +60,8 @@ class User(Base):
     )
     scans: Mapped[list[Scan]] = relationship(back_populates="owner")
     review_actions: Mapped[list[ReviewAction]] = relationship(back_populates="actor")
+    inspections: Mapped[list[Inspection]] = relationship(back_populates="owner")
+    product_audit_logs: Mapped[list[ProductAuditLog]] = relationship(back_populates="actor")
 
 
 class SessionRow(Base):
@@ -79,6 +81,86 @@ class SessionRow(Base):
     user: Mapped[User] = relationship(back_populates="sessions")
 
 
+class Product(Base):
+    __tablename__ = "products"
+    __table_args__ = (
+        Index("ix_products_fingerprint_exact", "fingerprint_exact", unique=True),
+        Index("ix_products_search_key", "search_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    fingerprint_exact: Mapped[str] = mapped_column(String(64))
+    search_key: Mapped[str] = mapped_column(Text)
+    manufacturer_name: Mapped[str | None] = mapped_column(Text, nullable=True)
+    common_name: Mapped[str | None] = mapped_column(Text, nullable=True)
+    net_quantity_value: Mapped[float | None] = mapped_column(Float, nullable=True)
+    net_quantity_unit: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    category: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    first_scan_id: Mapped[int | None] = mapped_column(ForeignKey("scans.id"), nullable=True)
+    latest_scan_id: Mapped[int | None] = mapped_column(ForeignKey("scans.id"), nullable=True)
+    scan_count: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
+
+    scans: Mapped[list[Scan]] = relationship(
+        "Scan",
+        back_populates="product",
+        foreign_keys="[Scan.product_id]",
+    )
+
+
+class Inspection(Base):
+    __tablename__ = "inspections"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('open', 'completed', 'cancelled')",
+            name="ck_inspections_status",
+        ),
+        Index("ix_inspections_owner_created_at", "owner_id", "created_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    company_name: Mapped[str | None] = mapped_column(Text, nullable=True)
+    location: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="open")
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+    )
+
+    owner: Mapped[User] = relationship(back_populates="inspections")
+    scans: Mapped[list[Scan]] = relationship(back_populates="inspection")
+
+
+class ProductAuditLog(Base):
+    __tablename__ = "product_audit_logs"
+    __table_args__ = (
+        Index("ix_product_audit_logs_scan_created", "scan_id", "created_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    actor_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    scan_id: Mapped[int] = mapped_column(ForeignKey("scans.id"))
+    old_product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id"), nullable=True)
+    new_product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id"), nullable=True)
+    action: Mapped[str] = mapped_column(String(50))
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+
+    actor: Mapped[User] = relationship(back_populates="product_audit_logs")
+    scan: Mapped[Scan] = relationship(back_populates="product_audit_logs")
+
+
 class Scan(Base):
     __tablename__ = "scans"
     __table_args__ = (
@@ -89,6 +171,9 @@ class Scan(Base):
             "client_local_id",
             unique=True,
         ),
+        Index("ix_scans_product_id", "product_id"),
+        Index("ix_scans_inspection_id", "inspection_id"),
+        Index("ix_scans_product_inspection_created", "product_id", "inspection_id", "created_at"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -111,11 +196,21 @@ class Scan(Base):
     processing_error_code: Mapped[str | None] = mapped_column(String, nullable=True)
     owner_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     client_local_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id"), nullable=True)
+    inspection_id: Mapped[int | None] = mapped_column(ForeignKey("inspections.id"), nullable=True)
+    product_match_status: Mapped[str] = mapped_column(String(20), default="unmatched")
     owner: Mapped[User | None] = relationship(back_populates="scans")
+    product: Mapped[Product | None] = relationship(
+        "Product",
+        foreign_keys=[product_id],
+        back_populates="scans",
+    )
+    inspection: Mapped[Inspection | None] = relationship(back_populates="scans")
     verdicts: Mapped[list[VerdictRow]] = relationship(
         back_populates="scan", cascade="all, delete-orphan"
     )
     review_actions: Mapped[list[ReviewAction]] = relationship(back_populates="scan")
+    product_audit_logs: Mapped[list[ProductAuditLog]] = relationship(back_populates="scan")
 
 
 class VerdictRow(Base):

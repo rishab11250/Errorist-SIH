@@ -16,6 +16,7 @@ import { extractMfgDate } from './mfg-date';
 import { extractMrp } from './mrp';
 import { extractNetQuantity } from './net-quantity';
 import { extractUnitPrice } from './unit-price';
+import { sortWordsSpatially } from '../../spatial-layout';
 
 export type Extractor = (
   words: OCRWord[],
@@ -145,9 +146,19 @@ export function extractAll(
       ? words.filter(insideViewport)
       : words;
 
+  // Reorder words into visual row-by-row reading order (top-to-bottom, left-to-right)
+  const orderedWords = sortWordsSpatially(visibleWords);
+  console.log(`[extractAll] Running ${Object.keys(EXTRACTORS).length} extractors on ${orderedWords.length} spatially ordered tokens...`);
+
   const result: Record<string, ExtractedField | null> = {};
   for (const [fieldName, extractor] of Object.entries(EXTRACTORS)) {
-    result[fieldName] = extractor(visibleWords, imageMeta, rules);
+    const field = extractor(orderedWords, imageMeta, rules);
+    result[fieldName] = field;
+    if (field && field.value) {
+      console.log(`  ✓ [extractAll] ${fieldName}: "${field.value}" (conf: ${(field.confidence * 100).toFixed(0)}%)`);
+    } else {
+      console.log(`  ✗ [extractAll] ${fieldName}: null`);
+    }
   }
   return result;
 }

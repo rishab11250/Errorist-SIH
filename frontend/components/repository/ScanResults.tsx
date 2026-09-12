@@ -182,7 +182,7 @@ export function ScanResults({ rows, returnQuery }: ScanResultsProps) {
             <article
               key={row.scan_id}
               className={cn(
-                'bg-white rounded-kinetic border border-[#EBE5DB] border-l-4 p-4 shadow-sm space-y-3',
+                'bg-white rounded-kinetic p-4 shadow-sm space-y-3',
                 item.borderClass
               )}
             >

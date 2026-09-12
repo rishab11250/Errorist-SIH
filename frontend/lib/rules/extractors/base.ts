@@ -84,9 +84,23 @@ export function emptyField(name: string): ExtractedField {
   };
 }
 
+
 /**
- * Match a label in one line or a bounded window of following lines.
- * Faithful port of Python `extract_labeled_field` in extractors/base.py.
+ * Clean inline python flag prefix `(?i)` if present.
+ */
+export function compileRegex(pattern: string, defaultFlags = ''): RegExp {
+  let pat = pattern;
+  let flags = defaultFlags;
+  if (pat.startsWith('(?i)')) {
+    pat = pat.slice(4);
+    if (!flags.includes('i')) flags += 'i';
+  }
+  return new RegExp(pat, flags);
+}
+
+/**
+ * Match a label in one line, a bounded window of following lines, or across adjacent columns in a row.
+ * Handles both standard stacked layouts and multi-column tables (Label in Col 1, Value in Col 2).
  */
 export function extractLabeledField(
   words: OCRWord[],
@@ -97,14 +111,13 @@ export function extractLabeledField(
   }
 ): ExtractedField {
   const { name, pattern, maxFollowingLines = 2 } = options;
-  const regex = typeof pattern === 'string' ? new RegExp(pattern, 'i') : pattern;
-  const lines = groupWordsIntoLines(words);
+  const regex = typeof pattern === 'string' ? compileRegex(pattern, 'i') : pattern;
 
+  // Pass 1: Standard line window search
+  const lines = groupWordsIntoLines(words);
   for (let start = 0; start < lines.length; start++) {
     for (let following = 0; following <= maxFollowingLines; following++) {
-      if (start + following + 1 > lines.length) {
-        break;
-      }
+      if (start + following + 1 > lines.length) break;
       const selectedLines = lines.slice(start, start + following + 1);
       const selectedWords: OCRWord[] = [];
       for (const l of selectedLines) {
@@ -114,15 +127,12 @@ export function extractLabeledField(
       }
       const text = wordsToText(selectedWords);
       const match = regex.exec(text);
-      if (!match) {
-        continue;
-      }
+      if (!match) continue;
       const rawCaptured = match[1] ?? match[0];
       const value = rawCaptured.trim().replace(/^[\s:-]+|[\s:-]+$/g, '');
-      if (!value) {
-        continue;
-      }
+      if (!value) continue;
       const merged = mergeBboxes(selectedWords);
+      console.log(`[Extractor:${name}] Matched via line window: "${value}" (conf: ${avgConfidence(selectedWords).toFixed(2)})`);
       return {
         name,
         value,
@@ -132,18 +142,46 @@ export function extractLabeledField(
       };
     }
   }
-  return emptyField(name);
-}
 
-/**
- * Clean inline inline python flag prefix `(?i)` if present.
- */
-export function compileRegex(pattern: string, defaultFlags = ''): RegExp {
-  let pat = pattern;
-  let flags = defaultFlags;
-  if (pat.startsWith('(?i)')) {
-    pat = pat.slice(4);
-    if (!flags.includes('i')) flags += 'i';
+  // Pass 2: Spatial row search (handles multi-column layouts where Tesseract ordered by column blocks)
+  // Cluster words by horizontal center Y
+  const sorted = words.filter((w) => w.bbox && w.bbox[2] > 0 && w.bbox[3] > 0);
+  const rowBuckets: Array<{ cy: number; h: number; words: OCRWord[] }> = [];
+
+  for (const word of sorted) {
+    const cy = word.bbox[1] + word.bbox[3] / 2;
+    const h = word.bbox[3];
+    let matchedBucket = rowBuckets.find((b) => Math.abs(cy - b.cy) <= Math.max(b.h, h) * 0.7);
+    if (matchedBucket) {
+      matchedBucket.words.push(word);
+      matchedBucket.cy = matchedBucket.words.reduce((sum, w) => sum + (w.bbox[1] + w.bbox[3] / 2), 0) / matchedBucket.words.length;
+      matchedBucket.h = Math.max(...matchedBucket.words.map((w) => w.bbox[3]));
+    } else {
+      rowBuckets.push({ cy, h, words: [word] });
+    }
   }
-  return new RegExp(pat, flags);
+
+  rowBuckets.sort((a, b) => a.cy - b.cy);
+  for (const bucket of rowBuckets) {
+    bucket.words.sort((a, b) => a.bbox[0] - b.bbox[0]);
+    const rowText = wordsToText(bucket.words);
+    const match = regex.exec(rowText);
+    if (match) {
+      const rawCaptured = match[1] ?? match[0];
+      const value = rawCaptured.trim().replace(/^[\s:-]+|[\s:-]+$/g, '');
+      if (value) {
+        const merged = mergeBboxes(bucket.words);
+        console.log(`[Extractor:${name}] Matched via spatial row: "${value}" in row "${rowText}"`);
+        return {
+          name,
+          value,
+          bbox: merged,
+          confidence: avgConfidence(bucket.words),
+          evidence_spans: bucket.words.map((w) => w.bbox),
+        };
+      }
+    }
+  }
+
+  return emptyField(name);
 }

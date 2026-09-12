@@ -15,6 +15,7 @@ import {
   type RulesConfig,
   type ScanContext,
 } from './rules';
+import { assessPackageContent } from './rules/package-gate';
 import type { OCRLine, OCRWord } from './types';
 
 let worker: Worker | null = null;
@@ -416,7 +417,85 @@ export async function runOCR(
       });
     };
 
-    const words1 = parseWords(res1.data.words ?? []);
+    let words1 = parseWords(res1.data.words ?? []);
+    console.log(`[runOCR] Pass 1 finished: ${words1.length} tokens extracted.`);
+    const textPreview = words1.slice(0, 20).map((w) => w.text).join(' ');
+    console.log(`[runOCR] Sample tokens at 0°: "${textPreview}"`);
+
+    // --- AUTO-ORIENTATION CHECK (Recovery for sideways mobile captures) ---
+    const anchorCheck1 = assessPackageContent(words1);
+    console.log(`[runOCR] Packaging anchors found at 0°: [${anchorCheck1.anchorsFound.join(', ')}] (score: ${anchorCheck1.score})`);
+
+    let bestAnchorScore = anchorCheck1.anchorsFound.length * 50 + Math.min(words1.length, 50);
+    const needsOrientationCheck =
+      words1.length < 25 ||
+      anchorCheck1.anchorsFound.length === 0 ||
+      (width > height * 1.15 && anchorCheck1.anchorsFound.length < 2);
+
+    if (needsOrientationCheck) {
+      console.log('[runOCR] Low anchor yield or landscape aspect ratio. Testing 270° CCW and 90° CW auto-orientation...');
+      for (const testAngle of [270, 90] as const) {
+        try {
+          const rotCanvas = document.createElement('canvas');
+          rotCanvas.width = height;
+          rotCanvas.height = width;
+          const rCtx = rotCanvas.getContext('2d', { willReadFrequently: true });
+          if (!rCtx) continue;
+          rCtx.translate(rotCanvas.width / 2, rotCanvas.height / 2);
+          rCtx.rotate((testAngle * Math.PI) / 180);
+          rCtx.drawImage(imageElement, -width / 2, -height / 2);
+
+          const rotTarget = rotCanvas.toDataURL('image/jpeg', 0.88);
+          const rotRes = await activeWorker.recognize(rotTarget);
+          throwIfAborted(signal);
+
+          const rotWords: OCRWord[] = (rotRes.data.words ?? []).map((w) => {
+            const { x0, y0, x1, y1 } = w.bbox;
+            const rw = x1 - x0;
+            const rh = y1 - y0;
+            const nrx = x0 / rotCanvas.width;
+            const nry = y0 / rotCanvas.height;
+            const nrw = rw / rotCanvas.width;
+            const nrh = rh / rotCanvas.height;
+
+            let nox = nrx, noy = nry, now = nrw, noh = nrh;
+            if (testAngle === 270) {
+              nox = 1 - (nry + nrh);
+              noy = nrx;
+              now = nrh;
+              noh = nrw;
+            } else if (testAngle === 90) {
+              nox = nry;
+              noy = 1 - (nrx + nrw);
+              now = nrh;
+              noh = nrw;
+            }
+            return {
+              text: normalizePackagingLexicon(w.text),
+              confidence: w.confidence / 100,
+              bbox: [
+                Math.max(0, Math.min(1, nox)),
+                Math.max(0, Math.min(1, noy)),
+                Math.max(0, Math.min(1, now)),
+                Math.max(0, Math.min(1, noh)),
+              ] as [number, number, number, number],
+            };
+          });
+
+          const rotAnchors = assessPackageContent(rotWords);
+          const rotScore = rotAnchors.anchorsFound.length * 50 + Math.min(rotWords.length, 50);
+          console.log(`[runOCR] Rotation ${testAngle}° produced ${rotWords.length} words, anchors: [${rotAnchors.anchorsFound.join(', ')}], score: ${rotScore}`);
+
+          if (rotScore > bestAnchorScore) {
+            words1 = rotWords;
+            bestAnchorScore = rotScore;
+            console.log(`[runOCR] ✅ Auto-orientation selected ${testAngle}° as optimal orientation!`);
+          }
+        } catch (rotErr) {
+          console.warn(`[runOCR] Rotation test ${testAngle}° skipped:`, rotErr);
+        }
+      }
+    }
 
     // --- OPTIONAL PASS 2 RECOGNITION ---
     let words2: OCRWord[] = [];

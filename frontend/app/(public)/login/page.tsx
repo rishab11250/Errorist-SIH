@@ -20,25 +20,25 @@ function LoginContent() {
       <div className="fixed inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#f1e5d7] via-transparent to-transparent"></div>
 
       {/* Top System Header */}
-      <header className="w-full border-b border-[#e5ded4] bg-surface/90 backdrop-blur px-6 py-3 flex items-center justify-between z-10">
-        <Link href="/" className="flex items-center gap-2.5 font-heading font-bold text-sm text-ink group">
-          <span className="grid size-8 place-items-center overflow-hidden rounded-[7px] shadow-sm transition-transform group-hover:scale-105">
+      <header className="w-full border-b border-[#e5ded4] bg-surface/90 backdrop-blur px-4 sm:px-6 py-3 flex items-center justify-between z-10">
+        <Link href="/" className="flex items-center gap-2.5 font-heading font-bold text-sm text-ink group min-w-0">
+          <span className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-[7px] shadow-sm transition-transform group-hover:scale-105">
             <Image src="/icons/icon.svg" alt="CLAIR logo" width={32} height={32} className="size-full object-cover" priority />
           </span>
-          <span>
+          <span className="min-w-0">
             <span className="block font-heading text-sm font-bold tracking-tight text-ink">CLAIR</span>
-            <span className="block text-[10px] font-mono text-ink-muted -mt-0.5">Inspection Workspace</span>
+            <span className="block text-[10px] font-mono text-ink-muted -mt-0.5 truncate">Inspection Workspace</span>
           </span>
         </Link>
-        <div className="flex items-center gap-2 text-xs font-medium text-amberAccent font-mono">
+        <div className="hidden xs:flex items-center gap-2 text-xs font-medium text-amberAccent font-mono shrink-0">
           <span className="w-2 h-2 rounded-full bg-amberAccent animate-ping"></span>
           Field Terminal Gateway
         </div>
       </header>
 
       {/* Main Centered Card Container */}
-      <main className="flex-1 flex items-center justify-center p-6 z-10 my-auto">
-        <div className="w-full max-w-md bg-white border border-[#e8dfd3] rounded-[10px] shadow-[0_12px_32px_-8px_rgba(28,27,25,0.08)] p-8 relative overflow-hidden transition-all hover:shadow-[0_18px_40px_-10px_rgba(28,27,25,0.12)]">
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 z-10 my-auto">
+        <div className="w-full max-w-md bg-white border border-[#e8dfd3] rounded-[10px] shadow-[0_12px_32px_-8px_rgba(28,27,25,0.08)] p-5 sm:p-8 relative overflow-hidden transition-all hover:shadow-[0_18px_40px_-10px_rgba(28,27,25,0.12)]">
           {/* Angled Decorative Accent in Card Header */}
           <div className="absolute -top-12 -right-12 w-28 h-28 bg-[#faeee5] rounded-full blur-xl pointer-events-none"></div>
 

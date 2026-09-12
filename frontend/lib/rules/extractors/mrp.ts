@@ -1,11 +1,15 @@
 import type { ExtractedField, ImageMeta, OCRWord } from '../domain';
 import { avgConfidence, compileRegex, mergeBboxes } from './base';
+import { groupWordsIntoSpatialRows } from '../../spatial-layout';
 
 export const PRICE_PATTERN =
   /(?:(?:M\.?\s*R\.?\s*P\.?|Max(?:imum)?\.?\s*Retail\s*Price)\s*[:\-]?[₹$X\.\s]*(?:(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)?|(?:₹|Rs\.?|Rs|price)\s*[:\-]?[₹$X\.\s]*)([0-9,oOlI]+(?:\.[0-9,oOlI]{1,2})?)/i;
 
 export const MRP_PREFIX_BRANCH =
   /^(?:M\.?\s*R\.?\s*P\.?|Max(?:imum)?\.?\s*Retail\s*Price)\s*[:\-]?/i;
+
+export const STANDALONE_PRICE =
+  /\b(?:₹|Rs\.?|INR)?\s*([0-9]{1,5}(?:\.[0-9]{1,2})?)\b/i;
 
 export function extractMrp(
   ocrWords: OCRWord[],
@@ -18,9 +22,11 @@ export function extractMrp(
     priceWord: OCRWord;
     value: string;
     numeric: number;
+    evidenceWords?: OCRWord[];
   }> = [];
   const seenNumeric = new Set<number>();
 
+  // Pass 1: Standard sequential window search
   for (let i = 0; i < ocrWords.length; i++) {
     let sampleText = ocrWords
       .slice(i, Math.min(i + 4, ocrWords.length))
@@ -69,7 +75,44 @@ export function extractMrp(
     }
   }
 
+  // Pass 2: Spatial Row Search for Two-Column Layouts (Left: "M.R.P. ₹", Right: "20.00" / "100.00")
   if (candidates.length === 0) {
+    const spatialRows = groupWordsIntoSpatialRows(ocrWords);
+    for (const row of spatialRows) {
+      if (/m\.?r\.?p\.?|max(?:imum)?\s*retail\s*price/i.test(row.text)) {
+        console.log(`[extractMrp] Checking MRP spatial row: "${row.text}"`);
+        // Find price tokens in this row
+        for (let wIdx = 0; wIdx < row.words.length; wIdx++) {
+          const w = row.words[wIdx];
+          // Skip tokens that are unit prices (e.g. 0.61/g)
+          const isUnitPrice = /\/\s*(?:g|gm|kg|ml|l|unit|u|pc)\b|\bper\b|\busp\b/i.test(
+            row.words.slice(Math.max(0, wIdx - 1), wIdx + 3).map((item) => item.text).join(' ')
+          );
+          if (isUnitPrice) continue;
+
+          // Check if word itself or word sequence is a price
+          const priceMatch = STANDALONE_PRICE.exec(w.text.replace(/^[₹$]/, ''));
+          if (priceMatch) {
+            const cleanNum = priceMatch[1].replace(/o/gi, '0').replace(/[lI]/g, '1');
+            const num = parseFloat(cleanNum);
+            if (!isNaN(num) && num > 0 && num < 100000 && !seenNumeric.has(num)) {
+              seenNumeric.add(num);
+              candidates.push({
+                priceWord: w,
+                value: cleanNum,
+                numeric: num,
+                evidenceWords: row.words,
+              });
+              console.log(`[extractMrp] Found spatial candidate: ${cleanNum} in row "${row.text}"`);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (candidates.length === 0) {
+    console.log('[extractMrp] No MRP candidates found in evidence.');
     return {
       name: 'mrp',
       value: null,

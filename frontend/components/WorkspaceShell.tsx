@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Toaster } from '@/components/ui/toaster';
 import { SyncStatusIndicator } from '@/components/pwa/SyncStatusIndicator';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { cn } from '@/lib/cn';
 import { useAuth, type AuthUser } from '@/lib/auth';
 
@@ -126,13 +125,19 @@ function WorkspaceFrame({
   return (
     <div className="min-h-screen bg-surface text-ink antialiased flex flex-col selection:bg-terracotta selection:text-white">
       {/* Top System Telemetry Bar */}
-      <div className="w-full bg-surface text-ink-muted px-4 sm:px-6 py-2 flex items-center justify-between border-b border-border text-xs font-mono">
-        <div className="flex items-center space-x-2 text-[11px] sm:text-xs">
+      <div className="w-full bg-surface text-ink-muted px-4 sm:px-6 py-1.5 sm:py-2 flex items-center justify-between border-b border-border text-xs font-mono">
+        <div className="hidden sm:flex items-center space-x-2 text-[11px] sm:text-xs">
           <span className="w-2 h-2 rounded-full bg-forest animate-pulse"></span>
           <span className="text-ink font-mono">Analysis Engine Active // Rules 2011</span>
         </div>
-        <div className="text-[11px] sm:text-xs text-ink-muted font-mono">
-          Terminal: <strong className="text-ink uppercase">{user.username || 'admin'}</strong>
+        <div className="text-[11px] sm:text-xs text-ink-muted font-mono w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2">
+          <span className="sm:hidden flex items-center gap-1.5 text-forest font-medium text-[10px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-forest animate-pulse inline-block"></span>
+            Active
+          </span>
+          <span>
+            Terminal: <strong className="text-ink uppercase">{user.username || 'admin'}</strong>
+          </span>
         </div>
       </div>
 
@@ -156,7 +161,6 @@ function WorkspaceFrame({
                 <span className="block text-[11px] font-mono text-ink-muted">Inspection Workspace</span>
               </span>
             </Link>
-            <ThemeToggle />
           </div>
 
           <Navigation user={user} />
@@ -169,17 +173,16 @@ function WorkspaceFrame({
 
         {/* Main Content Area & Mobile Bar */}
         <div className="min-w-0 flex flex-col">
-          <div className="sticky top-0 z-40 flex min-h-14 items-center justify-between border-b border-[#EBE5DB] bg-surface/95 px-4 backdrop-blur md:hidden">
-            <Link href="/" className="flex min-h-11 items-center gap-2.5 font-heading font-bold text-sm text-ink">
+          <div className="sticky top-0 z-40 flex min-h-14 items-center justify-between border-b border-[#EBE5DB] bg-surface/95 px-3 sm:px-4 backdrop-blur md:hidden">
+            <Link href="/" className="flex min-h-11 items-center gap-2 font-heading font-bold text-sm text-ink shrink-0">
               <Image src="/icons/icon.svg" alt="CLAIR logo" width={26} height={26} className="size-6.5 rounded-[6px] object-cover" priority />
-              CLAIR
+              <span>CLAIR</span>
             </Link>
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <SyncStatusIndicator className="max-w-40 text-xs font-mono" />
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <SyncStatusIndicator className="max-w-28 sm:max-w-40 text-xs font-mono truncate" />
               <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="Open navigation" className="border-[#EBE5DB] bg-white">
+                  <Button variant="outline" size="icon" aria-label="Open navigation" className="border-[#EBE5DB] bg-white shrink-0 size-9">
                     <Menu aria-hidden="true" className="size-5 text-ink" />
                   </Button>
                 </DialogTrigger>

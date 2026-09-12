@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, Camera, CheckCircle2, Focus, RefreshCw, Sun, Zap } from 'lucide-react';
+import { AlertTriangle, Camera, CheckCircle2, Focus, ImageUp, RefreshCw, Sun, Zap } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,10 @@ export interface FrameQuality {
 interface Props {
   onCapture: (file: File) => void;
   disabled?: boolean;
+  onSwitchToUpload?: () => void;
 }
 
-export function CameraCaptureGuide({ onCapture, disabled }: Props) {
+export function CameraCaptureGuide({ onCapture, disabled, onSwitchToUpload }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -278,10 +279,12 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
 
   const statusColor =
     quality.status === 'ready'
-      ? 'border-emerald-400/60 text-emerald-300 bg-emerald-950/80 shadow-[0_0_15px_rgba(16,185,129,0.35)]'
-      : quality.status === 'blurry'
-        ? 'border-rose-400/60 text-rose-300 bg-rose-950/80 shadow-[0_0_15px_rgba(244,63,94,0.35)]'
-        : 'border-amber-400/60 text-amber-300 bg-amber-950/80 shadow-[0_0_15px_rgba(245,158,11,0.35)]';
+      ? 'border-2 border-emerald-400 bg-neutral-900/95 !text-emerald-100 font-bold shadow-[0_0_20px_rgba(52,211,153,0.6)]'
+      : quality.status === 'too_dark'
+        ? 'border-2 border-amber-400 bg-neutral-900/95 !text-amber-100 font-bold shadow-[0_0_25px_rgba(251,191,36,0.9)]'
+        : quality.status === 'too_bright' || quality.status === 'glare'
+          ? 'border-2 border-amber-400 bg-neutral-900/95 !text-amber-100 font-bold shadow-[0_0_25px_rgba(251,191,36,0.9)]'
+          : 'border-2 border-rose-400 bg-neutral-900/95 !text-rose-100 font-bold shadow-[0_0_20px_rgba(244,63,94,0.6)]';
 
   const frameBorderColor =
     quality.status === 'ready'
@@ -290,7 +293,7 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
         : 'border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.5)] ring-2 ring-emerald-400/30'
       : quality.status === 'blurry'
         ? 'border-rose-400/90 shadow-[0_0_15px_rgba(244,63,94,0.3)]'
-        : 'border-amber-400/90 shadow-[0_0_15px_rgba(245,158,11,0.3)]';
+        : 'border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.6)] ring-2 ring-amber-400/40';
 
   if (cameraError) {
     return (
@@ -314,26 +317,26 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
   return (
     <div className="relative mx-auto flex flex-col items-center overflow-hidden rounded-2xl bg-neutral-950 shadow-2xl border border-neutral-800">
       {/* Video Viewport */}
-      <div className="relative aspect-[4/3] w-full max-w-2xl overflow-hidden sm:aspect-[16/10] bg-black">
+      <div className="relative aspect-[3/4] xs:aspect-[4/3] w-full max-w-2xl overflow-hidden sm:aspect-[16/10] bg-black">
         <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
 
         {/* Ambient Dark Mask with Cutout Effect */}
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-between p-4 sm:p-6 bg-gradient-to-b from-black/60 via-transparent to-black/70">
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-between p-3 sm:p-6 bg-gradient-to-b from-black/60 via-transparent to-black/70">
           {/* Top Header Label */}
-          <div className="flex items-center gap-2 rounded-full border border-white/15 bg-black/75 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-neutral-200 backdrop-blur-md shadow-md">
-            <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-            Primary Declaration Panel Guide
+          <div className="flex items-center gap-1.5 sm:gap-2 rounded-full border border-white/15 bg-black/75 px-2.5 sm:px-3.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-200 backdrop-blur-md shadow-md">
+            <span className="size-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span>Declaration Panel Guide</span>
           </div>
 
           {/* Target Declaration Panel Frame */}
           <div
-            className={`relative aspect-[16/9] w-[88%] max-w-[500px] rounded-xl border-2 transition-all duration-300 backdrop-brightness-105 ${frameBorderColor}`}
+            className={`relative aspect-[16/9] w-[92%] sm:w-[88%] max-w-[500px] rounded-xl border-2 transition-all duration-300 backdrop-brightness-105 ${frameBorderColor}`}
           >
             {/* High-Tech Corner Reticles */}
-            <div className="absolute -left-1.5 -top-1.5 size-6 border-l-[3.5px] border-t-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
-            <div className="absolute -right-1.5 -top-1.5 size-6 border-r-[3.5px] border-t-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
-            <div className="absolute -bottom-1.5 -left-1.5 size-6 border-b-[3.5px] border-l-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
-            <div className="absolute -bottom-1.5 -right-1.5 size-6 border-b-[3.5px] border-r-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+            <div className="absolute -left-1.5 -top-1.5 size-5 sm:size-6 border-l-[3.5px] border-t-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+            <div className="absolute -right-1.5 -top-1.5 size-5 sm:size-6 border-r-[3.5px] border-t-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+            <div className="absolute -bottom-1.5 -left-1.5 size-5 sm:size-6 border-b-[3.5px] border-l-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
+            <div className="absolute -bottom-1.5 -right-1.5 size-5 sm:size-6 border-b-[3.5px] border-r-[3.5px] border-white drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
 
             {/* Subtle Crosshairs */}
             <div className="absolute left-1/2 top-2 h-2 w-px -translate-x-1/2 bg-white/40" />
@@ -343,8 +346,8 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
 
             {/* Central Helper Pill */}
             <div className="flex h-full flex-col items-center justify-center p-2 text-center">
-              <p className="rounded-full border border-white/10 bg-black/60 px-3 py-1 text-xs font-medium text-white/95 backdrop-blur-md shadow-sm">
-                Frame MRP, Net Qty & Mfg Info Here
+              <p className="rounded-full border border-white/10 bg-black/60 px-2.5 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-medium text-white/95 backdrop-blur-md shadow-sm">
+                Frame MRP, Net Qty &amp; Mfg Info Here
               </p>
             </div>
           </div>
@@ -352,23 +355,25 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
           {/* Dynamic Real-Time Status & Readiness Bar */}
           <div className="flex flex-col items-center gap-1.5">
             <div
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-semibold backdrop-blur-md transition-all duration-200 ${statusColor}`}
+              className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold backdrop-blur-md transition-all duration-200 ${statusColor}`}
             >
               {quality.status === 'ready' ? (
-                <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="size-4 sm:size-4.5 text-emerald-300 shrink-0" />
               ) : quality.status === 'too_dark' || quality.status === 'too_bright' ? (
-                <Sun className="size-4 text-amber-400 shrink-0" />
+                <Sun className="size-4 sm:size-4.5 text-amber-300 shrink-0" />
               ) : quality.status === 'glare' ? (
-                <Zap className="size-4 text-amber-400 shrink-0" />
+                <Zap className="size-4 sm:size-4.5 text-amber-300 shrink-0" />
               ) : (
-                <Focus className="size-4 text-rose-400 shrink-0" />
+                <Focus className="size-4 sm:size-4.5 text-rose-300 shrink-0" />
               )}
-              <span>{quality.message}</span>
+              <span className="!text-white font-bold tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                {quality.message}
+              </span>
             </div>
 
             {/* Auto-Snap Streak Indicator */}
             {autoCapture && quality.status === 'ready' ? (
-              <div className="flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300/90 backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-medium text-emerald-300/90 backdrop-blur-sm">
                 <span>Auto-snap lock:</span>
                 <div className="flex gap-1">
                   {[0, 1, 2].map((idx) => (
@@ -389,36 +394,51 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
       </div>
 
       {/* Camera Controls Bar */}
-      <div className="flex w-full items-center justify-between bg-neutral-950/95 px-4 py-3.5 text-white border-t border-neutral-800/80 backdrop-blur-sm">
-        <button
-          type="button"
-          onClick={() => setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'))}
-          className="rounded-full bg-neutral-900 border border-neutral-800 p-2.5 text-neutral-300 transition-all hover:bg-neutral-800 hover:text-white active:scale-95"
-          title="Switch camera"
-          aria-label="Switch camera front/back"
-        >
-          <RefreshCw className="size-5" />
-        </button>
+      <div className="flex w-full items-center justify-between gap-2 bg-neutral-950/95 px-2.5 sm:px-4 py-3 text-white border-t border-neutral-800/80 backdrop-blur-sm">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'))}
+            className="rounded-full bg-neutral-900 border border-neutral-800 p-2.5 text-neutral-300 transition-all hover:bg-neutral-800 hover:text-white active:scale-95 shrink-0"
+            title="Switch camera front/back"
+            aria-label="Switch camera front/back"
+          >
+            <RefreshCw className="size-4 sm:size-4.5" />
+          </button>
+          {onSwitchToUpload && (
+            <button
+              type="button"
+              onClick={onSwitchToUpload}
+              className="rounded-full bg-neutral-900 border border-neutral-800 p-2.5 text-neutral-300 transition-all hover:bg-neutral-800 hover:text-white active:scale-95 shrink-0"
+              title="Upload from Gallery / Files"
+              aria-label="Upload photo from gallery"
+            >
+              <ImageUp className="size-4 sm:size-4.5 text-terracotta" />
+            </button>
+          )}
+        </div>
 
         {/* Primary Capture Action */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Button
             type="button"
             size="lg"
             disabled={(!cameraActive || quality.status !== 'ready') && !canOverride}
             onClick={handleCapture}
-            className={`min-w-44 rounded-full px-6 py-6 text-base font-bold shadow-lg transition-all active:scale-98 ${
+            className={`min-w-32 sm:min-w-44 rounded-full px-3 sm:px-6 py-4 sm:py-6 text-xs sm:text-base font-bold shadow-lg transition-all active:scale-98 ${
               quality.status === 'ready'
                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/60 ring-2 ring-emerald-400/40'
                 : 'bg-primary hover:bg-primary/90 text-primary-foreground'
             }`}
           >
-            <Camera className="mr-2 size-5" />
-            {quality.status === 'ready'
-              ? 'Snap Declaration'
-              : canOverride
-                ? 'Capture anyway'
-                : 'Hold still…'}
+            <Camera className="mr-1.5 sm:mr-2 size-4 sm:size-5 shrink-0" />
+            <span className="truncate">
+              {quality.status === 'ready'
+                ? 'Snap Declaration'
+                : canOverride
+                  ? 'Capture anyway'
+                  : 'Hold still…'}
+            </span>
           </Button>
         </div>
 
@@ -426,7 +446,7 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
         <button
           type="button"
           onClick={() => setAutoCapture((prev) => !prev)}
-          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95 ${
+          className={`inline-flex items-center gap-1 sm:gap-1.5 rounded-full px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-semibold transition-all active:scale-95 shrink-0 ${
             autoCapture
               ? 'border border-emerald-500/60 bg-emerald-500/20 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
               : 'border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-300'
@@ -434,11 +454,24 @@ export function CameraCaptureGuide({ onCapture, disabled }: Props) {
           title="Auto-snap after 3 steady frames (~1.3s)"
           aria-label={`Toggle auto-snap (currently ${autoCapture ? 'on' : 'off'})`}
         >
-          <Zap className="size-3.5" />
-          <span className="hidden sm:inline">Auto-snap:</span>
+          <Zap className="size-3 sm:size-3.5" />
+          <span className="hidden xs:inline">Auto:</span>
           <span>{autoCapture ? 'ON' : 'OFF'}</span>
         </button>
       </div>
+
+      {onSwitchToUpload && (
+        <div className="flex items-center justify-between gap-3 px-4 py-2.5 bg-neutral-900 border-t border-neutral-800 w-full text-xs font-mono">
+          <span className="text-neutral-400 text-[11px] sm:text-xs">Have a saved photo?</span>
+          <button
+            type="button"
+            onClick={onSwitchToUpload}
+            className="text-terracotta hover:underline font-semibold flex items-center gap-1 text-[11px] sm:text-xs"
+          >
+            <ImageUp className="size-3.5" /> Choose from Gallery
+          </button>
+        </div>
+      )}
     </div>
   );
 }

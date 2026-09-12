@@ -15,13 +15,13 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
   return (
     <nav
       aria-label="Inspection result pages"
-      className="bg-white rounded-kinetic border border-[#EBE5DB] px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm"
+      className="bg-white rounded-kinetic border border-[#EBE5DB] px-4 py-3.5 sm:px-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 shadow-sm"
     >
-      <div className="text-xs font-mono text-kinetic-textMuted">
+      <div className="text-xs font-mono text-kinetic-textMuted text-center sm:text-left">
         Displaying <strong className="text-kinetic-charcoal">{start}–{end}</strong> of{' '}
         <strong className="text-kinetic-charcoal">{total}</strong> filtered records (Page {page} of {pages})
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
         <Button
           type="button"
           variant="outline"
@@ -31,7 +31,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         >
           Previous
         </Button>
-        <div className="inline-flex items-center px-3 py-1 rounded-kinetic-sm bg-kinetic-terracotta text-white font-mono text-xs font-bold shadow-sm">
+        <div className="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-kinetic-sm bg-kinetic-terracotta text-white font-mono text-xs font-bold shadow-sm whitespace-nowrap">
           Page {page} of {pages}
         </div>
         <Button

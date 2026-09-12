@@ -17,8 +17,19 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
+import { confirmProductMatch, linkProduct, rejectProductMatch } from '@/lib/api';
 import { apiFetch } from '@/lib/api-client';
-import type { OverallStatus, QualitySummary, ReviewAction, Verdict } from '@/lib/types';
+import { useOptionalAuth } from '@/lib/auth';
+import type {
+  OverallStatus,
+  ProductMatchCandidate,
+  ProductMatchStatus,
+  ProductSummary,
+  PreviousScan,
+  QualitySummary,
+  ReviewAction,
+  Verdict,
+} from '@/lib/types';
 
 import { AnnotatedEvidence } from './AnnotatedEvidence';
 import { QualityPanel } from './QualityPanel';
@@ -36,6 +47,11 @@ export interface InspectionResultData {
   processingStatus: 'processing' | 'complete' | 'failed';
   analysisVersion: string;
   reviewActions: ReviewAction[];
+  productId?: string | null;
+  productMatchStatus?: ProductMatchStatus;
+  product?: ProductSummary | null;
+  productCandidates?: ProductMatchCandidate[];
+  previousScan?: PreviousScan | null;
 }
 
 type ResultFilter = 'all' | 'attention' | 'pass';
@@ -83,12 +99,52 @@ export function InspectionResult({
   const [overallStatus, setOverallStatus] = useState<OverallStatus>(result.overallStatus);
   const [reviews, setReviews] = useState<ReviewAction[]>(result.reviewActions);
   const [showUnreliableReview, setShowUnreliableReview] = useState(false);
+  const [productState, setProductState] = useState({
+    id: result.productId ?? null,
+    status: result.productMatchStatus,
+    product: result.product ?? null,
+    candidates: result.productCandidates ?? [],
+  });
+  const [productBusy, setProductBusy] = useState(false);
+  const [productError, setProductError] = useState<string | null>(null);
+  const [manualProductId, setManualProductId] = useState('');
+  const auth = useOptionalAuth();
 
   useEffect(() => {
     setVerdicts(result.verdicts);
     setOverallStatus(result.overallStatus);
     setReviews(result.reviewActions);
+    setProductState({
+      id: result.productId ?? null,
+      status: result.productMatchStatus,
+      product: result.product ?? null,
+      candidates: result.productCandidates ?? [],
+    });
   }, [result]);
+
+  async function updateProduct(action: 'confirm' | 'reject' | 'link', productId?: string) {
+    setProductBusy(true);
+    setProductError(null);
+    try {
+      const response =
+        action === 'confirm' && productId
+          ? await confirmProductMatch(result.scanId, productId)
+          : action === 'reject'
+            ? await rejectProductMatch(result.scanId)
+            : await linkProduct(result.scanId, productId ?? manualProductId.trim());
+      setProductState({
+        id: response.scan.product_id ?? null,
+        status: response.scan.product_match_status,
+        product: response.scan.product ?? null,
+        candidates: response.scan.product_candidates ?? [],
+      });
+      setManualProductId('');
+    } catch (reason) {
+      setProductError(reason instanceof Error ? reason.message : 'The product relationship could not be updated.');
+    } finally {
+      setProductBusy(false);
+    }
+  }
 
   const isRetakeRecommended =
     result.quality.status === 'retake_recommended' || result.quality.status === 'unreadable';
@@ -291,6 +347,80 @@ export function InspectionResult({
           </Button>
         </div>
       </header>
+
+      {productState.status || productState.product || productState.candidates.length ? (
+        <section className="rounded-xl border border-[#E0D9CD] bg-surface-card p-5 shadow-kinetic-sm" aria-labelledby="product-history-heading">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-mono font-bold uppercase tracking-wider text-terracotta">Product identity</p>
+              <h2 id="product-history-heading" className="mt-1 font-heading text-lg font-bold text-ink">
+                {productState.product?.common_name || productState.product?.manufacturer || 'Product relationship'}
+              </h2>
+              <p className="mt-1 text-xs text-ink-muted">
+                {productState.status === 'suggested'
+                  ? 'This scan may belong to an existing product.'
+                  : productState.product
+                    ? `${productState.product.scan_count} scan${productState.product.scan_count === 1 ? '' : 's'} in product history.`
+                    : 'No product has been linked to this scan.'}
+              </p>
+            </div>
+            {productState.id ? (
+              <Button asChild variant="outline" className="border-[#D5CFC4] font-mono text-xs text-ink">
+                <Link href={`/products/${encodeURIComponent(productState.id)}`}>View product history</Link>
+              </Button>
+            ) : null}
+          </div>
+
+          {productState.product ? (
+            <dl className="mt-4 grid gap-3 text-xs sm:grid-cols-4">
+              {[
+                ['Manufacturer', productState.product.manufacturer],
+                ['Quantity', [productState.product.quantity, productState.product.unit].filter(Boolean).join(' ')],
+                ['Category', productState.product.category],
+                ['Latest scan', productState.product.latest_scan ? new Date(productState.product.latest_scan).toLocaleDateString() : null],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-lg border border-[#E0D9CD] bg-surface-dim p-3">
+                  <dt className="font-mono uppercase tracking-wider text-ink-muted">{label}</dt>
+                  <dd className="mt-1 font-semibold capitalize text-ink">{value || '—'}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+
+          {productState.status === 'suggested' && productState.candidates.length ? (
+            <div className="mt-4 space-y-2">
+              {productState.candidates.map((candidate) => (
+                <div key={candidate.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#E0D9CD] bg-surface-dim p-3 text-xs">
+                  <div>
+                    <p className="font-semibold text-ink">{candidate.common_name || candidate.manufacturer || candidate.id}</p>
+                    <p className="mt-1 text-ink-muted">
+                      {[candidate.manufacturer, candidate.quantity && `${candidate.quantity} ${candidate.unit ?? ''}`, candidate.category].filter(Boolean).join(' · ')}
+                      {candidate.similarity_score != null ? ` · ${Math.round(candidate.similarity_score * 100)}% match` : ''}
+                    </p>
+                  </div>
+                  <Button type="button" size="sm" disabled={productBusy} onClick={() => updateProduct('confirm', candidate.id)}>
+                    {productBusy ? 'Confirming…' : 'Confirm'}
+                  </Button>
+                </div>
+              ))}
+              <Button type="button" variant="outline" size="sm" disabled={productBusy} onClick={() => updateProduct('reject')}>
+                {productBusy ? 'Updating…' : 'Reject suggestion'}
+              </Button>
+            </div>
+          ) : null}
+
+          {auth?.user?.role === 'admin' && productState.id == null ? (
+            <form className="mt-4 flex flex-wrap gap-2" onSubmit={(event) => { event.preventDefault(); void updateProduct('link'); }}>
+              <label className="sr-only" htmlFor="manual-product-id">Product ID</label>
+              <input id="manual-product-id" value={manualProductId} onChange={(event) => setManualProductId(event.target.value)} placeholder="Product ID" className="min-h-9 rounded-lg border border-[#D5CFC4] bg-white px-3 text-xs font-mono" />
+              <Button type="submit" size="sm" disabled={productBusy || !manualProductId.trim()}>{productBusy ? 'Linking…' : 'Link product'}</Button>
+            </form>
+          ) : null}
+          {productError ? <p role="alert" className="mt-3 text-xs font-mono text-brick">{productError}</p> : null}
+        </section>
+      ) : null}
+
+      {result.previousScan ? <PreviousScanPanel previousScan={result.previousScan} /> : null}
 
       {/* OVERALL-STATUS HERO BANNER */}
       <section
@@ -703,5 +833,34 @@ export function InspectionResult({
         </section>
       </div>
     </div>
+  );
+}
+
+function PreviousScanPanel({ previousScan }: { previousScan: PreviousScan }) {
+  return (
+    <section className="rounded-xl border border-[#E0D9CD] bg-surface-card p-5 shadow-kinetic-sm" aria-labelledby="previous-scan-heading">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-mono font-bold uppercase tracking-wider text-terracotta">Re-scan comparison</p>
+          <h2 id="previous-scan-heading" className="mt-1 font-heading text-lg font-bold text-ink">Previous scan #{previousScan.scan_id}</h2>
+        </div>
+        <span className="text-xs font-mono text-ink-muted">{new Date(previousScan.scanned_at).toLocaleString()}</span>
+      </div>
+      {previousScan.comparison.length ? (
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {previousScan.comparison.map((item) => (
+            <div key={item.rule_id} className="flex items-center justify-between rounded-lg border border-[#E0D9CD] bg-surface-dim px-3 py-2 text-xs">
+              <span className="font-mono text-ink">{item.rule_id}</span>
+              <span className={cn(
+                'rounded-full px-2 py-0.5 font-mono font-semibold capitalize',
+                item.direction === 'improved' ? 'bg-forest-light text-forest' : item.direction === 'regressed' ? 'bg-brick-bg text-brick' : 'bg-white text-ink-muted'
+              )}>
+                {item.direction} · {item.status_before} → {item.status_after}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </section>
   );
 }

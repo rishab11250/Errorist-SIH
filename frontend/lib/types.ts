@@ -105,9 +105,60 @@ export interface ScanAnalysisResponse {
   verdicts: Verdict[];
   overall_status: OverallStatus;
   analysis_version: string;
+  product_id?: string | null;
+  product_match_status?: ProductMatchStatus;
+  product?: ProductSummary | null;
+  product_candidates?: ProductMatchCandidate[];
+  previous_scan?: PreviousScan | null;
 }
 
 export type ScanResponse = ScanAnalysisResponse;
+
+export type ProductMatchStatus =
+  | 'unmatched'
+  | 'suggested'
+  | 'confirmed'
+  | 'rejected'
+  | 'auto_matched';
+
+export interface ProductSummary {
+  id: string;
+  manufacturer: string | null;
+  common_name: string | null;
+  quantity: string | null;
+  unit: string | null;
+  category: ScanContext['category'] | null;
+  scan_count: number;
+  first_scan: string | null;
+  latest_scan: string | null;
+}
+
+export interface ProductMatchCandidate extends ProductSummary {
+  similarity_score?: number | null;
+}
+
+export interface PreviousScanComparison {
+  rule_id: string;
+  status_before: VerdictStatus;
+  status_after: VerdictStatus;
+  changed: boolean;
+  direction: 'improved' | 'regressed' | 'unchanged';
+}
+
+export interface PreviousScan {
+  scan_id: number;
+  scanned_at: string;
+  overall_status: OverallStatus;
+  comparison: PreviousScanComparison[];
+}
+
+export interface ProductHistoryResponse {
+  product: ProductSummary;
+  items: import('./operations').HistoryItem[];
+  page: number;
+  page_size: number;
+  total: number;
+}
 
 export interface StoredScanResponse {
   scan: {
@@ -123,6 +174,11 @@ export interface StoredScanResponse {
     quality_summary: QualitySummary;
     analysis_version: string;
     processing_error_code: string | null;
+    product_id?: string | null;
+    product_match_status?: ProductMatchStatus;
+    product?: ProductSummary | null;
+    product_candidates?: ProductMatchCandidate[];
+    previous_scan?: PreviousScan | null;
   };
   verdicts: Verdict[];
   review_actions: ReviewAction[];

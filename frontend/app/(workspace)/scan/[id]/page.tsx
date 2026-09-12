@@ -28,6 +28,11 @@ function cachedResult(scanId: number): InspectionResultData | null {
       processingStatus: value.processingStatus ?? 'complete',
       analysisVersion: value.analysisVersion ?? 'inspection-v2',
       reviewActions: value.reviewActions ?? [],
+      productId: value.productId,
+      productMatchStatus: value.productMatchStatus,
+      product: value.product,
+      productCandidates: value.productCandidates,
+      previousScan: value.previousScan,
     };
   } catch {
     sessionStorage.removeItem(`scan:${scanId}`);
@@ -62,6 +67,11 @@ export default function ScanResultPage() {
           processingStatus: data.scan.processing_status,
           analysisVersion: data.scan.analysis_version,
           reviewActions: data.review_actions ?? [],
+          productId: data.scan.product_id,
+          productMatchStatus: data.scan.product_match_status,
+          product: data.scan.product,
+          productCandidates: data.scan.product_candidates,
+          previousScan: data.scan.previous_scan,
         });
       })
       .catch((reason) => {

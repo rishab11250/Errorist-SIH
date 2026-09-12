@@ -106,6 +106,7 @@ class ScanRequest(BaseModel):
     scan_context: ScanContextIn = Field(default_factory=ScanContextIn)
     schema_version: Literal[1, 2] = 1
     ocr_lines: list[OCRLineIn] = Field(default_factory=list)
+    inspection_id: int | None = None
 
     @field_validator("ocr_payload")
     @classmethod
@@ -219,6 +220,81 @@ class OfflineScanSyncResponse(BaseModel):
     created: bool
 
 
+class ProductSummaryOut(BaseModel):
+    id: str
+    manufacturer: str | None = None
+    common_name: str | None = None
+    quantity: str | None = None
+    unit: str | None = None
+    category: str | None = None
+    scan_count: int = 0
+    first_scan: str | None = None
+    latest_scan: str | None = None
+
+
+class ProductCandidateOut(ProductSummaryOut):
+    similarity_score: float | None = None
+    score: float | None = None
+    product_id: str | None = None
+
+
+class RuleDeltaOut(BaseModel):
+    rule_id: str
+    status_before: str | None
+    status_after: str
+    changed: bool
+    direction: Literal["improved", "regressed", "unchanged"]
+    repeated_non_compliance: bool = False
+
+
+class HistoricalAlertOut(BaseModel):
+    type: str = "repeated_non_compliance"
+    message: str
+    recommended_action: str = "review_previous_inspection"
+
+
+class PreviousInspectionOut(BaseModel):
+    inspection_id: str
+    scanned_at: str
+    overall_status: str
+
+
+class PreviousScanOut(BaseModel):
+    scan_id: int
+    scanned_at: str
+    overall_status: str
+    comparison: list[RuleDeltaOut] = Field(default_factory=list)
+
+
+class InspectionCreateIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    company_name: str | None = Field(default=None, max_length=256)
+    location: str | None = Field(default=None, max_length=256)
+    notes: str | None = Field(default=None, max_length=2000)
+
+
+class InspectionSummaryOut(BaseModel):
+    product_count: int = 0
+    scan_count: int = 0
+    pass_count: int = 0
+    fail_count: int = 0
+    manual_review_count: int = 0
+    repeated_non_compliance_count: int = 0
+
+
+class InspectionOut(BaseModel):
+    id: int
+    owner_id: int
+    company_name: str | None
+    location: str | None
+    status: Literal["open", "completed", "cancelled"]
+    started_at: datetime
+    completed_at: datetime | None
+    notes: str | None
+    summary: InspectionSummaryOut | None = None
+
+
 class ScanAnalysisResponse(BaseModel):
     scan_id: int
     processing_status: Literal["processing", "complete", "failed"]
@@ -227,9 +303,19 @@ class ScanAnalysisResponse(BaseModel):
     verdicts: list[VerdictOut]
     overall_status: OverallStatusValue
     analysis_version: str
+    inspection_id: int | None = None
+    product_id: str | None = None
+    product_match_status: Literal["unmatched", "auto_matched", "suggested", "confirmed", "rejected"] = "unmatched"
+    product: ProductSummaryOut | None = None
+    product_candidates: list[ProductCandidateOut] = Field(default_factory=list)
+    previous_scan: PreviousScanOut | None = None
+    previous_inspection: PreviousInspectionOut | None = None
+    comparison: list[RuleDeltaOut] = Field(default_factory=list)
+    historical_alert: HistoricalAlertOut | None = None
 
 
 class ErrorResponse(BaseModel):
     error: str
     detail: str
     request_id: str
+

@@ -16,6 +16,7 @@ from app.dashboard_routes import router as dashboard_router
 from app.db import init_db
 from app.errors import install_error_handlers
 from app.exports.routes import router as exports_router
+from app.inspection_routes import router as inspection_router
 from app.models import HealthResponse
 from app.report_routes import router as report_router
 from app.reviews.routes import router as reviews_router
@@ -63,6 +64,7 @@ app.add_middleware(
 )
 
 app.include_router(scan_router)
+app.include_router(inspection_router)
 app.include_router(dashboard_router)
 app.include_router(report_router)
 app.include_router(auth_router)

@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Toaster } from '@/components/ui/toaster';
 import { SyncStatusIndicator } from '@/components/pwa/SyncStatusIndicator';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { cn } from '@/lib/cn';
 import { useAuth, type AuthUser } from '@/lib/auth';
 
@@ -161,7 +160,6 @@ function WorkspaceFrame({
                 <span className="block text-[11px] font-mono text-ink-muted">Inspection Workspace</span>
               </span>
             </Link>
-            <ThemeToggle />
           </div>
 
           <Navigation user={user} />
@@ -180,7 +178,6 @@ function WorkspaceFrame({
               <span>CLAIR</span>
             </Link>
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <ThemeToggle />
               <SyncStatusIndicator className="max-w-28 sm:max-w-40 text-xs font-mono truncate" />
               <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
                 <DialogTrigger asChild>
